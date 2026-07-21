@@ -20,10 +20,8 @@ public class UserPrincipal implements UserDetails {
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(long id, String usernameOrEmail, String password, Collection<SimpleGrantedAuthority> authorities) {
-    }
-
-    public UserPrincipal(Long id, String usernameOrEmail, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, String usernameOrEmail, String email, String password,
+            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.usernameOrEmail = usernameOrEmail;
         this.email = email;
@@ -33,15 +31,18 @@ public class UserPrincipal implements UserDetails {
 
     public static UserDetails create(User user) {
         // Create a collection of authorities (roles) for the user
-        Collection<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(user.getRole()));
+        Collection<SimpleGrantedAuthority> authorities = Collections
+                .singleton(new SimpleGrantedAuthority(user.getRole()));
 
         // Create a new UserPrincipal instance using the user's details
+        // (User only stores one combined usernameOrEmail field, so it's reused for
+        // both)
         return new UserPrincipal(
                 user.getId(),
                 user.getUsernameOrEmail(),
+                user.getUsernameOrEmail(),
                 user.getPassword(),
-                authorities
-        );
+                authorities);
     }
 
     public void setId(Long id) {
@@ -98,5 +99,4 @@ public class UserPrincipal implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
-
 }

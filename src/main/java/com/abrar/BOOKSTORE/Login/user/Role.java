@@ -2,11 +2,10 @@ package com.abrar.BOOKSTORE.Login.user;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import org.aspectj.bridge.Message;
 import org.springframework.security.core.GrantedAuthority;
 
 @Entity
-@Table(name="roles")
+@Table(name = "roles")
 public class Role implements GrantedAuthority {
 
     @Getter
