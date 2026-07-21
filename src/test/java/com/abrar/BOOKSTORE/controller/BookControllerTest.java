@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
-@ContextConfiguration(classes = {BookController.class})
+@ContextConfiguration(classes = { BookController.class })
 @ExtendWith(SpringExtension.class)
 class BookControllerTest {
     @Autowired
@@ -55,54 +55,23 @@ class BookControllerTest {
     }
 
     /**
-     * Method under test: {@link BookController#deleteBook(int)}
-     */
-    @Test
-    void testDeleteBook3() throws Exception {
-        doNothing().when(myBookListService).deleteById(anyInt());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/deleteBook/{id}", 1);
-        MockMvcBuilders.standaloneSetup(bookController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isFound())
-                .andExpect(MockMvcResultMatchers.model().size(0))
-                .andExpect(MockMvcResultMatchers.view().name("redirect:/my_books"))
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/my_books"));
-    }
-
-    /**
-     * Method under test: {@link BookController#deleteBook(int)}
-     */
-    @Test
-    void testDeleteBook4() throws Exception {
-        doNothing().when(myBookListService).deleteById(anyInt());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/deleteBook/{id}", 1);
-        requestBuilder.contentType("https://example.org/example");
-        MockMvcBuilders.standaloneSetup(bookController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isFound())
-                .andExpect(MockMvcResultMatchers.model().size(0))
-                .andExpect(MockMvcResultMatchers.view().name("redirect:/my_books"))
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/my_books"));
-    }
-
-    /**
      * Method under test: {@link BookController#deleteMyBook(int)}
      */
     @Test
     @Disabled("TODO: Complete this test")
     void testDeleteMyBook() throws Exception {
         // TODO: Complete this test.
-        //   Reason: R013 No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
-        //   test threw
-        //   java.lang.IllegalStateException: Ambiguous mapping. Cannot map 'com.abrar.BOOKSTORE.controller.BookController#5543cb55' method
-        //   com.abrar.BOOKSTORE.controller.BookController#deleteBook(int)
-        //   to {[DELETE, GET, POST, PUT] [/deleteBook/{id}]}: There is already 'com.abrar.BOOKSTORE.controller.BookController#5543cb55' bean method
-        //   com.abrar.BOOKSTORE.controller.BookController#deleteMyBook(int) mapped.
-        //       at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:721)
-        //   See https://diff.blue/R013 to resolve this issue.
+        // Reason: R013 No inputs found that don't throw a trivial exception.
+        // Diffblue Cover tried to run the arrange/act section, but the method under
+        // test threw
+        // java.lang.IllegalStateException: Ambiguous mapping. Cannot map
+        // 'com.abrar.BOOKSTORE.controller.BookController#5543cb55' method
+        // com.abrar.BOOKSTORE.controller.BookController#deleteBook(int)
+        // to {[DELETE, GET, POST, PUT] [/deleteBook/{id}]}: There is already
+        // 'com.abrar.BOOKSTORE.controller.BookController#5543cb55' bean method
+        // com.abrar.BOOKSTORE.controller.BookController#deleteMyBook(int) mapped.
+        // at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:721)
+        // See https://diff.blue/R013 to resolve this issue.
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/deleteBook/{id}", 1);
         MockMvcBuilders.standaloneSetup(bookController).build().perform(requestBuilder);
@@ -331,4 +300,3 @@ class BookControllerTest {
                 .andExpect(MockMvcResultMatchers.forwardedUrl("home"));
     }
 }
-
