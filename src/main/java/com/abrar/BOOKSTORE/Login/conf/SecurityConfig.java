@@ -8,6 +8,7 @@ package com.abrar.BOOKSTORE.Login.conf;
 
 //
 import com.abrar.BOOKSTORE.Login.jwt.JwtAuthorizationFilter;
+import com.abrar.BOOKSTORE.Login.jwt.JwtTokenProvider;
 import com.abrar.BOOKSTORE.Login.auth.JwtAuthenticationEntryPoint;
 import com.abrar.BOOKSTORE.Login.user.CustomUserDetailsService;
 import com.abrar.BOOKSTORE.Login.user.UserDetailsServiceWrapper;
@@ -35,7 +36,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     @Getter
     private final PasswordEncoder passwordEncoder;
-    private final JwtAuthorizationFilter jwtAuthorizationFilter;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -44,10 +45,10 @@ public class SecurityConfig {
     public SecurityConfig(
             UserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder,
-            JwtAuthorizationFilter jwtAuthorizationFilter) {
+            JwtTokenProvider jwtTokenProvider) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
-        this.jwtAuthorizationFilter = jwtAuthorizationFilter;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Bean
@@ -66,6 +67,11 @@ public class SecurityConfig {
     @Bean
     public UserDetailsServiceWrapper userDetailsServiceWrapper() {
         return new UserDetailsServiceWrapper(userDetailsService);
+    }
+
+    @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter() {
+        return new JwtAuthorizationFilter(jwtTokenProvider, userDetailsService);
     }
 
     @Bean
@@ -93,7 +99,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthorizationFilter, JwtAuthorizationFilter.class);
+                .addFilterBefore(jwtAuthorizationFilter(),
+                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

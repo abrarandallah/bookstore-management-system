@@ -3,6 +3,7 @@
 //getUserIdFromJWT extracts the user's ID from a JWT token.
 //validateToken checks the validity and integrity of a JWT token.
 package com.abrar.BOOKSTORE.Login.jwt;
+
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,9 +13,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
-
 
 @Service
 public class JwtTokenProvider {
@@ -50,6 +50,7 @@ public class JwtTokenProvider {
         }
         return null;
     }
+
     // Get the username from the token
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parser()
@@ -87,10 +88,9 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-         UserDetails userDetails = userDetailsService.loadUserByUsername(getUsernameFromToken(token));
-         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(getUsernameFromToken(token));
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
-
 
     public String generateToken(String username) {
         Date now = new Date();
