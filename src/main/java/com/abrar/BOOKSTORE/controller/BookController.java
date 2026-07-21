@@ -29,7 +29,7 @@ public class BookController {
         return "home";
     }
 
-    @PostMapping("/book_register")
+    @GetMapping("/book_register")
     public String BookRegister() {
         return "bookRegister";
     }
