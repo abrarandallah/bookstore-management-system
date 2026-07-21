@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.management.relation.Role;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,7 +24,6 @@ public class User implements UserDetails {
     private String password;
     @Getter
     private String role;
-
 
     public User() {
     }
@@ -88,17 +86,15 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //need to return user roles or authorities
-        return Collections.emptyList();    }
+        // need to return user roles or authorities
+        return Collections.emptyList();
+    }
 
     // i guess this field should go to User entity
     @Getter
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
