@@ -4,12 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import org.springframework.stereotype.Component;
 
 @Getter
-@Component
 @Entity
-@Table(name="MyBooks")
+@Table(name = "MyBooks")
 public class MyBookList {
 
     @Id
@@ -25,6 +23,7 @@ public class MyBookList {
         this.author = author;
         this.price = price;
     }
+
     public MyBookList() {
         super();
     }

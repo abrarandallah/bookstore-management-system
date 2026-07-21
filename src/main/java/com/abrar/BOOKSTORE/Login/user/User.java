@@ -29,6 +29,9 @@ public class User implements UserDetails {
     }
 
     public User(String username, String email, String encode, String roleUser) {
+        this.usernameOrEmail = username;
+        this.password = encode;
+        this.role = roleUser;
     }
 
     public User(long id, String usernameOrEmail, String password, String role) {
