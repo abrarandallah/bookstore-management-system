@@ -1,4 +1,7 @@
-﻿target/
+﻿# .gitignore
+.env
+run-local.sh
+target/
 .idea/
 *.iml
 .vscode/

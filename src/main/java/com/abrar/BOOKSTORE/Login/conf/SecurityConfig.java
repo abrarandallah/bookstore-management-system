@@ -10,7 +10,6 @@ import com.abrar.BOOKSTORE.Login.jwt.JwtAuthorizationFilter;
 import com.abrar.BOOKSTORE.Login.jwt.JwtTokenProvider;
 import com.abrar.BOOKSTORE.Login.auth.JwtAuthenticationEntryPoint;
 import com.abrar.BOOKSTORE.Login.user.CustomUserDetailsService;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,8 +33,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
-    @Getter
-    private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
@@ -44,10 +41,8 @@ public class SecurityConfig {
     @Autowired
     public SecurityConfig(
             UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder,
             JwtTokenProvider jwtTokenProvider) {
         this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
