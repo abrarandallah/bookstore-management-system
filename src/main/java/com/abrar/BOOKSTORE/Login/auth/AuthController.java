@@ -1,5 +1,6 @@
 package com.abrar.BOOKSTORE.Login.auth;
 //We use the AuthenticationManager to authenticate the user based on the provided credentials.
+
 //Upon successful authentication, we generate a JWT token using the JwtTokenProvider.
 //The token is then sent back in the response.
 
@@ -33,16 +34,16 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
 
     public AuthController(AuthenticationManager authenticationManager,
-                          JwtTokenProvider jwtTokenProvider,
-                          UserRepository userRepository,
-                          PasswordEncoder passwordEncoder) {
+            JwtTokenProvider jwtTokenProvider,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    //Here, SignupRequest and LoginRequest are DTOs (Data Transfer Objects) that
+    // Here, SignupRequest and LoginRequest are DTOs (Data Transfer Objects) that
     // represent the data sent in registration and login requests.
     @Autowired
     private AuthService authService;
@@ -52,14 +53,13 @@ public class AuthController {
         authService.registerUser(signupRequest);
         return ResponseEntity.ok(new ApiResponse(true, "User registered successfully."));
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsernameOrEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+                        loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -70,6 +70,5 @@ public class AuthController {
 
         return ResponseEntity.ok(new JwtAuthenticationResponse(token));
     }
-
 
 }
