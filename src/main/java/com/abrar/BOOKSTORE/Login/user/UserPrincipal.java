@@ -35,12 +35,10 @@ public class UserPrincipal implements UserDetails {
                 .singleton(new SimpleGrantedAuthority(user.getRole()));
 
         // Create a new UserPrincipal instance using the user's details
-        // (User only stores one combined usernameOrEmail field, so it's reused for
-        // both)
         return new UserPrincipal(
                 user.getId(),
                 user.getUsernameOrEmail(),
-                user.getUsernameOrEmail(),
+                user.getEmail(),
                 user.getPassword(),
                 authorities);
     }
