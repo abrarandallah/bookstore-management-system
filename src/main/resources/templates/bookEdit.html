@@ -28,6 +28,7 @@
 
 <div class="container my-5 p-5" style="border:1px solid black;">
     <h4 class="text-center">Edit Book Here</h4>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
     <form class="col-md-4 offset-md-4" th:action="@{/save}" method="post" th:object="${book}">
 
         <input type="hidden" name="id" th:value="${book.id}">
