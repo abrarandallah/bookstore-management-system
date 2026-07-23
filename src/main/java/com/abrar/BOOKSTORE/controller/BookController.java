@@ -80,7 +80,7 @@ public class BookController {
         return "redirect:/available_books";
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @PreAuthorize("hasRole('USER')") // Secure this endpoint for authenticated users
     public ResponseEntity<Book> getBookById(@PathVariable Long id) {
         // Your code to retrieve the book by ID
