@@ -1,8 +1,8 @@
 package com.abrar.BOOKSTORE.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doNothing;
@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.abrar.BOOKSTORE.entity.Book;
+import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import com.abrar.BOOKSTORE.repository.BookRepository;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ContextConfiguration(classes = {BookService.class})
+@ContextConfiguration(classes = { BookService.class })
 @ExtendWith(SpringExtension.class)
 class BookServiceTest {
     @MockBean
@@ -95,7 +96,7 @@ class BookServiceTest {
     void testGetBookById2() {
         Optional<Book> emptyResult = Optional.empty();
         when(bookRepository.findById(Mockito.<Integer>any())).thenReturn(emptyResult);
-        assertNull(bookService.getBookById(1));
+        assertThrows(ResourceNotFoundException.class, () -> bookService.getBookById(1));
         verify(bookRepository).findById(Mockito.<Integer>any());
     }
 
@@ -104,10 +105,19 @@ class BookServiceTest {
      */
     @Test
     void testDeleteById() {
+        when(bookRepository.existsById(Mockito.<Integer>any())).thenReturn(true);
         doNothing().when(bookRepository).deleteById(Mockito.<Integer>any());
         bookService.deleteById(1);
         verify(bookRepository).deleteById(Mockito.<Integer>any());
         assertTrue(bookService.getAllBook().isEmpty());
     }
-}
 
+    /**
+     * Method under test: {@link BookService#deleteById(int)}
+     */
+    @Test
+    void testDeleteByIdNotFound() {
+        when(bookRepository.existsById(Mockito.<Integer>any())).thenReturn(false);
+        assertThrows(ResourceNotFoundException.class, () -> bookService.deleteById(1));
+    }
+}

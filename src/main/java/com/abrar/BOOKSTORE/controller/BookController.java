@@ -91,13 +91,24 @@ public class BookController {
     @GetMapping("/{id:\\d+}")
     @PreAuthorize("hasRole('USER')") // Secure this endpoint for authenticated users
     public ResponseEntity<Book> getBookById(@PathVariable Long id) {
-        // Your code to retrieve the book by ID
-        Book book = service.getBookById(Math.toIntExact(id));
-        if (book != null) {
+        try {
+            Book book = service.getBookById(Math.toIntExact(id));
             return ResponseEntity.ok(book);
-        } else {
+        } catch (ResourceNotFoundException ex) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * Centralized handling for the MVC endpoints in this controller: rather than
+     * letting a missing book (unknown id, already deleted, etc.) surface as an
+     * unhandled 500 error / NullPointerException, send the user back to the book
+     * list with a friendly, flashed error message.
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public String handleResourceNotFound(ResourceNotFoundException ex, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        return "redirect:/available_books";
     }
 
 }

@@ -21,7 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ContextConfiguration(classes = {MyBookListService.class})
+@ContextConfiguration(classes = { MyBookListService.class })
 @ExtendWith(SpringExtension.class)
 class MyBookListServiceTest {
     @Autowired
@@ -74,10 +74,10 @@ class MyBookListServiceTest {
      */
     @Test
     void testDeleteById() {
+        when(myBookRepository.existsById(Mockito.<Integer>any())).thenReturn(true);
         doNothing().when(myBookRepository).deleteById(Mockito.<Integer>any());
         myBookListService.deleteById(1);
         verify(myBookRepository).deleteById(Mockito.<Integer>any());
         assertTrue(myBookListService.getAllMyBooks().isEmpty());
     }
 }
-

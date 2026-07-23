@@ -39,17 +39,20 @@ class BookControllerTest {
     private MyBookListService myBookListService;
 
     /**
-     * Method under test: {@link BookController#addBook(Book)}
+     * Method under test:
+     * {@link BookController#addBook(Book, org.springframework.validation.BindingResult, Model)}
      */
     @Test
     void testAddBook() throws Exception {
         doNothing().when(bookService).save(Mockito.<Book>any());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/save");
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/save")
+                .param("name", "Name")
+                .param("author", "JaneDoe")
+                .param("price", "19.99");
         MockMvcBuilders.standaloneSetup(bookController)
                 .build()
                 .perform(requestBuilder)
                 .andExpect(MockMvcResultMatchers.status().isFound())
-                .andExpect(MockMvcResultMatchers.model().size(0))
                 .andExpect(MockMvcResultMatchers.view().name("redirect:/available_books"))
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/available_books"));
     }
@@ -128,20 +131,43 @@ class BookControllerTest {
     }
 
     /**
-     * Method under test: {@link BookController#addBook(Book)}
+     * Method under test:
+     * {@link BookController#addBook(Book, org.springframework.validation.BindingResult, Model)}
      */
     @Test
     void testAddBook2() throws Exception {
         doNothing().when(bookService).save(Mockito.<Book>any());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/save");
-        requestBuilder.contentType("https://example.org/example");
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/save")
+                .param("name", "Name")
+                .param("author", "JaneDoe")
+                .param("price", "19.99")
+                .contentType("application/x-www-form-urlencoded");
         MockMvcBuilders.standaloneSetup(bookController)
                 .build()
                 .perform(requestBuilder)
                 .andExpect(MockMvcResultMatchers.status().isFound())
-                .andExpect(MockMvcResultMatchers.model().size(0))
                 .andExpect(MockMvcResultMatchers.view().name("redirect:/available_books"))
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/available_books"));
+    }
+
+    /**
+     * Method under test:
+     * {@link BookController#addBook(Book, org.springframework.validation.BindingResult, Model)}
+     * Verifies that submitting a book with blank fields is rejected instead of
+     * being saved.
+     */
+    @Test
+    void testAddBookRejectsInvalidData() throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/save")
+                .param("name", "")
+                .param("author", "")
+                .param("price", "not-a-number");
+        MockMvcBuilders.standaloneSetup(bookController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.model().attributeExists("error"))
+                .andExpect(MockMvcResultMatchers.view().name("bookRegister"));
     }
 
     /**
