@@ -1,0 +1,62 @@
+/* BookStore custom styles */
+
+body {
+    background-color: #f7f5f0;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+    font-weight: 600;
+    background-color: #212529;
+    color: #fff;
+}
+
+.form-panel {
+    background: #fff;
+    border: 1px solid #e3e1db;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.table-actions a {
+    text-decoration: none;
+}
+
+.table-actions a + a {
+    margin-left: 0.75rem;
+}
+
+.hero {
+    padding: 4rem 1rem;
+}
+
+.hero img {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    margin: 1.5rem 0;
+}
+
+.alert {
+    border-radius: 0.5rem;
+}
+
+.logout-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #fff;
+    text-decoration: none;
+}
+
+.logout-link:hover {
+    text-decoration: underline;
+}
