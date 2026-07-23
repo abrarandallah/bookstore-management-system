@@ -2,15 +2,19 @@ package com.abrar.BOOKSTORE.controller;
 
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.MyBookList;
+import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -41,7 +45,11 @@ public class BookController {
     }
 
     @PostMapping("/save")
-    public String addBook(@ModelAttribute Book b) {
+    public String addBook(@Valid @ModelAttribute("book") Book b, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("error", "Please correct the highlighted fields and try again.");
+            return "bookRegister";
+        }
         service.save(b);
         return "redirect:/available_books";
     }
