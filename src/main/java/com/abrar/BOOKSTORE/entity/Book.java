@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
@@ -12,8 +14,15 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @NotBlank(message = "Book name is required.")
     private String name;
+
+    @NotBlank(message = "Author name is required.")
     private String author;
+
+    @NotBlank(message = "Price is required.")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Price must be a positive number, e.g. 19.99.")
     private String price;
 
     public Book(int id, String name, String author, String price) {
