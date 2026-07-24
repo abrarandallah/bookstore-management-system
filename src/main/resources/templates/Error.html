@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Oops')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container mt-5 text-center">
+    <h2>Oops</h2>
+    <p th:text="${message} ?: 'Something went wrong.'">Something went wrong.</p>
+    <a class="btn btn-primary" href="/">Back to Home</a>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

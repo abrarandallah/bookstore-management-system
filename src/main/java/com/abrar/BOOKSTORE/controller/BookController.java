@@ -2,20 +2,17 @@ package com.abrar.BOOKSTORE.controller;
 
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.MyBookList;
-import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -34,6 +31,7 @@ public class BookController {
     }
 
     @GetMapping("/book_register")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public String BookRegister() {
         return "bookRegister";
     }
@@ -45,13 +43,37 @@ public class BookController {
     }
 
     @PostMapping("/save")
-    public String addBook(@Valid @ModelAttribute("book") Book b, BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            model.addAttribute("error", "Please correct the highlighted fields and try again.");
-            return "bookRegister";
+    @PreAuthorize("hasRole('LIBRARIAN')")
+    public String addBook(@ModelAttribute Book b, Model model) {
+        String error = validate(b);
+        if (error != null) {
+            model.addAttribute("error", error);
+            model.addAttribute("book", b);
+            // id is 0 for a brand-new book (never persisted), non-zero when editing
+            return b.getId() == 0 ? "bookRegister" : "bookEdit";
         }
         service.save(b);
         return "redirect:/available_books";
+    }
+
+    private String validate(Book b) {
+        if (b.getName() == null || b.getName().isBlank()) {
+            return "Book name is required.";
+        }
+        if (b.getAuthor() == null || b.getAuthor().isBlank()) {
+            return "Author is required.";
+        }
+        if (b.getPrice() == null || b.getPrice().isBlank()) {
+            return "Price is required.";
+        }
+        try {
+            if (new BigDecimal(b.getPrice().trim()).signum() < 0) {
+                return "Price cannot be negative.";
+            }
+        } catch (NumberFormatException ex) {
+            return "Price must be a valid number.";
+        }
+        return null;
     }
 
     @GetMapping("/my_books")
@@ -69,7 +91,8 @@ public class BookController {
         return "redirect:/my_books";
     }
 
-    @RequestMapping("/editBook/{id}")
+    @GetMapping("/editBook/{id}")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public String editBook(@PathVariable("id") int id, Model model) {
         Book b = service.getBookById(id);
         model.addAttribute("book", b);
@@ -77,6 +100,7 @@ public class BookController {
     }
 
     @RequestMapping("/deleteBook/{id}")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public String deleteBook(@PathVariable("id") int id) {
         service.deleteById(id);
         return "redirect:/available_books";
@@ -89,26 +113,15 @@ public class BookController {
     }
 
     @GetMapping("/{id:\\d+}")
-    @PreAuthorize("hasRole('USER')") // Secure this endpoint for authenticated users
+    @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')") // Secure this endpoint for authenticated users
     public ResponseEntity<Book> getBookById(@PathVariable Long id) {
-        try {
-            Book book = service.getBookById(Math.toIntExact(id));
+        // Your code to retrieve the book by ID
+        Book book = service.getBookById(Math.toIntExact(id));
+        if (book != null) {
             return ResponseEntity.ok(book);
-        } catch (ResourceNotFoundException ex) {
+        } else {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    /**
-     * Centralized handling for the MVC endpoints in this controller: rather than
-     * letting a missing book (unknown id, already deleted, etc.) surface as an
-     * unhandled 500 error / NullPointerException, send the user back to the book
-     * list with a friendly, flashed error message.
-     */
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public String handleResourceNotFound(ResourceNotFoundException ex, RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
-        return "redirect:/available_books";
     }
 
 }
