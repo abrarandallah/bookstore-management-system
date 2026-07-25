@@ -3,6 +3,7 @@ package com.abrar.BOOKSTORE.Login.user;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -20,6 +21,9 @@ public class User implements UserDetails {
     @Getter
     @Column(nullable = true, unique = true)
     private String usernameOrEmail;
+    @Getter
+    @Column(nullable = true, unique = true)
+    private String email;
     @Column(nullable = true)
     private String password;
     @Getter
@@ -30,6 +34,7 @@ public class User implements UserDetails {
 
     public User(String username, String email, String encode, String roleUser) {
         this.usernameOrEmail = username;
+        this.email = email;
         this.password = encode;
         this.role = roleUser;
     }
@@ -47,6 +52,10 @@ public class User implements UserDetails {
 
     public void setUsernameOrEmail(String usernameOrEmail) {
         this.usernameOrEmail = usernameOrEmail;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override
@@ -89,8 +98,12 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // need to return user roles or authorities
-        return Collections.emptyList();
+        // Mirrors UserPrincipal.create(): a single authority derived from the
+        // simple `role` string (e.g. "ROLE_USER" / "ROLE_LIBRARIAN").
+        if (role == null || role.isBlank()) {
+            return Collections.emptyList();
+        }
+        return Collections.singleton(new SimpleGrantedAuthority(role));
     }
 
     // i guess this field should go to User entity

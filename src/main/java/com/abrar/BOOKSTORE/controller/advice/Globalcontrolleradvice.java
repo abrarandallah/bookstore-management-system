@@ -1,5 +1,6 @@
 package com.abrar.BOOKSTORE.controller.advice;
 
+import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.ui.Model;
@@ -16,6 +17,16 @@ public class GlobalControllerAdvice {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleAccessDenied(Model model) {
         model.addAttribute("message", "You don't have permission to do that.");
+        return "error";
+    }
+
+    // Covers every MVC controller (editBook/{id}, deleteBook/{id}, mylist/{id},
+    // deleteMyBook/{id}, etc.) hitting a stale/missing id. myBookListController
+    // has its own narrower handler for its one route; this is the catch-all.
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNotFound(ResourceNotFoundException ex, Model model) {
+        model.addAttribute("message", ex.getMessage());
         return "error";
     }
 }
