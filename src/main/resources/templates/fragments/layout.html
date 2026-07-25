@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <!--/* One pinned Bootstrap version + FontAwesome + the site's own stylesheet, used everywhere. */-->
-    <th:block th:fragment="head(title)">
+    <th:block th:fragment="pageHead(title)">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title th:text="${title} + ' - BookStore'">BookStore</title>
