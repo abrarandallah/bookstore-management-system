@@ -13,6 +13,9 @@
                     <div class="alert alert-success" th:if="${param.registered != null}">
                         Account created successfully. Please log in.
                     </div>
+                    <div class="alert alert-success" th:if="${param.reset != null}">
+                        Your password has been reset. Please log in.
+                    </div>
                     <div class="alert alert-danger" th:if="${param.error != null}">
                         Invalid username/email or password.
                     </div>
@@ -26,6 +29,7 @@
                             <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Login</button>
+                        <a href="/forgot-password" class="ms-2">Forgot password?</a>
                     </form>
                 </div>
             </div>
