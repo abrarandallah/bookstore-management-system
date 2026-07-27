@@ -44,6 +44,4 @@ public class MyBookList {
         this.price = price;
     }
 
-    public void deleteById(int id) {
-    }
 }
