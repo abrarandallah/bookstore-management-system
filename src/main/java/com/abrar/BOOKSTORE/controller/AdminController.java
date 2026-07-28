@@ -29,9 +29,16 @@ public class AdminController {
         return "admin/users";
     }
 
+    private static final java.util.Set<String> VALID_ROLES = java.util.Set.of("ROLE_USER", "ROLE_LIBRARIAN");
+
     @PostMapping("/users/{id}/role")
     public String changeRole(@PathVariable long id, @RequestParam String role,
             Authentication authentication, Model model) {
+        if (!VALID_ROLES.contains(role)) {
+            model.addAttribute("error", "Invalid role.");
+            model.addAttribute("users", userRepository.findAll());
+            return "admin/users";
+        }
         User target = userRepository.findById(id).orElse(null);
         if (target == null) {
             return "redirect:/admin/users";
