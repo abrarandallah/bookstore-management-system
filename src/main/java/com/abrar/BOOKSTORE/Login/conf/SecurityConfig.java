@@ -19,7 +19,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -74,7 +73,12 @@ public class SecurityConfig {
         http
                 .cors(cors -> {
                 })
-                .csrf(AbstractHttpConfigurer::disable)
+                // The /api/** JSON endpoints authenticate via a Bearer token read from the
+                // Authorization header (see JwtTokenProvider.resolveToken) - never from a
+                // cookie - so they aren't vulnerable to CSRF and are exempted here. Every
+                // other route uses session-cookie auth via formLogin and needs CSRF
+                // protection, since that's what a forged cross-site request would ride on.
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/register", "/forgot-password", "/reset-password",
                                 "/api/auth/**",
