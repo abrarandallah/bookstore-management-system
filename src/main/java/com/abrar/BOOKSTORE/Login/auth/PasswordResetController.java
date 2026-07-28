@@ -4,6 +4,7 @@ import com.abrar.BOOKSTORE.Login.user.PasswordResetToken;
 import com.abrar.BOOKSTORE.Login.user.PasswordResetTokenRepository;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,8 @@ public class PasswordResetController {
     private EmailService emailService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RateLimiter rateLimiter;
 
     @GetMapping("/forgot-password")
     public String forgotPasswordForm() {
@@ -33,20 +36,25 @@ public class PasswordResetController {
     }
 
     @PostMapping("/forgot-password")
-    public String forgotPasswordSubmit(@RequestParam String usernameOrEmail, Model model) {
-        Optional<User> userOpt = userRepository.findByUsernameOrEmailOrEmail(usernameOrEmail);
-        if (userOpt.isPresent() && userOpt.get().getEmail() != null && !userOpt.get().getEmail().isBlank()) {
-            User user = userOpt.get();
-            // One active token per user: clear any previous one first.
-            tokenRepository.deleteByUser(user);
-            PasswordResetToken resetToken = new PasswordResetToken(UUID.randomUUID().toString(), user);
-            tokenRepository.save(resetToken);
-            emailService.sendPasswordResetEmail(user.getEmail(), resetToken.getToken());
+    public String forgotPasswordSubmit(@RequestParam String usernameOrEmail, HttpServletRequest request,
+            Model model) {
+        String clientIp = request.getRemoteAddr();
+        if (!rateLimiter.allow(clientIp)) {
+            model.addAttribute("error", "Too many reset attempts. Please try again in a few minutes.");
+            return "forgotPassword";
         }
-        // Same message whether or not the account exists, so this can't be used
-        // to check which usernames/emails are registered.
-        model.addAttribute("message",
-                "If an account with that username or email exists, we've sent a password reset link to it.");
+        Optional<User> userOpt = userRepository.findByUsernameOrEmailOrEmail(usernameOrEmail);
+        if (userOpt.isEmpty() || userOpt.get().getEmail() == null || userOpt.get().getEmail().isBlank()) {
+            model.addAttribute("error", "No account found with that username or email.");
+            return "forgotPassword";
+        }
+        User user = userOpt.get();
+        // One active token per user: clear any previous one first.
+        tokenRepository.deleteByUser(user);
+        PasswordResetToken resetToken = new PasswordResetToken(UUID.randomUUID().toString(), user);
+        tokenRepository.save(resetToken);
+        emailService.sendPasswordResetEmail(user.getEmail(), resetToken.getToken());
+        model.addAttribute("message", "A password reset link has been sent to " + user.getEmail() + ".");
         return "forgotPassword";
     }
 
