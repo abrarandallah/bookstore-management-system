@@ -44,17 +44,19 @@ public class PasswordResetController {
             return "forgotPassword";
         }
         Optional<User> userOpt = userRepository.findByUsernameOrEmailOrEmail(usernameOrEmail);
-        if (userOpt.isEmpty() || userOpt.get().getEmail() == null || userOpt.get().getEmail().isBlank()) {
-            model.addAttribute("error", "No account found with that username or email.");
-            return "forgotPassword";
+        if (userOpt.isPresent() && userOpt.get().getEmail() != null && !userOpt.get().getEmail().isBlank()) {
+            User user = userOpt.get();
+            // One active token per user: clear any previous one first.
+            tokenRepository.deleteByUser(user);
+            PasswordResetToken resetToken = new PasswordResetToken(UUID.randomUUID().toString(), user);
+            tokenRepository.save(resetToken);
+            emailService.sendPasswordResetEmail(user.getEmail(), resetToken.getToken());
         }
-        User user = userOpt.get();
-        // One active token per user: clear any previous one first.
-        tokenRepository.deleteByUser(user);
-        PasswordResetToken resetToken = new PasswordResetToken(UUID.randomUUID().toString(), user);
-        tokenRepository.save(resetToken);
-        emailService.sendPasswordResetEmail(user.getEmail(), resetToken.getToken());
-        model.addAttribute("message", "A password reset link has been sent to " + user.getEmail() + ".");
+        // Same message whether or not the account exists, so this can't be used
+        // to enumerate registered usernames/emails. Rate limiting above is what
+        // keeps this endpoint from being abused for spam/enumeration attempts.
+        model.addAttribute("message",
+                "If an account with that username or email exists, we've sent a password reset link to it.");
         return "forgotPassword";
     }
 
