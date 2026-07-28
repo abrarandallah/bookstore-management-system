@@ -4,8 +4,10 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
+<main class="page-body">
 <div class="container my-5 p-5 form-panel" style="max-width: 600px;">
-    <h4 class="text-center">New Book Register</h4>
+    <span class="eyebrow d-block text-center mb-2">New entry</span>
+    <h4 class="text-center">Register a Book</h4>
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
     <form th:action="@{/save}" method="post" th:object="${book}">
         <div class="mb-3">
@@ -27,7 +29,9 @@
         </div>
     </form>
 </div>
+</main>
 
+<div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

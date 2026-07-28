@@ -4,36 +4,40 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
-<div class="container mt-5">
+<main class="page-body">
+<div class="container mt-5 mb-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">Register</div>
-                <div class="card-body">
-                    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
-                    <form th:action="@{/register}" th:object="${signupRequest}" method="post">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username"
-                                   th:value="${signupRequest?.username}" placeholder="Enter your username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email"
-                                   th:value="${signupRequest?.email}" placeholder="Enter your email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Register</button>
-                    </form>
-                </div>
+        <div class="col-md-5">
+            <div class="auth-card p-4">
+                <h4>Create an account</h4>
+                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+                <form th:action="@{/register}" th:object="${signupRequest}" method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               th:value="${signupRequest?.username}" placeholder="Enter your username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               th:value="${signupRequest?.email}" placeholder="Enter your email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                    <div class="text-center mt-3">
+                        <a href="/login">Already have an account? Log in</a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
+</main>
 
+<div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

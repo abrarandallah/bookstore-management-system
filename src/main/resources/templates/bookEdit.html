@@ -4,7 +4,9 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
+<main class="page-body">
 <div class="container my-5 p-5 form-panel" style="max-width: 600px;">
+    <span class="eyebrow d-block text-center mb-2">Editing</span>
     <h4 class="text-center">Edit Book</h4>
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
     <form th:action="@{/save}" method="post" th:object="${book}">
@@ -29,7 +31,9 @@
         </div>
     </form>
 </div>
+</main>
 
+<div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <!--/* One pinned Bootstrap version + FontAwesome + the site's own stylesheet, used everywhere. */-->
+    <!--/* One pinned Bootstrap version (layout/grid only) + the site's own design system on top. */-->
     <th:block th:fragment="pageHead(title)">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title th:text="${title} + ' - BookStore'">BookStore</title>
         <link rel="icon" type="image/svg+xml" th:href="@{/img/favicon.svg}">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Courier+Prime&display=swap" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
               integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -21,9 +24,12 @@
     </th:block>
 </head>
 <body>
-    <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav th:fragment="navbar" class="navbar navbar-expand-lg site-header">
         <div class="container-fluid">
-            <a class="navbar-brand text-white" href="/">BookStore</a>
+            <a class="navbar-brand" href="/">
+                <i class="fa-solid fa-feather-pointed brand-mark"></i>
+                <span>BookStore</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -31,29 +37,29 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link text-white" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link text-white" href="/available_books">Available Books</a>
+                        <a class="nav-link" href="/available_books">Available Books</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link text-white" href="/my_books">My Books</a>
+                        <a class="nav-link" href="/my_books">My Books</a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('LIBRARIAN')">
-                        <a class="nav-link text-white" href="/book_register">New Book Register</a>
+                        <a class="nav-link" href="/book_register">New Book Register</a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('LIBRARIAN')">
-                        <a class="nav-link text-white" href="/admin/users">Admin</a>
+                        <a class="nav-link" href="/admin/users">Admin</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav mb-2 mb-lg-0">
                     <li class="nav-item" sec:authorize="isAnonymous()">
-                        <a class="nav-link text-white" href="/login">Login</a>
+                        <a class="nav-link" href="/login">Login</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAnonymous()">
-                        <a class="nav-link text-white" href="/register">Register</a>
+                        <a class="nav-link" href="/register">Register</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link text-white" href="/profile">Profile</a>
+                        <a class="nav-link" href="/profile">Profile</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
                         <form th:action="@{/logout}" method="post" class="px-3">
@@ -64,5 +70,19 @@
             </div>
         </div>
     </nav>
+
+    <footer th:fragment="footer" class="site-footer">
+        <div class="container d-flex flex-wrap justify-content-between gap-3">
+            <div>
+                <i class="fa-solid fa-feather-pointed brand-mark"></i>
+                <strong>BookStore</strong> — every book has a spine, every spine tells you something.
+            </div>
+            <div>
+                <a href="/">Home</a>
+                <span class="mx-2">·</span>
+                <a href="/available_books">Available Books</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
