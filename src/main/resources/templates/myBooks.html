@@ -20,10 +20,12 @@
             <td th:text="${b.author}"></td>
             <td th:text="${b.price}"></td>
             <td>
-                <a style="color:red" th:href="@{/deleteMyBook/{id}(id=${b.id})}"
-                   onclick="return confirm('Remove this book from your list?');">
-                    <i class="btn-sm fa-solid fa-trash ms-4"></i>
-                </a>
+                <form th:action="@{/deleteMyBook/{id}(id=${b.id})}" method="post"
+                      onsubmit="return confirm('Remove this book from your list?');">
+                    <button type="submit" class="btn btn-link p-0" style="color:red;">
+                        <i class="btn-sm fa-solid fa-trash ms-4"></i>
+                    </button>
+                </form>
             </td>
         </tr>
         </tbody>

@@ -20,14 +20,19 @@
             <td th:text="${b.author}"></td>
             <td th:text="${b.price}"></td>
             <td class="table-actions">
-                <a class="btn btn-secondary btn-sm" th:href="@{/mylist/{id}(id=${b.id})}">Add To My books</a>
+                <form th:action="@{/mylist/{id}(id=${b.id})}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-secondary btn-sm">Add To My books</button>
+                </form>
                 <a style="color:blue" th:href="@{/editBook/{id}(id=${b.id})}" sec:authorize="hasRole('LIBRARIAN')">
                     <i class="fa-solid fa-pen-to-square ms-4"></i>
                 </a>
-                <a style="color:red" th:href="@{/deleteBook/{id}(id=${b.id})}" sec:authorize="hasRole('LIBRARIAN')"
-                   onclick="return confirm('Delete this book? This cannot be undone.');">
-                    <i class="fa-solid fa-trash ms-4"></i>
-                </a>
+                <form th:action="@{/deleteBook/{id}(id=${b.id})}" method="post" class="d-inline"
+                      sec:authorize="hasRole('LIBRARIAN')"
+                      onsubmit="return confirm('Delete this book? This cannot be undone.');">
+                    <button type="submit" class="btn btn-link p-0 ms-4" style="color:red;">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
             </td>
         </tr>
         </tbody>

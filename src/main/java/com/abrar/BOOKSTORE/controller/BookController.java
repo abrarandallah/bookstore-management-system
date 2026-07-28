@@ -83,7 +83,10 @@ public class BookController {
         return "myBooks";
     }
 
-    @RequestMapping("/mylist/{id}")
+    // POST-only (not GET): these mutate data, and only state-changing methods
+    // are covered by CSRF protection. A GET link here would be triggerable by
+    // an <img>/prefetch/bookmark from anywhere, CSRF token or not.
+    @PostMapping("/mylist/{id}")
     public String getMylist(@PathVariable("id") int id) {
         Book b = service.getBookById(id);
         MyBookList mb = new MyBookList(b.getId(), b.getName(), b.getAuthor(), b.getPrice());
@@ -99,14 +102,14 @@ public class BookController {
         return "bookEdit";
     }
 
-    @RequestMapping("/deleteBook/{id}")
+    @PostMapping("/deleteBook/{id}")
     @PreAuthorize("hasRole('LIBRARIAN')")
     public String deleteBook(@PathVariable("id") int id) {
         service.deleteById(id);
         return "redirect:/available_books";
     }
 
-    @RequestMapping("/deleteMyBook/{id}")
+    @PostMapping("/deleteMyBook/{id}")
     public String deleteMyBook(@PathVariable("id") int id) {
         myBookService.deleteById(id);
         return "redirect:/available_books";
