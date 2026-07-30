@@ -19,11 +19,13 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -73,12 +75,14 @@ public class SecurityConfig {
         http
                 .cors(cors -> {
                 })
-                // The /api/** JSON endpoints authenticate via a Bearer token read from the
-                // Authorization header (see JwtTokenProvider.resolveToken) - never from a
-                // cookie - so they aren't vulnerable to CSRF and are exempted here. Every
-                // other route uses session-cookie auth via formLogin and needs CSRF
-                // protection, since that's what a forged cross-site request would ride on.
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+                .csrf(AbstractHttpConfigurer::disable)
+                // Without this, browsers send the full page URL - including anything in
+                // the query string, like the password-reset token - as a Referer header
+                // to every external resource the page loads (our Bootstrap/FontAwesome
+                // CDNs). no-referrer strips that entirely, for every page on the site.
+                .headers(headers -> headers.referrerPolicy(
+                        referrer -> referrer.policy(
+                                org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/register", "/forgot-password", "/reset-password",
                                 "/api/auth/**",
