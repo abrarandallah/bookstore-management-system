@@ -26,6 +26,8 @@ public class User implements UserDetails {
     private String password;
     @Getter
     private String role;
+    @Getter
+    private String avatarUrl;
 
     public User() {
     }
@@ -72,6 +74,10 @@ public class User implements UserDetails {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     @Override
