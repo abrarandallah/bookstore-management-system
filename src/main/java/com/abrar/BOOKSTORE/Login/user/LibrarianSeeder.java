@@ -8,9 +8,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-// Role/RoleRepository still aren't wired into the auth flow (see User.getRole()),
-// so this seeds the one librarian account via the same simple `role` string the
-// rest of the app uses. Replace with a real admin flow if/when one exists.
+// Seeds the one librarian account via the simple `role` string field on
+// User. There's now a real admin panel (/admin/users) for promoting other
+// users afterward - this just handles the bootstrap problem of getting the
+// very first librarian in.
 @Component
 public class LibrarianSeeder implements CommandLineRunner {
 

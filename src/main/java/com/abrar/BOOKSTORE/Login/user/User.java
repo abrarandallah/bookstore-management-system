@@ -8,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -104,15 +102,5 @@ public class User implements UserDetails {
             return Collections.emptyList();
         }
         return Collections.singleton(new SimpleGrantedAuthority(role));
-    }
-
-    // i guess this field should go to User entity
-    @Getter
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
     }
 }
