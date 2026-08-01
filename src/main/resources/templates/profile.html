@@ -1,18 +1,36 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: pageHead('Profile')}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-7">
             <div class="card">
-                <div class="card-header">User Profile</div>
+                <div class="card-body text-center py-4">
+                    <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width:72px;height:72px;font-size:1.75rem;"
+                         th:text="${#strings.toUpperCase(#strings.substring(user.username,0,1))}">U</div>
+                    <h5 class="mb-1" th:text="${user.username}"></h5>
+                    <p class="text-muted mb-2" th:text="${user.email}"></p>
+                    <span class="badge" th:classappend="${user.role == 'ROLE_LIBRARIAN'} ? 'bg-dark' : 'bg-secondary'"
+                          th:text="${user.role == 'ROLE_LIBRARIAN'} ? 'Librarian' : 'Reader'"></span>
+                </div>
+            </div>
+
+            <div class="card mt-3">
                 <div class="card-body">
-                    <p th:text="'Username: ' + ${user.username}"></p>
-                    <p th:text="'Email: ' + ${user.email}"></p>
-                    <p th:text="'Role: ' + ${user.role}"></p>
+                    <h6 class="card-title mb-3">Quick links</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="/available_books" class="btn btn-outline-secondary btn-sm">Browse Books</a>
+                        <a href="/my_books" class="btn btn-outline-secondary btn-sm">My Books</a>
+                        <a href="/forgot-password" class="btn btn-outline-secondary btn-sm">Change Password</a>
+                        <a href="/book_register" class="btn btn-outline-secondary btn-sm"
+                           sec:authorize="hasRole('LIBRARIAN')">Register a Book</a>
+                        <a href="/admin/users" class="btn btn-outline-secondary btn-sm"
+                           sec:authorize="hasRole('LIBRARIAN')">Manage Users</a>
+                    </div>
                 </div>
             </div>
         </div>

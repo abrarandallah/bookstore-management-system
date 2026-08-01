@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: pageHead('Manage Users')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Manage Users</h4>
+            <p class="text-muted mb-0">Promote readers to librarian, or reset anyone's password.</p>
+        </div>
+    </div>
+
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <div class="alert alert-success" th:if="${message}" th:text="${message}"></div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+            <div class="card text-center py-3">
+                <div class="fs-3 fw-bold" th:text="${#lists.size(users)}">0</div>
+                <div class="text-muted small">Total users</div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card text-center py-3">
+                <div class="fs-3 fw-bold" th:text="${#lists.size(users.?[role == 'ROLE_LIBRARIAN'])}">0</div>
+                <div class="text-muted small">Librarians</div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card text-center py-3">
+                <div class="fs-3 fw-bold" th:text="${#lists.size(users.?[role == 'ROLE_USER'])}">0</div>
+                <div class="text-muted small">Readers</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Change Role</th>
+                <th>Reset Password</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${users}">
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center"
+                             style="width:32px;height:32px;font-size:0.85rem;flex-shrink:0;"
+                             th:text="${#strings.toUpperCase(#strings.substring(u.username,0,1))}">U</div>
+                        <span th:text="${u.username}"></span>
+                    </div>
+                </td>
+                <td th:text="${u.email}"></td>
+                <td>
+                    <span class="badge" th:classappend="${u.role == 'ROLE_LIBRARIAN'} ? 'bg-dark' : 'bg-secondary'"
+                          th:text="${u.role == 'ROLE_LIBRARIAN'} ? 'Librarian' : 'Reader'"></span>
+                </td>
+                <td>
+                    <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" class="d-flex gap-2">
+                        <select name="role" class="form-select form-select-sm" style="width: auto;">
+                            <option value="ROLE_USER" th:selected="${u.role == 'ROLE_USER'}">Reader</option>
+                            <option value="ROLE_LIBRARIAN" th:selected="${u.role == 'ROLE_LIBRARIAN'}">Librarian</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Save</button>
+                    </form>
+                </td>
+                <td>
+                    <form th:action="@{/admin/users/{id}/reset-password(id=${u.id})}" method="post" class="d-flex gap-2">
+                        <input type="password" name="newPassword" class="form-control form-control-sm"
+                               placeholder="New password" minlength="8" required style="width: 160px;">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Reset</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
