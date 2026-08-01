@@ -21,8 +21,7 @@ public class GlobalControllerAdvice {
     }
 
     // Covers every MVC controller (editBook/{id}, deleteBook/{id}, mylist/{id},
-    // deleteMyBook/{id}, etc.) hitting a stale/missing id. myBookListController
-    // has its own narrower handler for its one route; this is the catch-all.
+    // deleteMyBook/{id}, etc.) hitting a stale/missing id.
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFound(ResourceNotFoundException ex, Model model) {
