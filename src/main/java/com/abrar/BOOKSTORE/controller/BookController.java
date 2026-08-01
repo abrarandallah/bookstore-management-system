@@ -1,5 +1,7 @@
 package com.abrar.BOOKSTORE.controller;
 
+import com.abrar.BOOKSTORE.Login.user.User;
+import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.MyBookList;
 import com.abrar.BOOKSTORE.service.BookService;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -24,6 +27,13 @@ public class BookController {
     private BookService service;
     @Autowired
     private MyBookListService myBookService;
+    @Autowired
+    private UserRepository userRepository;
+
+    private User currentUser(Principal principal) {
+        return userRepository.findByUsernameOrEmail(principal.getName())
+                .orElseThrow(() -> new IllegalStateException("Logged-in user not found: " + principal.getName()));
+    }
 
     @GetMapping("/")
     public String home() {
@@ -77,8 +87,8 @@ public class BookController {
     }
 
     @GetMapping("/my_books")
-    public String getMyBooks(Model model) {
-        List<MyBookList> list = myBookService.getAllMyBooks();
+    public String getMyBooks(Model model, Principal principal) {
+        List<MyBookList> list = myBookService.getMyBooks(currentUser(principal));
         model.addAttribute("book", list);
         return "myBooks";
     }
@@ -87,10 +97,13 @@ public class BookController {
     // are covered by CSRF protection. A GET link here would be triggerable by
     // an <img>/prefetch/bookmark from anywhere, CSRF token or not.
     @PostMapping("/mylist/{id}")
-    public String getMylist(@PathVariable("id") int id) {
-        Book b = service.getBookById(id);
-        MyBookList mb = new MyBookList(b.getId(), b.getName(), b.getAuthor(), b.getPrice());
-        myBookService.saveMyBooks(mb);
+    public String getMylist(@PathVariable("id") int id, Principal principal) {
+        User user = currentUser(principal);
+        if (!myBookService.alreadyInList(id, user)) {
+            Book b = service.getBookById(id);
+            MyBookList mb = new MyBookList(b.getId(), b.getName(), b.getAuthor(), b.getPrice(), user);
+            myBookService.saveMyBooks(mb);
+        }
         return "redirect:/my_books";
     }
 
@@ -110,9 +123,9 @@ public class BookController {
     }
 
     @PostMapping("/deleteMyBook/{id}")
-    public String deleteMyBook(@PathVariable("id") int id) {
-        myBookService.deleteById(id);
-        return "redirect:/available_books";
+    public String deleteMyBook(@PathVariable("id") long id, Principal principal) {
+        myBookService.deleteById(id, currentUser(principal));
+        return "redirect:/my_books";
     }
 
     @GetMapping("/{id:\\d+}")

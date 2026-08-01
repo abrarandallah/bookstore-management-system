@@ -1,5 +1,6 @@
 package com.abrar.BOOKSTORE.service;
 
+import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.entity.MyBookList;
 import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import com.abrar.BOOKSTORE.repository.MyBookRepository;
@@ -18,21 +19,24 @@ public class MyBookListService {
         mybook.save(book);
     }
 
-    public List<MyBookList> getAllMyBooks() {
-        return mybook.findAll();
+    public boolean alreadyInList(int bookId, User user) {
+        return mybook.existsByBookIdAndUser(bookId, user);
+    }
 
+    public List<MyBookList> getMyBooks(User user) {
+        return mybook.findByUser(user);
     }
 
     /**
-     * @throws ResourceNotFoundException if no entry exists with the given id,
-     *                                   instead of letting an
-     *                                   EmptyResultDataAccessException escape.
+     * @throws ResourceNotFoundException if no entry with this id exists for
+     *                                   this specific user - either it never
+     *                                   existed, or it belongs to someone
+     *                                   else, and either way we don't
+     *                                   distinguish the two in the error.
      */
-    public void deleteById(int id) {
-        if (!mybook.existsById(id)) {
-            throw new ResourceNotFoundException("Book not found in your list with id: " + id);
-        }
-        mybook.deleteById(id);
+    public void deleteById(long id, User user) {
+        MyBookList entry = mybook.findByIdAndUser(id, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found in your list with id: " + id));
+        mybook.delete(entry);
     }
-
 }

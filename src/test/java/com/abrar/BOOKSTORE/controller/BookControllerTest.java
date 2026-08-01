@@ -1,17 +1,20 @@
 package com.abrar.BOOKSTORE.controller;
 
 import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.abrar.BOOKSTORE.Login.user.User;
+import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.MyBookList;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
 
+import java.security.Principal;
 import java.util.ArrayList;
-
-import org.junit.jupiter.api.Disabled;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +41,16 @@ class BookControllerTest {
         @MockBean
         private MyBookListService myBookListService;
 
+        @MockBean
+        private UserRepository userRepository;
+
+        private static final Principal READER_PRINCIPAL = () -> "reader";
+
+        private void stubCurrentUser() {
+                User user = new User("reader", "reader@example.com", "hash", "ROLE_USER");
+                when(userRepository.findByUsernameOrEmail("reader")).thenReturn(Optional.of(user));
+        }
+
         /**
          * Method under test:
          * {@link BookController#addBook(Book, org.springframework.validation.BindingResult, Model)}
@@ -58,59 +71,36 @@ class BookControllerTest {
         }
 
         /**
-         * Method under test: {@link BookController#deleteMyBook(int)}
+         * Method under test: {@link BookController#deleteMyBook(long, Principal)}
          */
         @Test
-        @Disabled("TODO: Complete this test")
         void testDeleteMyBook() throws Exception {
-                // TODO: Complete this test.
-                // Reason: R013 No inputs found that don't throw a trivial exception.
-                // Diffblue Cover tried to run the arrange/act section, but the method under
-                // test threw
-                // java.lang.IllegalStateException: Ambiguous mapping. Cannot map
-                // 'com.abrar.BOOKSTORE.controller.BookController#5543cb55' method
-                // com.abrar.BOOKSTORE.controller.BookController#deleteBook(int)
-                // to {[DELETE, GET, POST, PUT] [/deleteBook/{id}]}: There is already
-                // 'com.abrar.BOOKSTORE.controller.BookController#5543cb55' bean method
-                // com.abrar.BOOKSTORE.controller.BookController#deleteMyBook(int) mapped.
-                // at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:721)
-                // See https://diff.blue/R013 to resolve this issue.
-
-                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/deleteBook/{id}", 1);
-                MockMvcBuilders.standaloneSetup(bookController).build().perform(requestBuilder);
-        }
-
-        /**
-         * Method under test: {@link BookController#deleteMyBook(int)}
-         */
-        @Test
-        void testDeleteMyBook2() throws Exception {
-                doNothing().when(myBookListService).deleteById(anyInt());
-                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/deleteMyBook/{id}", 1);
+                stubCurrentUser();
+                doNothing().when(myBookListService).deleteById(anyLong(), Mockito.<User>any());
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/deleteMyBook/{id}", 1)
+                                .principal(READER_PRINCIPAL);
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isFound())
                                 .andExpect(MockMvcResultMatchers.model().size(0))
-                                .andExpect(MockMvcResultMatchers.view().name("redirect:/available_books"))
-                                .andExpect(MockMvcResultMatchers.redirectedUrl("/available_books"));
+                                .andExpect(MockMvcResultMatchers.view().name("redirect:/my_books"))
+                                .andExpect(MockMvcResultMatchers.redirectedUrl("/my_books"));
         }
 
         /**
-         * Method under test: {@link BookController#deleteMyBook(int)}
+         * Method under test: {@link BookController#deleteMyBook(long, Principal)}
+         * Verifies the endpoint is POST-only - CSRF protection (and the
+         * intentional avoidance of state-changing GET requests) only applies to
+         * mutating HTTP methods.
          */
         @Test
-        void testDeleteMyBook3() throws Exception {
-                doNothing().when(myBookListService).deleteById(anyInt());
+        void testDeleteMyBookRejectsGet() throws Exception {
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/deleteMyBook/{id}", 1);
-                requestBuilder.contentType("https://example.org/example");
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
-                                .andExpect(MockMvcResultMatchers.status().isFound())
-                                .andExpect(MockMvcResultMatchers.model().size(0))
-                                .andExpect(MockMvcResultMatchers.view().name("redirect:/available_books"))
-                                .andExpect(MockMvcResultMatchers.redirectedUrl("/available_books"));
+                                .andExpect(MockMvcResultMatchers.status().isMethodNotAllowed());
         }
 
         /**
@@ -186,28 +176,12 @@ class BookControllerTest {
         }
 
         /**
-         * Method under test: {@link BookController#BookRegister()}
-         */
-        @Test
-        void testBookRegister2() throws Exception {
-                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/book_register",
-                                "Uri Variables");
-                MockMvcBuilders.standaloneSetup(bookController)
-                                .build()
-                                .perform(requestBuilder)
-                                .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(0))
-                                .andExpect(MockMvcResultMatchers.view().name("bookRegister"))
-                                .andExpect(MockMvcResultMatchers.forwardedUrl("bookRegister"));
-        }
-
-        /**
          * Method under test: {@link BookController#deleteBook(int)}
          */
         @Test
         void testDeleteBook() throws Exception {
                 doNothing().when(bookService).deleteById(anyInt());
-                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/deleteBook/{id}", 1);
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/deleteBook/{id}", 1);
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
@@ -219,19 +193,15 @@ class BookControllerTest {
 
         /**
          * Method under test: {@link BookController#deleteBook(int)}
+         * Verifies the endpoint is POST-only.
          */
         @Test
-        void testDeleteBook2() throws Exception {
-                doNothing().when(bookService).deleteById(anyInt());
+        void testDeleteBookRejectsGet() throws Exception {
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/deleteBook/{id}", 1);
-                requestBuilder.contentType("https://example.org/example");
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
-                                .andExpect(MockMvcResultMatchers.status().isFound())
-                                .andExpect(MockMvcResultMatchers.model().size(0))
-                                .andExpect(MockMvcResultMatchers.view().name("redirect:/available_books"))
-                                .andExpect(MockMvcResultMatchers.redirectedUrl("/available_books"));
+                                .andExpect(MockMvcResultMatchers.status().isMethodNotAllowed());
         }
 
         /**
@@ -257,12 +227,16 @@ class BookControllerTest {
         }
 
         /**
-         * Method under test: {@link BookController#getMyBooks(Model)}
+         * Method under test: {@link BookController#getMyBooks(Model, Principal)}
+         * Verifies only the current user's books come back, via the
+         * user-scoped service call.
          */
         @Test
         void testGetMyBooks() throws Exception {
-                when(myBookListService.getAllMyBooks()).thenReturn(new ArrayList<>());
-                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/my_books");
+                stubCurrentUser();
+                when(myBookListService.getMyBooks(Mockito.<User>any())).thenReturn(new ArrayList<>());
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/my_books")
+                                .principal(READER_PRINCIPAL);
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
@@ -274,10 +248,12 @@ class BookControllerTest {
         }
 
         /**
-         * Method under test: {@link BookController#getMylist(int)}
+         * Method under test: {@link BookController#getMylist(int, Principal)}
          */
         @Test
         void testGetMyList() throws Exception {
+                stubCurrentUser();
+                when(myBookListService.alreadyInList(anyInt(), Mockito.<User>any())).thenReturn(false);
                 doNothing().when(myBookListService).saveMyBooks(Mockito.<MyBookList>any());
 
                 Book book = new Book();
@@ -286,7 +262,8 @@ class BookControllerTest {
                 book.setName("Name");
                 book.setPrice("Price");
                 when(bookService.getBookById(anyInt())).thenReturn(book);
-                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/mylist/{id}", 1);
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/mylist/{id}", 1)
+                                .principal(READER_PRINCIPAL);
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
@@ -297,27 +274,31 @@ class BookControllerTest {
         }
 
         /**
-         * Method under test: {@link BookController#home()}
+         * Method under test: {@link BookController#getMylist(int, Principal)}
+         * Adding a book already on the user's list shouldn't try to save a
+         * second (now constraint-violating) row.
          */
         @Test
-        void testHome() throws Exception {
-                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/");
+        void testGetMyListSkipsDuplicates() throws Exception {
+                stubCurrentUser();
+                when(myBookListService.alreadyInList(anyInt(), Mockito.<User>any())).thenReturn(true);
+
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/mylist/{id}", 1)
+                                .principal(READER_PRINCIPAL);
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
-                                .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(0))
-                                .andExpect(MockMvcResultMatchers.view().name("home"))
-                                .andExpect(MockMvcResultMatchers.forwardedUrl("home"));
+                                .andExpect(MockMvcResultMatchers.status().isFound())
+                                .andExpect(MockMvcResultMatchers.redirectedUrl("/my_books"));
+                Mockito.verify(myBookListService, Mockito.never()).saveMyBooks(Mockito.<MyBookList>any());
         }
 
         /**
          * Method under test: {@link BookController#home()}
          */
         @Test
-        void testHome2() throws Exception {
+        void testHome() throws Exception {
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/");
-                requestBuilder.contentType("https://example.org/example");
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)

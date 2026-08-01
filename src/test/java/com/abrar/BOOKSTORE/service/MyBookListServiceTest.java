@@ -1,17 +1,20 @@
 package com.abrar.BOOKSTORE.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.entity.MyBookList;
+import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import com.abrar.BOOKSTORE.repository.MyBookRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,54 +33,47 @@ class MyBookListServiceTest {
     @MockBean
     private MyBookRepository myBookRepository;
 
-    /**
-     * Method under test: {@link MyBookListService#saveMyBooks(MyBookList)}
-     */
+    private final User user = new User("reader", "reader@example.com", "hash", "ROLE_USER");
+
     @Test
     void testSaveMyBooks() {
-        MyBookList myBookList = new MyBookList();
-        myBookList.setAuthor("JaneDoe");
-        myBookList.setId(1);
-        myBookList.setName("Name");
-        myBookList.setPrice("Price");
-        when(myBookRepository.save(Mockito.<MyBookList>any())).thenReturn(myBookList);
+        MyBookList book = new MyBookList(1, "Name", "JaneDoe", "Price", user);
+        when(myBookRepository.save(Mockito.<MyBookList>any())).thenReturn(book);
 
-        MyBookList book = new MyBookList();
-        book.setAuthor("JaneDoe");
-        book.setId(1);
-        book.setName("Name");
-        book.setPrice("Price");
         myBookListService.saveMyBooks(book);
         verify(myBookRepository).save(Mockito.<MyBookList>any());
-        assertEquals("JaneDoe", book.getAuthor());
-        assertEquals("Price", book.getPrice());
-        assertEquals("Name", book.getName());
-        assertEquals(1, book.getId());
-        assertTrue(myBookListService.getAllMyBooks().isEmpty());
     }
 
-    /**
-     * Method under test: {@link MyBookListService#getAllMyBooks()}
-     */
     @Test
-    void testGetAllMyBooks() {
-        ArrayList<MyBookList> myBookListList = new ArrayList<>();
-        when(myBookRepository.findAll()).thenReturn(myBookListList);
-        List<MyBookList> actualAllMyBooks = myBookListService.getAllMyBooks();
-        assertSame(myBookListList, actualAllMyBooks);
-        assertTrue(actualAllMyBooks.isEmpty());
-        verify(myBookRepository).findAll();
+    void testGetMyBooksReturnsOnlyThatUsersEntries() {
+        List<MyBookList> books = new ArrayList<>();
+        books.add(new MyBookList(1, "Name", "JaneDoe", "Price", user));
+        when(myBookRepository.findByUser(user)).thenReturn(books);
+
+        List<MyBookList> actual = myBookListService.getMyBooks(user);
+        assertEquals(1, actual.size());
+        verify(myBookRepository).findByUser(user);
     }
 
-    /**
-     * Method under test: {@link MyBookListService#deleteById(int)}
-     */
     @Test
-    void testDeleteById() {
-        when(myBookRepository.existsById(Mockito.<Integer>any())).thenReturn(true);
-        doNothing().when(myBookRepository).deleteById(Mockito.<Integer>any());
-        myBookListService.deleteById(1);
-        verify(myBookRepository).deleteById(Mockito.<Integer>any());
-        assertTrue(myBookListService.getAllMyBooks().isEmpty());
+    void testAlreadyInList() {
+        when(myBookRepository.existsByBookIdAndUser(1, user)).thenReturn(true);
+        assertTrue(myBookListService.alreadyInList(1, user));
+    }
+
+    @Test
+    void testDeleteByIdRemovesOwnedEntry() {
+        MyBookList entry = new MyBookList(1, "Name", "JaneDoe", "Price", user);
+        when(myBookRepository.findByIdAndUser(5L, user)).thenReturn(Optional.of(entry));
+        doNothing().when(myBookRepository).delete(entry);
+
+        myBookListService.deleteById(5L, user);
+        verify(myBookRepository).delete(entry);
+    }
+
+    @Test
+    void testDeleteByIdRejectsEntryThatIsntTheUsersOwn() {
+        when(myBookRepository.findByIdAndUser(5L, user)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> myBookListService.deleteById(5L, user));
     }
 }
