@@ -71,7 +71,7 @@ public class SecurityConfig {
                         referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/register", "/forgot-password", "/reset-password",
-                                "/css/**", "/js/**", "/images/**", "/img/**", "/*.jpg", "/*.png")
+                                "/css/**", "/js/**", "/images/**", "/img/**", "/uploads/**", "/*.jpg", "/*.png")
                         .permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
