@@ -10,6 +10,7 @@ import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.MyBookList;
 import com.abrar.BOOKSTORE.service.BookService;
+import com.abrar.BOOKSTORE.service.FileStorageService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
 
 import java.security.Principal;
@@ -44,6 +45,9 @@ class BookControllerTest {
         @MockBean
         private UserRepository userRepository;
 
+        @MockBean
+        private FileStorageService fileStorageService;
+
         private static final Principal READER_PRINCIPAL = () -> "reader";
 
         private void stubCurrentUser() {
@@ -53,7 +57,7 @@ class BookControllerTest {
 
         /**
          * Method under test:
-         * {@link BookController#addBook(Book, org.springframework.validation.BindingResult, Model)}
+         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, Model)}
          */
         @Test
         void testAddBook() throws Exception {
@@ -61,7 +65,9 @@ class BookControllerTest {
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/save")
                                 .param("name", "Name")
                                 .param("author", "JaneDoe")
-                                .param("price", "19.99");
+                                .param("price", "19.99")
+                                .param("takeaways[0].heading", "Heading")
+                                .param("takeaways[0].content", "Content");
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
@@ -122,7 +128,7 @@ class BookControllerTest {
 
         /**
          * Method under test:
-         * {@link BookController#addBook(Book, org.springframework.validation.BindingResult, Model)}
+         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, Model)}
          */
         @Test
         void testAddBook2() throws Exception {
@@ -131,6 +137,8 @@ class BookControllerTest {
                                 .param("name", "Name")
                                 .param("author", "JaneDoe")
                                 .param("price", "19.99")
+                                .param("takeaways[0].heading", "Heading")
+                                .param("takeaways[0].content", "Content")
                                 .contentType("application/x-www-form-urlencoded");
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
@@ -142,7 +150,7 @@ class BookControllerTest {
 
         /**
          * Method under test:
-         * {@link BookController#addBook(Book, org.springframework.validation.BindingResult, Model)}
+         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, Model)}
          * Verifies that submitting a book with blank fields is rejected instead of
          * being saved.
          */
@@ -158,6 +166,27 @@ class BookControllerTest {
                                 .andExpect(MockMvcResultMatchers.status().isOk())
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("error"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookRegister"));
+        }
+
+        /**
+         * Method under test:
+         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, Model)}
+         * Otherwise-valid book with zero takeaways should be rejected - the
+         * whole point of the format is that a book has at least one.
+         */
+        @Test
+        void testAddBookRequiresAtLeastOneTakeaway() throws Exception {
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/save")
+                                .param("name", "Name")
+                                .param("author", "JaneDoe")
+                                .param("price", "19.99");
+                MockMvcBuilders.standaloneSetup(bookController)
+                                .build()
+                                .perform(requestBuilder)
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.model().attributeExists("error"))
+                                .andExpect(MockMvcResultMatchers.view().name("bookRegister"));
+                Mockito.verify(bookService, Mockito.never()).save(Mockito.<Book>any());
         }
 
         /**
