@@ -1,37 +1,137 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: pageHead('Register a Book')}"></head>
-<body>
-<div th:replace="~{fragments/layout :: navbar}"></div>
+  <head th:replace="~{fragments/layout :: pageHead('Register a Book')}"></head>
+  <body>
+    <div th:replace="~{fragments/layout :: navbar}"></div>
 
-<main class="page-body">
-<div class="container my-5 p-5 form-panel" style="max-width: 600px;">
-    <span class="eyebrow d-block text-center mb-2">New entry</span>
-    <h4 class="text-center">Register a Book</h4>
-    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
-    <form th:action="@{/save}" method="post" th:object="${book}">
-        <div class="mb-3">
+    <main class="page-body">
+      <div class="container my-5 p-5 form-panel" style="max-width: 640px">
+        <span class="eyebrow d-block text-center mb-2">New entry</span>
+        <h4 class="text-center">Register a Book</h4>
+        <p class="text-center text-muted small mb-4">
+          Distill the book into 1&ndash;10 short takeaways &mdash; the key ideas
+          someone could read in a few minutes.
+        </p>
+        <div
+          class="alert alert-danger"
+          th:if="${error}"
+          th:text="${error}"
+        ></div>
+        <form
+          th:action="@{/save}"
+          method="post"
+          th:object="${book}"
+          enctype="multipart/form-data"
+        >
+          <div class="mb-3">
             <label for="name" class="form-label">Book Name</label>
-            <input type="text" id="name" class="form-control" name="name" th:value="${book?.name}">
-        </div>
+            <input
+              type="text"
+              id="name"
+              class="form-control"
+              name="name"
+              th:value="${book?.name}"
+            />
+          </div>
 
-        <div class="mb-3">
+          <div class="mb-3">
             <label for="author" class="form-label">The Author</label>
-            <input type="text" id="author" class="form-control" name="author" th:value="${book?.author}">
-        </div>
-        <div class="mb-3">
+            <input
+              type="text"
+              id="author"
+              class="form-control"
+              name="author"
+              th:value="${book?.author}"
+            />
+          </div>
+          <div class="mb-3">
             <label for="price" class="form-label">Price</label>
-            <input type="text" id="price" class="form-control" name="price" th:value="${book?.price}">
-        </div>
+            <input
+              type="text"
+              id="price"
+              class="form-control"
+              name="price"
+              th:value="${book?.price}"
+            />
+          </div>
+          <div class="mb-4">
+            <label for="cover" class="form-label"
+              >Cover image
+              <span class="text-muted fw-normal">(optional)</span></label
+            >
+            <input
+              type="file"
+              id="cover"
+              class="form-control"
+              name="cover"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+            />
+            <input
+              type="hidden"
+              name="existingCoverImageUrl"
+              th:value="${book?.coverImageUrl}"
+            />
+          </div>
 
-        <div class="text-center">
+          <hr class="my-4" />
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <span class="eyebrow d-block">Key takeaways</span>
+              <span class="text-muted small"
+                >1&ndash;10 short pages, each with a heading and the idea
+                itself.</span
+              >
+            </div>
+            <button
+              type="button"
+              class="btn btn-outline-brass btn-sm"
+              onclick="addTakeaway()"
+            >
+              <i class="fa-solid fa-plus me-1"></i> Add another
+            </button>
+          </div>
+
+          <div id="takeaways-container">
+            <div class="takeaway-row mb-3 p-3">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <span class="eyebrow">Takeaway</span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-link text-danger p-0"
+                  onclick="removeTakeaway(this)"
+                >
+                  Remove
+                </button>
+              </div>
+              <input
+                type="text"
+                class="form-control mb-2"
+                data-field="heading"
+                name="takeaways[0].heading"
+                placeholder="Heading, e.g. 'Start before you're ready'"
+              />
+              <textarea
+                class="form-control"
+                data-field="content"
+                name="takeaways[0].content"
+                rows="3"
+                placeholder="What's the key idea, in a few sentences?"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
             <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-    </form>
-</div>
-</main>
+          </div>
+        </form>
+      </div>
+    </main>
 
-<div th:replace="~{fragments/layout :: footer}"></div>
-<div th:replace="~{fragments/layout :: scripts}"></div>
-</body>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+    <div th:replace="~{fragments/layout :: takeawayFormScript}"></div>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+  </body>
 </html>

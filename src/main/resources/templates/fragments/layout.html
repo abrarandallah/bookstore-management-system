@@ -22,6 +22,49 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
                 integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
     </th:block>
+
+    <!--/* Shared by bookRegister.html and bookEdit.html - dynamic add/remove
+           for the takeaway rows, always re-numbering "name" attributes to a
+           contiguous 0..N-1 range so Spring's indexed list binding never
+           sees a gap. */-->
+    <th:block th:fragment="takeawayFormScript">
+        <script>
+            function renumberTakeaways() {
+                document.querySelectorAll('#takeaways-container .takeaway-row').forEach((row, index) => {
+                    row.querySelectorAll('[data-field]').forEach((el) => {
+                        el.setAttribute('name', 'takeaways[' + index + '].' + el.getAttribute('data-field'));
+                    });
+                });
+            }
+            function removeTakeaway(button) {
+                const rows = document.querySelectorAll('#takeaways-container .takeaway-row');
+                if (rows.length <= 1) {
+                    alert('You need at least 1 takeaway.');
+                    return;
+                }
+                button.closest('.takeaway-row').remove();
+                renumberTakeaways();
+            }
+            function addTakeaway() {
+                const container = document.getElementById('takeaways-container');
+                if (container.querySelectorAll('.takeaway-row').length >= 10) {
+                    alert('Maximum 10 takeaways.');
+                    return;
+                }
+                const row = document.createElement('div');
+                row.className = 'takeaway-row mb-3 p-3';
+                row.innerHTML =
+                    '<div class="d-flex justify-content-between align-items-center mb-2">' +
+                    '<span class="eyebrow">Takeaway</span>' +
+                    '<button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="removeTakeaway(this)">Remove</button>' +
+                    '</div>' +
+                    '<input type="text" class="form-control mb-2" data-field="heading" placeholder="Heading">' +
+                    '<textarea class="form-control" data-field="content" rows="3" placeholder="What\'s the key idea?"></textarea>';
+                container.appendChild(row);
+                renumberTakeaways();
+            }
+        </script>
+    </th:block>
 </head>
 <body>
     <nav th:fragment="navbar" class="navbar navbar-expand-lg site-header">

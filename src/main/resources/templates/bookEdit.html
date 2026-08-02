@@ -5,11 +5,11 @@
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main class="page-body">
-<div class="container my-5 p-5 form-panel" style="max-width: 600px;">
+<div class="container my-5 p-5 form-panel" style="max-width: 640px;">
     <span class="eyebrow d-block text-center mb-2">Editing</span>
     <h4 class="text-center">Edit Book</h4>
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
-    <form th:action="@{/save}" method="post" th:object="${book}">
+    <form th:action="@{/save}" method="post" th:object="${book}" enctype="multipart/form-data">
         <input type="hidden" name="id" th:value="${book.id}">
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
@@ -26,7 +26,42 @@
             <input type="text" id="price" class="form-control" name="price" th:value="${book.price}">
         </div>
 
-        <div class="text-center">
+        <div class="mb-4">
+            <label for="cover" class="form-label">Cover image</label>
+            <div th:if="${book.coverImageUrl}" class="mb-2">
+                <img th:src="@{${book.coverImageUrl}}" alt="Current cover" style="height:90px;border-radius:4px;box-shadow:var(--shadow-card);">
+            </div>
+            <input type="file" id="cover" class="form-control" name="cover" accept="image/png,image/jpeg,image/webp,image/gif">
+            <div class="form-text">Leave empty to keep the current cover.</div>
+            <input type="hidden" name="existingCoverImageUrl" th:value="${book.coverImageUrl}">
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <span class="eyebrow d-block">Key takeaways</span>
+                <span class="text-muted small">1&ndash;10 short pages, each with a heading and the idea itself.</span>
+            </div>
+            <button type="button" class="btn btn-outline-brass btn-sm" onclick="addTakeaway()">
+                <i class="fa-solid fa-plus me-1"></i> Add another
+            </button>
+        </div>
+
+        <div id="takeaways-container">
+            <div class="takeaway-row mb-3 p-3" th:each="page, iter : ${book.takeaways}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="eyebrow">Takeaway</span>
+                    <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="removeTakeaway(this)">Remove</button>
+                </div>
+                <input type="text" class="form-control mb-2" data-field="heading"
+                       th:name="|takeaways[${iter.index}].heading|" th:value="${page.heading}" placeholder="Heading">
+                <textarea class="form-control" data-field="content" rows="3"
+                          th:name="|takeaways[${iter.index}].content|" th:text="${page.content}" placeholder="What's the key idea?"></textarea>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
     </form>
@@ -34,6 +69,7 @@
 </main>
 
 <div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: takeawayFormScript}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

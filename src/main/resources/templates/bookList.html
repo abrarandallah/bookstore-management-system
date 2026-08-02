@@ -25,12 +25,22 @@
         <div class="book-grid" th:unless="${#lists.isEmpty(book)}">
             <div class="book-card" th:each="b : ${book}"
                  th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(b.name.hashCode()) % 360} + ', 42%, 34%)'">
+                <img th:if="${b.coverImageUrl}" th:src="@{${b.coverImageUrl}}" alt="Cover" class="book-cover mb-2">
                 <div class="book-author" th:text="${b.author}">Author</div>
                 <div class="book-title" th:text="${b.name}">Book title</div>
-                <div class="price-tag" th:text="'$' + ${b.price}">$0.00</div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="price-tag" th:text="'$' + ${b.price}">$0.00</span>
+                    <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span th:text="${#lists.size(b.takeaways)} + ' takeaways · ' + ${b.estimatedReadMinutes} + ' min read'"></span>
+                    </span>
+                </div>
                 <div class="book-actions">
+                    <a th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
                     <form th:action="@{/mylist/{id}(id=${b.id})}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-secondary btn-sm">Add to My Books</button>
+                        <button type="submit" class="btn btn-link p-0 icon-link" style="border:none;background:none;" title="Add to My Books">
+                            <i class="fa-solid fa-bookmark"></i>
+                        </button>
                     </form>
                     <a th:href="@{/editBook/{id}(id=${b.id})}" sec:authorize="hasRole('LIBRARIAN')" class="icon-link">
                         <i class="fa-solid fa-pen-to-square"></i>

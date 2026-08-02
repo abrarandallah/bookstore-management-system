@@ -4,39 +4,50 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
-<div class="container mt-5">
+<main class="page-body">
+<div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-7">
-            <div class="card">
-                <div class="card-body text-center py-4">
-                    <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center mx-auto mb-3"
-                         style="width:72px;height:72px;font-size:1.75rem;"
-                         th:text="${#strings.toUpperCase(#strings.substring(user.username,0,1))}">U</div>
-                    <h5 class="mb-1" th:text="${user.username}"></h5>
-                    <p class="text-muted mb-2" th:text="${user.email}"></p>
-                    <span class="badge" th:classappend="${user.role == 'ROLE_LIBRARIAN'} ? 'bg-dark' : 'bg-secondary'"
-                          th:text="${user.role == 'ROLE_LIBRARIAN'} ? 'Librarian' : 'Reader'"></span>
-                </div>
+            <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+            <div class="auth-card text-center">
+                <img th:if="${user.avatarUrl}" th:src="@{${user.avatarUrl}}" alt="Avatar"
+                     class="rounded-circle mx-auto mb-3" style="width:88px;height:88px;object-fit:cover;box-shadow:var(--shadow-card);">
+                <div th:unless="${user.avatarUrl}"
+                     class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                     style="width:88px;height:88px;background:var(--ink);color:var(--paper-raised);font-family:var(--font-display);font-size:2rem;"
+                     th:text="${#strings.toUpperCase(#strings.substring(user.username,0,1))}">U</div>
+
+                <h5 class="mb-1" th:text="${user.username}"></h5>
+                <p class="text-muted mb-2" th:text="${user.email}"></p>
+                <span class="price-tag" th:text="${user.role == 'ROLE_LIBRARIAN'} ? 'Librarian' : 'Reader'"></span>
+
+                <form th:action="@{/profile/avatar}" method="post" enctype="multipart/form-data"
+                      class="d-flex justify-content-center align-items-center gap-2 mt-3">
+                    <input type="file" name="avatar" class="form-control form-control-sm" style="max-width: 220px;"
+                           accept="image/png,image/jpeg,image/webp,image/gif" required>
+                    <button type="submit" class="btn btn-outline-brass btn-sm">Update photo</button>
+                </form>
             </div>
 
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h6 class="card-title mb-3">Quick links</h6>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="/available_books" class="btn btn-outline-secondary btn-sm">Browse Books</a>
-                        <a href="/my_books" class="btn btn-outline-secondary btn-sm">My Books</a>
-                        <a href="/forgot-password" class="btn btn-outline-secondary btn-sm">Change Password</a>
-                        <a href="/book_register" class="btn btn-outline-secondary btn-sm"
-                           sec:authorize="hasRole('LIBRARIAN')">Register a Book</a>
-                        <a href="/admin/users" class="btn btn-outline-secondary btn-sm"
-                           sec:authorize="hasRole('LIBRARIAN')">Manage Users</a>
-                    </div>
+            <div class="form-panel p-4 mt-3">
+                <span class="eyebrow d-block mb-3">Quick links</span>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="/available_books" class="btn btn-secondary btn-sm">Browse Books</a>
+                    <a href="/my_books" class="btn btn-secondary btn-sm">My Books</a>
+                    <a href="/forgot-password" class="btn btn-secondary btn-sm">Change Password</a>
+                    <a href="/book_register" class="btn btn-secondary btn-sm"
+                       sec:authorize="hasRole('LIBRARIAN')">Register a Book</a>
+                    <a href="/admin/users" class="btn btn-secondary btn-sm"
+                       sec:authorize="hasRole('LIBRARIAN')">Manage Users</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+</main>
 
+<div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>
