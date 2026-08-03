@@ -1,0 +1,272 @@
+[
+  {
+    "name": "The Art of Unfinished Things",
+    "author": "Laila Morningside",
+    "price": "14.99",
+    "takeaways": [
+      {
+        "heading": "Start Before You're Ready",
+        "content": "Progress begins when you stop waiting for perfect conditions."
+      },
+      {
+        "heading": "Celebrate Incompletion",
+        "content": "Unfinished projects hold lessons just as valuable as finished ones."
+      },
+      {
+        "heading": "Momentum Over Perfection",
+        "content": "Small steps compound faster than flawless plans."
+      },
+      {
+        "heading": "Let Go of Control",
+        "content": "Creativity thrives when you allow space for uncertainty."
+      },
+      {
+        "heading": "Redefine Success",
+        "content": "Success can mean growth, not completion."
+      }
+    ]
+  },
+  {
+    "name": "Why We Forget",
+    "author": "Dr. Elias Rowan",
+    "price": "19.50",
+    "takeaways": [
+      {
+        "heading": "Memory is Selective",
+        "content": "Forgetting is the brain's way of prioritizing."
+      },
+      {
+        "heading": "Stress Blocks Recall",
+        "content": "Anxiety clouds access to stored memories."
+      },
+      {
+        "heading": "Sleep Restores Memory",
+        "content": "Deep rest strengthens recall and learning."
+      },
+      {
+        "heading": "Emotions Anchor Memories",
+        "content": "Strong feelings make events unforgettable."
+      },
+      {
+        "heading": "Practice Builds Retention",
+        "content": "Repetition is the antidote to forgetting."
+      }
+    ]
+  },
+  {
+    "name": "The Invisible Rules of Conversation",
+    "author": "Mira Chen",
+    "price": "12.00",
+    "takeaways": [
+      {
+        "heading": "Listen Twice, Speak Once",
+        "content": "Active listening builds trust."
+      },
+      {
+        "heading": "Silence is Powerful",
+        "content": "Pauses give weight to words."
+      },
+      {
+        "heading": "Tone Shapes Meaning",
+        "content": "How you say it matters more than what you say."
+      },
+      {
+        "heading": "Questions Unlock Depth",
+        "content": "Curiosity keeps dialogue alive."
+      },
+      {
+        "heading": "Respect the Flow",
+        "content": "Conversations are dances, not debates."
+      }
+    ]
+  },
+  {
+    "name": "How to Travel Without Moving",
+    "author": "Jonah Vale",
+    "price": "16.75",
+    "takeaways": [
+      {
+        "heading": "Books as Journeys",
+        "content": "Reading transports you across cultures."
+      },
+      {
+        "heading": "Food as Geography",
+        "content": "Cooking lets you taste distant lands."
+      },
+      {
+        "heading": "Music as Maps",
+        "content": "Songs carry the spirit of places."
+      },
+      {
+        "heading": "Imagination as Flight",
+        "content": "Daydreaming is the cheapest ticket."
+      },
+      {
+        "heading": "Perspective as Passport",
+        "content": "Seeing through others' eyes expands horizons."
+      }
+    ]
+  },
+  {
+    "name": "The Mathematics of Happiness",
+    "author": "Sofia Delgado",
+    "price": "21.00",
+    "takeaways": [
+      {
+        "heading": "Subtract Negativity",
+        "content": "Removing toxic influences multiplies joy."
+      },
+      {
+        "heading": "Add Gratitude",
+        "content": "Daily appreciation compounds emotional wealth."
+      },
+      {
+        "heading": "Divide Time Wisely",
+        "content": "Balance between work and play sustains happiness."
+      },
+      {
+        "heading": "Multiply Kindness",
+        "content": "Acts of generosity ripple outward."
+      },
+      {
+        "heading": "Equations of Meaning",
+        "content": "Happiness is solved through purpose, not possessions."
+      }
+    ]
+  },
+  {
+    "name": "Echoes of Tomorrow",
+    "author": "Daniel Stryker",
+    "price": "18.99",
+    "takeaways": [
+      {
+        "heading": "Dual Futures",
+        "content": "Every choice creates two timelines: one of hope, one of regret."
+      },
+      {
+        "heading": "Technology Mirrors Humanity",
+        "content": "Progress reflects our deepest fears and desires."
+      },
+      {
+        "heading": "Memory as Architecture",
+        "content": "The past builds the scaffolding of tomorrow."
+      },
+      {
+        "heading": "Echoes Never Fade",
+        "content": "Actions ripple through time, shaping unseen destinies."
+      },
+      {
+        "heading": "Hope in Ruins",
+        "content": "Even dystopias hold seeds of renewal."
+      }
+    ]
+  },
+  {
+    "name": "The Cartographer of Dreams",
+    "author": "Julian Northwood",
+    "price": "22.50",
+    "takeaways": [
+      {
+        "heading": "Mapping the Mind",
+        "content": "Imagination is the geography of the soul."
+      },
+      {
+        "heading": "Dreams as Coordinates",
+        "content": "Each dream points to a hidden truth."
+      },
+      {
+        "heading": "The Compass Within",
+        "content": "Intuition guides where logic cannot."
+      },
+      {
+        "heading": "Lost Islands of Memory",
+        "content": "Forgotten dreams hold forgotten wisdom."
+      },
+      {
+        "heading": "Draw Your Own Map",
+        "content": "The journey matters more than the destination."
+      }
+    ]
+  },
+  {
+    "name": "The Physics of Loneliness",
+    "author": "Daniel Kessler",
+    "price": "17.25",
+    "takeaways": [
+      {
+        "heading": "Gravity of Solitude",
+        "content": "Loneliness pulls us inward to rediscover ourselves."
+      },
+      {
+        "heading": "Entropy of Connection",
+        "content": "Relationships decay without energy and care."
+      },
+      {
+        "heading": "Quantum Emotions",
+        "content": "Feelings exist in multiple states until expressed."
+      },
+      {
+        "heading": "Light in the Void",
+        "content": "Even isolation can illuminate understanding."
+      },
+      {
+        "heading": "Universal Constants",
+        "content": "We all orbit the same need for belonging."
+      }
+    ]
+  },
+  {
+    "name": "The Library of Lost Sounds",
+    "author": "Alec Hartman",
+    "price": "15.80",
+    "takeaways": [
+      {
+        "heading": "Silence Has Memory",
+        "content": "Every sound leaves an echo in time."
+      },
+      {
+        "heading": "Music as History",
+        "content": "Melodies preserve emotions better than words."
+      },
+      {
+        "heading": "Listening to Absence",
+        "content": "What's missing teaches more than what's heard."
+      },
+      {
+        "heading": "Resonance of the Soul",
+        "content": "Sound connects us to something eternal."
+      },
+      {
+        "heading": "Reclaim the Noise",
+        "content": "Rediscover the forgotten symphonies of life."
+      }
+    ]
+  },
+  {
+    "name": "The Algorithm of Emotion",
+    "author": "Daniel Kepler",
+    "price": "20.00",
+    "takeaways": [
+      {
+        "heading": "Data Meets Heart",
+        "content": "Emotions can be decoded but never fully defined."
+      },
+      {
+        "heading": "Human Variables",
+        "content": "Love, fear, and empathy resist computation."
+      },
+      {
+        "heading": "Artificial Empathy",
+        "content": "Machines can mimic feeling but not meaning."
+      },
+      {
+        "heading": "Code of Connection",
+        "content": "True intelligence lies in compassion."
+      },
+      {
+        "heading": "Emotional Logic",
+        "content": "Understanding others begins with understanding yourself."
+      }
+    ]
+  }
+]
