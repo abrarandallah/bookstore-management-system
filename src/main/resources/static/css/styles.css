@@ -571,3 +571,74 @@ a:hover {
   font-size: 1.05rem;
   line-height: 1.7;
 }
+
+/* ---- dark theme ------------------------------------------------------------ */
+/* Nearly everything on the site already reads from these variables, so
+   redefining them here re-themes the whole app without touching individual
+   components. Only things with hardcoded colors (a few alert variants,
+   below) need their own override. */
+
+[data-theme="dark"] {
+  --ink: #f1e9d2;
+  --ink-soft: #cbbfa0;
+  --paper: #1c1a15;
+  --paper-raised: #262319;
+  --brass: #c99a44;
+  --brass-bright: #e0b563;
+  --burgundy: #d97c7c;
+  --line: #3a361f;
+  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .alert-danger {
+  background-color: #3a2422;
+  color: #e6a29a;
+  border-color: #5a332f;
+}
+
+[data-theme="dark"] .alert-success {
+  background-color: #24301c;
+  color: #a9c98d;
+  border-color: #3a4d2c;
+}
+
+[data-theme="dark"] .alert-info {
+  background-color: #26231c;
+  color: var(--ink-soft);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .hero-figure img {
+  border-color: var(--paper-raised);
+}
+
+/* ---- theme toggle button ----------------------------------------------- */
+
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.theme-icon-dark {
+  display: none;
+}
+
+[data-theme="dark"] .theme-icon-light {
+  display: none;
+}
+
+[data-theme="dark"] .theme-icon-dark {
+  display: inline;
+}
+
+/* ---- reader font size preference ---------------------------------------- */
+
+:root[data-reader-font-size="small"] .reader-page p {
+  font-size: 0.92rem;
+}
+
+:root[data-reader-font-size="large"] .reader-page p {
+  font-size: 1.25rem;
+}
