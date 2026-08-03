@@ -69,6 +69,11 @@ public class AuthPageController {
         return "profile";
     }
 
+    @GetMapping("/settings")
+    public String settingsPage() {
+        return "settings";
+    }
+
     @PostMapping("/profile/avatar")
     public String uploadAvatar(@RequestParam MultipartFile avatar, Authentication authentication,
             RedirectAttributes redirectAttributes) {
