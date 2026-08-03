@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: pageHead('Settings')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="page-body">
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <span class="eyebrow d-block mb-2">Preferences</span>
+            <h4 class="mb-4">Settings</h4>
+
+            <div class="form-panel p-4 mb-3">
+                <h6 class="mb-3">Appearance</h6>
+                <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Theme">
+                    <button type="button" class="btn btn-secondary theme-option" data-theme-value="light" onclick="setTheme('light')">
+                        <i class="fa-solid fa-sun me-1"></i> Light
+                    </button>
+                    <button type="button" class="btn btn-secondary theme-option" data-theme-value="dark" onclick="setTheme('dark')">
+                        <i class="fa-solid fa-moon me-1"></i> Dark
+                    </button>
+                    <button type="button" class="btn btn-secondary theme-option" data-theme-value="system" onclick="setTheme('system')">
+                        <i class="fa-solid fa-desktop me-1"></i> Match system
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-panel p-4">
+                <h6 class="mb-3">Reading</h6>
+                <label class="form-label">Takeaway text size</label>
+                <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Reader font size">
+                    <button type="button" class="btn btn-secondary font-size-option" data-size-value="small" onclick="setReaderFontSize('small')">Small</button>
+                    <button type="button" class="btn btn-secondary font-size-option" data-size-value="medium" onclick="setReaderFontSize('medium')">Medium</button>
+                    <button type="button" class="btn btn-secondary font-size-option" data-size-value="large" onclick="setReaderFontSize('large')">Large</button>
+                </div>
+                <p class="text-muted small mt-2 mb-0">Affects the takeaway text in the book reader.</p>
+            </div>
+
+            <p class="text-muted small mt-3">Language support is on the roadmap - for now the site is English-only.</p>
+        </div>
+    </div>
+</div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+    function setTheme(choice) {
+        localStorage.setItem('bookstore-theme', choice);
+        const resolved = choice === 'system'
+            ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : choice;
+        document.documentElement.setAttribute('data-theme', resolved);
+        highlightActiveButtons();
+    }
+
+    function setReaderFontSize(size) {
+        localStorage.setItem('bookstore-reader-font-size', size);
+        document.documentElement.setAttribute('data-reader-font-size', size);
+        highlightActiveButtons();
+    }
+
+    function highlightActiveButtons() {
+        const theme = localStorage.getItem('bookstore-theme') || 'system';
+        document.querySelectorAll('.theme-option').forEach((btn) => {
+            btn.classList.toggle('btn-primary', btn.getAttribute('data-theme-value') === theme);
+            btn.classList.toggle('btn-secondary', btn.getAttribute('data-theme-value') !== theme);
+        });
+        const fontSize = localStorage.getItem('bookstore-reader-font-size') || 'medium';
+        document.querySelectorAll('.font-size-option').forEach((btn) => {
+            btn.classList.toggle('btn-primary', btn.getAttribute('data-size-value') === fontSize);
+            btn.classList.toggle('btn-secondary', btn.getAttribute('data-size-value') !== fontSize);
+        });
+    }
+
+    highlightActiveButtons();
+</script>
+</body>
+</html>
