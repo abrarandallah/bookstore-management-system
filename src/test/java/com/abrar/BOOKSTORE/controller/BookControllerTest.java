@@ -12,6 +12,7 @@ import com.abrar.BOOKSTORE.entity.MyBookList;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.FileStorageService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
+import com.abrar.BOOKSTORE.service.BookValidator;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
-@ContextConfiguration(classes = { BookController.class })
+@ContextConfiguration(classes = { BookController.class, BookValidator.class })
 @ExtendWith(SpringExtension.class)
 class BookControllerTest {
         @Autowired
