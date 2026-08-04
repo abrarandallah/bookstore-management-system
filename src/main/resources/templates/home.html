@@ -8,17 +8,18 @@
     <div class="container hero-section">
         <div class="row align-items-center g-5">
             <div class="col-lg-6 hero-copy">
-                <span class="eyebrow">Independently stocked, one shelf at a time</span>
+                <span class="eyebrow">Big ideas, small time commitment</span>
                 <h1>Welcome to BookStore</h1>
                 <p>
-                    We hope you find what you're looking for in here. This shop holds books we found
-                    interesting, unusual, or hard to put down. If you're a bookworm, have a good read —
-                    and keep it up.
+                    Every book here is distilled into 1&ndash;10 short takeaways &mdash; the ideas worth keeping,
+                    without the hundreds of pages around them. Good for a first taste of a book, or for
+                    when you just don't have the time to read the whole thing.
                 </p>
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="/login" class="btn btn-primary" sec:authorize="isAnonymous()">Login</a>
                     <a href="/register" class="btn btn-outline-brass" sec:authorize="isAnonymous()">Create an account</a>
                     <a href="/available_books" class="btn btn-primary" sec:authorize="isAuthenticated()">Browse Books</a>
+                    <a href="/about" class="btn btn-outline-brass">How it works</a>
                 </div>
             </div>
             <div class="col-lg-6 text-center">
