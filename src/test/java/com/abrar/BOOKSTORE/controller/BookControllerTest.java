@@ -111,17 +111,17 @@ class BookControllerTest {
         }
 
         /**
-         * Method under test: {@link BookController#getAllBook()}
+         * Method under test: {@link BookController#getAllBook(String, String, Model)}
          */
         @Test
         void testGetAllBook() throws Exception {
-                when(bookService.getAllBook()).thenReturn(new ArrayList<>());
+                when(bookService.search(Mockito.<String>any(), Mockito.<String>any())).thenReturn(new ArrayList<>());
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/available_books");
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(1))
+                                .andExpect(MockMvcResultMatchers.model().size(3))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("book"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookList"))
                                 .andExpect(MockMvcResultMatchers.forwardedUrl("bookList"));

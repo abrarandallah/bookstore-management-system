@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
 import java.util.Iterator;
@@ -48,6 +47,11 @@ public class BookController {
         return "home";
     }
 
+    @GetMapping("/about")
+    public String about() {
+        return "about";
+    }
+
     @GetMapping("/book_register")
     @PreAuthorize("hasRole('LIBRARIAN')")
     public String BookRegister() {
@@ -55,9 +59,13 @@ public class BookController {
     }
 
     @GetMapping("/available_books")
-    public ModelAndView getAllBook() {
-        List<Book> list = service.getAllBook();
-        return new ModelAndView("bookList", "book", list);
+    public String getAllBook(@RequestParam(required = false) String q,
+            @RequestParam(required = false, defaultValue = "name_asc") String sort, Model model) {
+        List<Book> list = service.search(q, sort);
+        model.addAttribute("book", list);
+        model.addAttribute("q", q);
+        model.addAttribute("sort", sort);
+        return "bookList";
     }
 
     @PostMapping("/save")

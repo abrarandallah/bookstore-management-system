@@ -120,4 +120,52 @@ class BookServiceTest {
         when(bookRepository.existsById(Mockito.<Integer>any())).thenReturn(false);
         assertThrows(ResourceNotFoundException.class, () -> bookService.deleteById(1));
     }
+
+    /**
+     * Method under test: {@link BookService#search(String, String)}
+     */
+    @Test
+    void testSearchDefaultsToNameAscending() {
+        ArrayList<Book> bookList = new ArrayList<>();
+        when(bookRepository.search(Mockito.eq(""), Mockito.<org.springframework.data.domain.Sort>any()))
+                .thenReturn(bookList);
+
+        List<Book> actual = bookService.search(null, null);
+
+        assertSame(bookList, actual);
+        verify(bookRepository).search(Mockito.eq(""),
+                Mockito.eq(org.springframework.data.domain.Sort.by("name").ascending()));
+    }
+
+    /**
+     * Method under test: {@link BookService#search(String, String)}
+     */
+    @Test
+    void testSearchTrimsTermAndAppliesRequestedSort() {
+        ArrayList<Book> bookList = new ArrayList<>();
+        when(bookRepository.search(Mockito.eq("dune"), Mockito.<org.springframework.data.domain.Sort>any()))
+                .thenReturn(bookList);
+
+        bookService.search("  dune  ", "price_desc");
+
+        verify(bookRepository).search(Mockito.eq("dune"),
+                Mockito.eq(org.springframework.data.domain.Sort.by("price").descending()));
+    }
+
+    /**
+     * Method under test: {@link BookService#search(String, String)}
+     * An unrecognized sort value shouldn't error - it should just fall back
+     * to the default, since this value comes straight from a query param.
+     */
+    @Test
+    void testSearchFallsBackToDefaultOnUnknownSort() {
+        ArrayList<Book> bookList = new ArrayList<>();
+        when(bookRepository.search(Mockito.eq(""), Mockito.<org.springframework.data.domain.Sort>any()))
+                .thenReturn(bookList);
+
+        bookService.search(null, "not-a-real-sort-option");
+
+        verify(bookRepository).search(Mockito.eq(""),
+                Mockito.eq(org.springframework.data.domain.Sort.by("name").ascending()));
+    }
 }

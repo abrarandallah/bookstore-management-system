@@ -16,10 +16,31 @@
             </a>
         </div>
 
-        <div th:if="${#lists.isEmpty(book)}" class="empty-state">
+        <form th:action="@{/available_books}" method="get" class="d-flex flex-wrap gap-2 mb-4">
+            <div class="flex-grow-1" style="min-width: 220px;">
+                <input type="search" name="q" class="form-control" placeholder="Search by title or author&hellip;" th:value="${q}">
+            </div>
+            <select name="sort" class="form-select" style="max-width: 200px;" onchange="this.form.submit()">
+                <option value="name_asc" th:selected="${sort == 'name_asc' or sort == null}">Title A&ndash;Z</option>
+                <option value="author_asc" th:selected="${sort == 'author_asc'}">Author A&ndash;Z</option>
+                <option value="price_asc" th:selected="${sort == 'price_asc'}">Price: low to high</option>
+                <option value="price_desc" th:selected="${sort == 'price_desc'}">Price: high to low</option>
+                <option value="newest" th:selected="${sort == 'newest'}">Newest first</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Search</button>
+            <a th:if="${q != null and !#strings.isEmpty(q)}" th:href="@{/available_books(sort=${sort})}" class="btn btn-link">Clear</a>
+        </form>
+
+        <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q))}" class="empty-state">
             <span class="eyebrow">Nothing here yet</span>
             <h3>The shelf is empty</h3>
             <p>No books have been registered for the store yet.</p>
+        </div>
+
+        <div th:if="${#lists.isEmpty(book) and q != null and !#strings.isEmpty(q)}" class="empty-state">
+            <span class="eyebrow">No matches</span>
+            <h3>Nothing matches "<span th:text="${q}"></span>"</h3>
+            <p>Try a different title or author.</p>
         </div>
 
         <div class="book-grid" th:unless="${#lists.isEmpty(book)}">

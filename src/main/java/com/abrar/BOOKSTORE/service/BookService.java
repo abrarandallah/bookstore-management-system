@@ -5,6 +5,7 @@ import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import com.abrar.BOOKSTORE.repository.BookRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +22,27 @@ public class BookService {
 
     public List<Book> getAllBook() {
         return bRepo.findAll();
+    }
+
+    /**
+     * @param term   free-text match against name/author, or blank for
+     *               everything.
+     * @param sortBy one of: name_asc, author_asc, price_asc, price_desc,
+     *               newest. Falls back to name_asc for anything else, rather
+     *               than erroring on an unrecognized/tampered value.
+     */
+    public List<Book> search(String term, String sortBy) {
+        Sort sort = switch (sortBy == null ? "" : sortBy) {
+            case "author_asc" -> Sort.by("author").ascending();
+            case "price_asc" -> Sort.by("price").ascending();
+            case "price_desc" -> Sort.by("price").descending();
+            // No createdAt column exists, but id is auto-incrementing, so
+            // higher id reliably means "added more recently".
+            case "newest" -> Sort.by("id").descending();
+            default -> Sort.by("name").ascending();
+        };
+        String safeTerm = term == null ? "" : term.trim();
+        return bRepo.search(safeTerm, sort);
     }
 
     /**
