@@ -2,7 +2,6 @@
   {
     "name": "The Art of Unfinished Things",
     "author": "Laila Morningside",
-    "price": "14.99",
     "takeaways": [
       {
         "heading": "Start Before You're Ready",
@@ -29,7 +28,6 @@
   {
     "name": "Why We Forget",
     "author": "Dr. Elias Rowan",
-    "price": "19.50",
     "takeaways": [
       {
         "heading": "Memory is Selective",
@@ -56,7 +54,6 @@
   {
     "name": "The Invisible Rules of Conversation",
     "author": "Mira Chen",
-    "price": "12.00",
     "takeaways": [
       {
         "heading": "Listen Twice, Speak Once",
@@ -83,7 +80,6 @@
   {
     "name": "How to Travel Without Moving",
     "author": "Jonah Vale",
-    "price": "16.75",
     "takeaways": [
       {
         "heading": "Books as Journeys",
@@ -110,7 +106,6 @@
   {
     "name": "The Mathematics of Happiness",
     "author": "Sofia Delgado",
-    "price": "21.00",
     "takeaways": [
       {
         "heading": "Subtract Negativity",
@@ -137,7 +132,6 @@
   {
     "name": "Echoes of Tomorrow",
     "author": "Daniel Stryker",
-    "price": "18.99",
     "takeaways": [
       {
         "heading": "Dual Futures",
@@ -164,7 +158,6 @@
   {
     "name": "The Cartographer of Dreams",
     "author": "Julian Northwood",
-    "price": "22.50",
     "takeaways": [
       {
         "heading": "Mapping the Mind",
@@ -191,7 +184,6 @@
   {
     "name": "The Physics of Loneliness",
     "author": "Daniel Kessler",
-    "price": "17.25",
     "takeaways": [
       {
         "heading": "Gravity of Solitude",
@@ -218,7 +210,6 @@
   {
     "name": "The Library of Lost Sounds",
     "author": "Alec Hartman",
-    "price": "15.80",
     "takeaways": [
       {
         "heading": "Silence Has Memory",
@@ -245,7 +236,6 @@
   {
     "name": "The Algorithm of Emotion",
     "author": "Daniel Kepler",
-    "price": "20.00",
     "takeaways": [
       {
         "heading": "Data Meets Heart",

@@ -128,7 +128,7 @@ public class BookController {
         User user = currentUser(principal);
         if (!myBookService.alreadyInList(id, user)) {
             Book b = service.getBookById(id);
-            MyBookList mb = new MyBookList(b.getId(), b.getName(), b.getAuthor(), b.getPrice(), user);
+            MyBookList mb = new MyBookList(b.getId(), b.getName(), b.getAuthor(), user);
             myBookService.saveMyBooks(mb);
         }
         return "redirect:/my_books";

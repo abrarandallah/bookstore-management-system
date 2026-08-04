@@ -5,7 +5,6 @@ import java.util.List;
 public class BookImportRequest {
     private String name;
     private String author;
-    private String price;
     private List<TakeawayImportRequest> takeaways;
 
     public String getName() {
@@ -22,14 +21,6 @@ public class BookImportRequest {
 
     public void setAuthor(String author) {
         this.author = author;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
     }
 
     public List<TakeawayImportRequest> getTakeaways() {

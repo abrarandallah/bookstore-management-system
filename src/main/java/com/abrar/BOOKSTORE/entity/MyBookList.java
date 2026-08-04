@@ -24,7 +24,6 @@ public class MyBookList {
 
     private String name;
     private String author;
-    private String price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -34,12 +33,11 @@ public class MyBookList {
         super();
     }
 
-    public MyBookList(int bookId, String name, String author, String price, User user) {
+    public MyBookList(int bookId, String name, String author, User user) {
         super();
         this.bookId = bookId;
         this.name = name;
         this.author = author;
-        this.price = price;
         this.user = user;
     }
 
@@ -57,10 +55,6 @@ public class MyBookList {
 
     public void setAuthor(String author) {
         this.author = author;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
     }
 
     public void setUser(User user) {

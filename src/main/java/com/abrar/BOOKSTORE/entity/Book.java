@@ -2,7 +2,6 @@ package com.abrar.BOOKSTORE.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -21,10 +20,6 @@ public class Book {
     @NotBlank(message = "Author name is required.")
     private String author;
 
-    @NotBlank(message = "Price is required.")
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Price must be a positive number, e.g. 19.99.")
-    private String price;
-
     // Path under /uploads/** the cover image was saved to, or null if the
     // book has no cover yet (falls back to a generated spine card).
     private String coverImageUrl;
@@ -35,12 +30,11 @@ public class Book {
     @OrderBy("pageNumber ASC")
     private List<BookPage> takeaways = new ArrayList<>();
 
-    public Book(int id, String name, String author, String price) {
+    public Book(int id, String name, String author) {
         super();
         this.id = id;
         this.name = name;
         this.author = author;
-        this.price = price;
     }
 
     public Book() {
@@ -57,10 +51,6 @@ public class Book {
 
     public void setAuthor(String author) {
         this.author = author;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
     }
 
     public void setCoverImageUrl(String coverImageUrl) {

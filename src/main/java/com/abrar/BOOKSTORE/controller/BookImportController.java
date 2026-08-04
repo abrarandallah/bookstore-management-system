@@ -35,7 +35,6 @@ public class BookImportController {
               {
                 "name": "The Art of Unfinished Things",
                 "author": "Laila Morningside",
-                "price": "14.99",
                 "takeaways": [
                   { "heading": "Start Before You're Ready", "content": "Progress begins when you stop waiting for perfect conditions." },
                   { "heading": "Celebrate Incompletion", "content": "Unfinished projects hold lessons just as valuable as finished ones." }
@@ -76,7 +75,6 @@ public class BookImportController {
             Book book = new Book();
             book.setName(req.getName());
             book.setAuthor(req.getAuthor());
-            book.setPrice(req.getPrice());
 
             List<BookPage> pages = new ArrayList<>();
             if (req.getTakeaways() != null) {

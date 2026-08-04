@@ -21,11 +21,6 @@
             <input type="text" id="author" class="form-control" name="author" th:value="${book.author}">
         </div>
 
-        <div class="mb-3">
-            <label for="price" class="form-label">Price</label>
-            <input type="text" id="price" class="form-control" name="price" th:value="${book.price}">
-        </div>
-
         <div class="mb-4">
             <label for="cover" class="form-label">Cover image</label>
             <div th:if="${book.coverImageUrl}" class="mb-2">
