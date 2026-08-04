@@ -70,7 +70,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.referrerPolicy(
                         referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/register", "/forgot-password", "/reset-password",
+                        .requestMatchers("/", "/about", "/login", "/register", "/forgot-password", "/reset-password",
                                 "/css/**", "/js/**", "/images/**", "/img/**", "/uploads/**", "/*.jpg", "/*.png")
                         .permitAll()
                         .anyRequest().authenticated())
