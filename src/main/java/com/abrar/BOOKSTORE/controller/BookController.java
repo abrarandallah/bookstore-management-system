@@ -68,6 +68,30 @@ public class BookController {
         return "bookList";
     }
 
+    /**
+     * Same data as {@link #getAllBook}, but returns just the results
+     * fragment (grid + empty states) rather than the full page. Used by the
+     * live/incremental search on the book list so typing doesn't trigger a
+     * full page reload.
+     */
+    @GetMapping("/available_books/results")
+    public String getAllBookResultsFragment(@RequestParam(required = false) String q,
+            @RequestParam(required = false, defaultValue = "name_asc") String sort, Model model) {
+        List<Book> list = service.search(q, sort);
+        model.addAttribute("book", list);
+        model.addAttribute("q", q);
+        model.addAttribute("sort", sort);
+        return "bookList :: resultsFragment";
+    }
+
+    // "Surprise Me" on the home page - picks a random book and drops the
+    // reader straight into it, rather than making them browse first.
+    @GetMapping("/random_book")
+    public String randomBook() {
+        Book b = service.getRandomBook();
+        return "redirect:/available_books/" + b.getId() + "/read";
+    }
+
     @PostMapping("/save")
     @PreAuthorize("hasRole('LIBRARIAN')")
     public String addBook(@ModelAttribute Book b, @RequestParam(required = false) MultipartFile cover,

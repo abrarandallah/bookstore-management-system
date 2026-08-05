@@ -19,6 +19,9 @@
                     <a href="/login" class="btn btn-primary" sec:authorize="isAnonymous()">Login</a>
                     <a href="/register" class="btn btn-outline-brass" sec:authorize="isAnonymous()">Create an account</a>
                     <a href="/available_books" class="btn btn-primary" sec:authorize="isAuthenticated()">Browse Books</a>
+                    <a href="/random_book" class="btn btn-outline-brass" sec:authorize="isAuthenticated()">
+                        <i class="fa-solid fa-dice me-1"></i> Surprise Me
+                    </a>
                     <a href="/about" class="btn btn-outline-brass">How it works</a>
                 </div>
             </div>

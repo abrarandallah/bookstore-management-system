@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -27,20 +28,47 @@ public class BookService {
     /**
      * @param term   free-text match against name/author, or blank for
      *               everything.
-     * @param sortBy one of: name_asc, author_asc, newest. Falls back to
-     *               name_asc for anything else, rather than erroring on an
-     *               unrecognized/tampered value.
+     * @param sortBy one of: name_asc, author_asc, newest, read_time_asc,
+     *               read_time_desc. Falls back to name_asc for anything
+     *               else, rather than erroring on an unrecognized/tampered
+     *               value.
      */
     public List<Book> search(String term, String sortBy) {
-        Sort sort = switch (sortBy == null ? "" : sortBy) {
+        String safeTerm = term == null ? "" : term.trim();
+        String effectiveSort = sortBy == null ? "" : sortBy;
+
+        // estimatedReadMinutes is a derived value, not a persisted column,
+        // so it can't be pushed down into a JPA Sort - fetch in a stable
+        // order and sort by read time in memory instead.
+        if (effectiveSort.equals("read_time_asc") || effectiveSort.equals("read_time_desc")) {
+            List<Book> results = bRepo.search(safeTerm, Sort.by("name").ascending());
+            Comparator<Book> byReadTime = Comparator.comparingInt(Book::getEstimatedReadMinutes);
+            results.sort(effectiveSort.equals("read_time_desc") ? byReadTime.reversed() : byReadTime);
+            return results;
+        }
+
+        Sort sort = switch (effectiveSort) {
             case "author_asc" -> Sort.by("author").ascending();
             // No createdAt column exists, but id is auto-incrementing, so
             // higher id reliably means "added more recently".
             case "newest" -> Sort.by("id").descending();
             default -> Sort.by("name").ascending();
         };
-        String safeTerm = term == null ? "" : term.trim();
         return bRepo.search(safeTerm, sort);
+    }
+
+    /**
+     * @throws ResourceNotFoundException if there are no books to pick from
+     *                                   yet - lets the existing
+     *                                   not-found error page handle it
+     *                                   rather than needing a special case.
+     */
+    public Book getRandomBook() {
+        List<Book> all = bRepo.findAll();
+        if (all.isEmpty()) {
+            throw new ResourceNotFoundException("No books available yet - check back once some have been added.");
+        }
+        return all.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(all.size()));
     }
 
     /**
