@@ -42,6 +42,9 @@
                 Next <i class="fa-solid fa-arrow-right ms-1"></i>
             </button>
         </div>
+        <p class="text-center mt-2 mb-0 small" style="color: var(--ink-soft); opacity: 0.7;">
+            <i class="fa-solid fa-keyboard me-1"></i> Use the &larr; and &rarr; arrow keys to navigate too
+        </p>
     </div>
 </div>
 </main>
@@ -79,6 +82,20 @@
 
     if (readerTotal > 0) {
         readerRender();
+        // Arrow-key navigation alongside the Previous/Next buttons - skipped
+        // while focus is on a form control so it doesn't hijack typing
+        // elsewhere on the page.
+        document.addEventListener('keydown', (event) => {
+            const tag = document.activeElement ? document.activeElement.tagName : '';
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+                return;
+            }
+            if (event.key === 'ArrowLeft') {
+                readerGo(-1);
+            } else if (event.key === 'ArrowRight') {
+                readerGo(1);
+            }
+        });
     }
 </script>
 </body>
