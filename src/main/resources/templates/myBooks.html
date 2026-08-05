@@ -28,7 +28,6 @@
                  th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(b.name.hashCode()) % 360} + ', 42%, 34%)'">
                 <div class="book-author" th:text="${b.author}">Author</div>
                 <div class="book-title" th:text="${b.name}">Book title</div>
-                <div class="price-tag" th:text="'$' + ${b.price}">$0.00</div>
                 <div class="book-actions">
                     <form th:action="@{/deleteMyBook/{id}(id=${b.id})}" method="post"
                           onsubmit="return confirm('Remove this book from your list?');">
