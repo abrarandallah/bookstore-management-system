@@ -20,7 +20,7 @@
 
                 <h5 class="mb-1" th:text="${user.username}"></h5>
                 <p class="text-muted mb-2" th:text="${user.email}"></p>
-                <span class="price-tag" th:text="${user.role == 'ROLE_LIBRARIAN'} ? 'Librarian' : 'Reader'"></span>
+                <span class="pill-tag" th:text="${user.role == 'ROLE_LIBRARIAN'} ? 'Librarian' : 'Reader'"></span>
 
                 <form th:action="@{/profile/avatar}" method="post" enctype="multipart/form-data"
                       class="d-flex justify-content-center align-items-center gap-2 mt-3">
