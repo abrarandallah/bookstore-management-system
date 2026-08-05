@@ -16,60 +16,72 @@
             </a>
         </div>
 
-        <form th:action="@{/available_books}" method="get" class="d-flex flex-wrap gap-2 mb-4">
-            <div class="flex-grow-1" style="min-width: 220px;">
-                <input type="search" name="q" class="form-control" placeholder="Search by title or author&hellip;" th:value="${q}">
+        <form th:action="@{/available_books}" method="get" id="search-form" class="search-panel mb-4">
+            <div class="search-field">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="search" name="q" id="search-input" class="search-input"
+                       placeholder="Search by title or author&hellip;" th:value="${q}" autocomplete="off">
             </div>
-            <select name="sort" class="form-select" style="max-width: 200px;" onchange="this.form.submit()">
+            <div class="search-divider"></div>
+            <select name="sort" id="search-sort" class="search-sort">
                 <option value="name_asc" th:selected="${sort == 'name_asc' or sort == null}">Title A&ndash;Z</option>
                 <option value="author_asc" th:selected="${sort == 'author_asc'}">Author A&ndash;Z</option>
                 <option value="newest" th:selected="${sort == 'newest'}">Newest first</option>
+                <option value="read_time_asc" th:selected="${sort == 'read_time_asc'}">Shortest read</option>
+                <option value="read_time_desc" th:selected="${sort == 'read_time_desc'}">Longest read</option>
             </select>
-            <button type="submit" class="btn btn-secondary">Search</button>
-            <a th:if="${q != null and !#strings.isEmpty(q)}" th:href="@{/available_books(sort=${sort})}" class="btn btn-link">Clear</a>
+            <button type="submit" class="btn btn-secondary search-submit">
+                <span class="search-submit-text">Search</span>
+                <i class="fa-solid fa-circle-notch fa-spin search-submit-spinner" aria-hidden="true"></i>
+            </button>
+            <a th:href="@{/available_books(sort=${sort})}"
+               th:classappend="${q == null or #strings.isEmpty(q)} ? 'd-none' : ''"
+               id="search-clear" class="btn btn-link">Clear</a>
         </form>
 
-        <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q))}" class="empty-state">
-            <span class="eyebrow">Nothing here yet</span>
-            <h3>The shelf is empty</h3>
-            <p>No books have been registered for the store yet.</p>
-        </div>
+        <div id="book-results" th:fragment="resultsFragment">
+            <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q))}" class="empty-state">
+                <span class="eyebrow">Nothing here yet</span>
+                <h3>The shelf is empty</h3>
+                <p>No books have been registered for the store yet.</p>
+            </div>
 
-        <div th:if="${#lists.isEmpty(book) and q != null and !#strings.isEmpty(q)}" class="empty-state">
-            <span class="eyebrow">No matches</span>
-            <h3>Nothing matches "<span th:text="${q}"></span>"</h3>
-            <p>Try a different title or author.</p>
-        </div>
+            <div th:if="${#lists.isEmpty(book) and q != null and !#strings.isEmpty(q)}" class="empty-state">
+                <span class="eyebrow">No matches</span>
+                <h3>Nothing matches "<span th:text="${q}"></span>"</h3>
+                <p>Try a different title or author.</p>
+            </div>
 
-        <div class="book-grid" th:unless="${#lists.isEmpty(book)}">
-            <div class="book-card" th:each="b : ${book}"
-                 th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(b.name.hashCode()) % 360} + ', 42%, 34%)'">
-                <img th:if="${b.coverImageUrl}" th:src="@{${b.coverImageUrl}}" alt="Cover" class="book-cover mb-2">
-                <div class="book-author" th:text="${b.author}">Author</div>
-                <div class="book-title" th:text="${b.name}">Book title</div>
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
-                        <i class="fa-solid fa-list-check"></i>
-                        <span th:text="${#lists.size(b.takeaways)} + ' takeaways · ' + ${b.estimatedReadMinutes} + ' min read'"></span>
-                    </span>
-                </div>
-                <div class="book-actions">
-                    <a th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
-                    <form th:action="@{/mylist/{id}(id=${b.id})}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-link p-0 icon-link" style="border:none;background:none;" title="Add to My Books">
-                            <i class="fa-solid fa-bookmark"></i>
-                        </button>
-                    </form>
-                    <a th:href="@{/editBook/{id}(id=${b.id})}" sec:authorize="hasRole('LIBRARIAN')" class="icon-link">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </a>
-                    <form th:action="@{/deleteBook/{id}(id=${b.id})}" method="post" class="d-inline"
-                          sec:authorize="hasRole('LIBRARIAN')"
-                          onsubmit="return confirm('Delete this book? This cannot be undone.');">
-                        <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </form>
+            <div class="book-grid" th:unless="${#lists.isEmpty(book)}">
+                <div class="book-card" th:each="b : ${book}"
+                     th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(b.name.hashCode()) % 360} + ', 42%, 34%)'">
+                    <img th:if="${b.coverImageUrl}" th:src="@{${b.coverImageUrl}}" alt="Cover" class="book-cover mb-2">
+                    <div class="book-author" th:text="${b.author}">Author</div>
+                    <div class="book-title" th:text="${b.name}">Book title</div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span th:text="${#lists.size(b.takeaways)} + ' takeaways · ' + ${b.estimatedReadMinutes} + ' min read'"></span>
+                        </span>
+                    </div>
+                    <div class="book-actions">
+                        <a th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
+                        <form th:action="@{/mylist/{id}(id=${b.id})}" method="post" class="d-inline ajax-bookmark-form">
+                            <button type="submit" class="btn btn-link p-0 icon-link" style="border:none;background:none;" title="Add to My Books">
+                                <i class="fa-solid fa-bookmark"></i>
+                            </button>
+                        </form>
+                        <a th:href="@{/editBook/{id}(id=${b.id})}" sec:authorize="hasRole('LIBRARIAN')" class="icon-link">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        <form th:action="@{/deleteBook/{id}(id=${b.id})}" method="post" class="d-inline"
+                              sec:authorize="hasRole('LIBRARIAN')"
+                              onsubmit="return confirm('Delete this book? This cannot be undone.');">
+                            <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,5 +90,7 @@
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:src="@{/js/live-search.js}"></script>
+<script th:src="@{/js/toast.js}"></script>
 </body>
 </html>
