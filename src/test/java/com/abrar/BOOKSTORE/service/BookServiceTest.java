@@ -134,6 +134,31 @@ class BookServiceTest {
     }
 
     /**
+     * Method under test: {@link BookService#getRandomBook()}
+     */
+    @Test
+    void testGetRandomBookReturnsFromRepository() {
+        Book onlyBook = new Book(1, "Name", "JaneDoe");
+        when(bookRepository.findAll()).thenReturn(List.of(onlyBook));
+
+        Book actual = bookService.getRandomBook();
+
+        assertSame(onlyBook, actual);
+    }
+
+    /**
+     * Method under test: {@link BookService#getRandomBook()}
+     * Should surface as the app's existing not-found error page rather than
+     * an unhandled index-out-of-bounds exception.
+     */
+    @Test
+    void testGetRandomBookThrowsWhenNoBooksExist() {
+        when(bookRepository.findAll()).thenReturn(new ArrayList<>());
+
+        assertThrows(ResourceNotFoundException.class, () -> bookService.getRandomBook());
+    }
+
+    /**
      * Method under test: {@link BookService#search(String, String)}
      */
     @Test
