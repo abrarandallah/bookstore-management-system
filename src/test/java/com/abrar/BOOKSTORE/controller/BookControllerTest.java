@@ -66,7 +66,6 @@ class BookControllerTest {
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/save")
                                 .param("name", "Name")
                                 .param("author", "JaneDoe")
-                                .param("price", "19.99")
                                 .param("takeaways[0].heading", "Heading")
                                 .param("takeaways[0].content", "Content");
                 MockMvcBuilders.standaloneSetup(bookController)
@@ -137,7 +136,6 @@ class BookControllerTest {
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/save")
                                 .param("name", "Name")
                                 .param("author", "JaneDoe")
-                                .param("price", "19.99")
                                 .param("takeaways[0].heading", "Heading")
                                 .param("takeaways[0].content", "Content")
                                 .contentType("application/x-www-form-urlencoded");
@@ -159,8 +157,7 @@ class BookControllerTest {
         void testAddBookRejectsInvalidData() throws Exception {
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/save")
                                 .param("name", "")
-                                .param("author", "")
-                                .param("price", "not-a-number");
+                                .param("author", "");
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
@@ -179,8 +176,7 @@ class BookControllerTest {
         void testAddBookRequiresAtLeastOneTakeaway() throws Exception {
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/save")
                                 .param("name", "Name")
-                                .param("author", "JaneDoe")
-                                .param("price", "19.99");
+                                .param("author", "JaneDoe");
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
@@ -243,7 +239,6 @@ class BookControllerTest {
                 book.setAuthor("JaneDoe");
                 book.setId(1);
                 book.setName("Name");
-                book.setPrice("Price");
                 when(bookService.getBookById(anyInt())).thenReturn(book);
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/editBook/{id}", 1);
                 MockMvcBuilders.standaloneSetup(bookController)
@@ -290,7 +285,6 @@ class BookControllerTest {
                 book.setAuthor("JaneDoe");
                 book.setId(1);
                 book.setName("Name");
-                book.setPrice("Price");
                 when(bookService.getBookById(anyInt())).thenReturn(book);
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/mylist/{id}", 1)
                                 .principal(READER_PRINCIPAL);

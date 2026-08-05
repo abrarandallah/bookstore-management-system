@@ -43,18 +43,15 @@ class BookServiceTest {
         book.setAuthor("JaneDoe");
         book.setId(1);
         book.setName("Name");
-        book.setPrice("Price");
         when(bookRepository.save(Mockito.<Book>any())).thenReturn(book);
 
         Book b = new Book();
         b.setAuthor("JaneDoe");
         b.setId(1);
         b.setName("Name");
-        b.setPrice("Price");
         bookService.save(b);
         verify(bookRepository).save(Mockito.<Book>any());
         assertEquals("JaneDoe", b.getAuthor());
-        assertEquals("Price", b.getPrice());
         assertEquals("Name", b.getName());
         assertEquals(1, b.getId());
         assertTrue(bookService.getAllBook().isEmpty());
@@ -82,7 +79,6 @@ class BookServiceTest {
         book.setAuthor("JaneDoe");
         book.setId(1);
         book.setName("Name");
-        book.setPrice("Price");
         Optional<Book> ofResult = Optional.of(book);
         when(bookRepository.findById(Mockito.<Integer>any())).thenReturn(ofResult);
         assertSame(book, bookService.getBookById(1));
@@ -146,10 +142,10 @@ class BookServiceTest {
         when(bookRepository.search(Mockito.eq("dune"), Mockito.<org.springframework.data.domain.Sort>any()))
                 .thenReturn(bookList);
 
-        bookService.search("  dune  ", "price_desc");
+        bookService.search("  dune  ", "author_asc");
 
         verify(bookRepository).search(Mockito.eq("dune"),
-                Mockito.eq(org.springframework.data.domain.Sort.by("price").descending()));
+                Mockito.eq(org.springframework.data.domain.Sort.by("author").ascending()));
     }
 
     /**
@@ -167,5 +163,34 @@ class BookServiceTest {
 
         verify(bookRepository).search(Mockito.eq(""),
                 Mockito.eq(org.springframework.data.domain.Sort.by("name").ascending()));
+    }
+
+    /**
+     * Method under test: {@link BookService#search(String, String)}
+     * estimatedReadMinutes isn't a persisted column, so read-time sorting
+     * has to happen in memory after fetching - this verifies the ordering
+     * comes out correct (shortest first) rather than just trusting the
+     * repository's order.
+     */
+    @Test
+    void testSearchSortsByReadTimeAscendingInMemory() {
+        Book shortBook = new Book(1, "Short One", "AuthorA");
+        shortBook.setTakeaways(java.util.List.of(new com.abrar.BOOKSTORE.entity.BookPage(1, "H1", "C1")));
+
+        Book longBook = new Book(2, "Long One", "AuthorB");
+        longBook.setTakeaways(java.util.List.of(
+                new com.abrar.BOOKSTORE.entity.BookPage(1, "H1", "C1"),
+                new com.abrar.BOOKSTORE.entity.BookPage(2, "H2", "C2"),
+                new com.abrar.BOOKSTORE.entity.BookPage(3, "H3", "C3"),
+                new com.abrar.BOOKSTORE.entity.BookPage(4, "H4", "C4")));
+
+        ArrayList<Book> unsorted = new ArrayList<>(List.of(longBook, shortBook));
+        when(bookRepository.search(Mockito.eq(""),
+                Mockito.eq(org.springframework.data.domain.Sort.by("name").ascending())))
+                .thenReturn(unsorted);
+
+        List<Book> actual = bookService.search(null, "read_time_asc");
+
+        assertEquals(List.of(shortBook, longBook), actual);
     }
 }

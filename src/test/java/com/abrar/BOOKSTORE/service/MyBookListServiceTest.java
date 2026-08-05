@@ -37,7 +37,7 @@ class MyBookListServiceTest {
 
     @Test
     void testSaveMyBooks() {
-        MyBookList book = new MyBookList(1, "Name", "JaneDoe", "Price", user);
+        MyBookList book = new MyBookList(1, "Name", "JaneDoe", user);
         when(myBookRepository.save(Mockito.<MyBookList>any())).thenReturn(book);
 
         myBookListService.saveMyBooks(book);
@@ -47,7 +47,7 @@ class MyBookListServiceTest {
     @Test
     void testGetMyBooksReturnsOnlyThatUsersEntries() {
         List<MyBookList> books = new ArrayList<>();
-        books.add(new MyBookList(1, "Name", "JaneDoe", "Price", user));
+        books.add(new MyBookList(1, "Name", "JaneDoe", user));
         when(myBookRepository.findByUser(user)).thenReturn(books);
 
         List<MyBookList> actual = myBookListService.getMyBooks(user);
@@ -63,7 +63,7 @@ class MyBookListServiceTest {
 
     @Test
     void testDeleteByIdRemovesOwnedEntry() {
-        MyBookList entry = new MyBookList(1, "Name", "JaneDoe", "Price", user);
+        MyBookList entry = new MyBookList(1, "Name", "JaneDoe", user);
         when(myBookRepository.findByIdAndUser(5L, user)).thenReturn(Optional.of(entry));
         doNothing().when(myBookRepository).delete(entry);
 
