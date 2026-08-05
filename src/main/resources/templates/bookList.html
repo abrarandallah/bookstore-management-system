@@ -39,51 +39,53 @@
                id="search-clear" class="btn btn-link">Clear</a>
         </form>
 
-        <div id="book-results" th:fragment="resultsFragment">
-            <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q))}" class="empty-state">
-                <span class="eyebrow">Nothing here yet</span>
-                <h3>The shelf is empty</h3>
-                <p>No books have been registered for the store yet.</p>
-            </div>
+        <div id="book-results">
+            <th:block th:fragment="resultsFragment">
+                <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q))}" class="empty-state">
+                    <span class="eyebrow">Nothing here yet</span>
+                    <h3>The shelf is empty</h3>
+                    <p>No books have been registered for the store yet.</p>
+                </div>
 
-            <div th:if="${#lists.isEmpty(book) and q != null and !#strings.isEmpty(q)}" class="empty-state">
-                <span class="eyebrow">No matches</span>
-                <h3>Nothing matches "<span th:text="${q}"></span>"</h3>
-                <p>Try a different title or author.</p>
-            </div>
+                <div th:if="${#lists.isEmpty(book) and q != null and !#strings.isEmpty(q)}" class="empty-state">
+                    <span class="eyebrow">No matches</span>
+                    <h3>Nothing matches "<span th:text="${q}"></span>"</h3>
+                    <p>Try a different title or author.</p>
+                </div>
 
-            <div class="book-grid" th:unless="${#lists.isEmpty(book)}">
-                <div class="book-card" th:each="b : ${book}"
-                     th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(b.name.hashCode()) % 360} + ', 42%, 34%)'">
-                    <img th:if="${b.coverImageUrl}" th:src="@{${b.coverImageUrl}}" alt="Cover" class="book-cover mb-2">
-                    <div class="book-author" th:text="${b.author}">Author</div>
-                    <div class="book-title" th:text="${b.name}">Book title</div>
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
-                            <i class="fa-solid fa-list-check"></i>
-                            <span th:text="${#lists.size(b.takeaways)} + ' takeaways · ' + ${b.estimatedReadMinutes} + ' min read'"></span>
-                        </span>
-                    </div>
-                    <div class="book-actions">
-                        <a th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
-                        <form th:action="@{/mylist/{id}(id=${b.id})}" method="post" class="d-inline ajax-bookmark-form">
-                            <button type="submit" class="btn btn-link p-0 icon-link" style="border:none;background:none;" title="Add to My Books">
-                                <i class="fa-solid fa-bookmark"></i>
-                            </button>
-                        </form>
-                        <a th:href="@{/editBook/{id}(id=${b.id})}" sec:authorize="hasRole('LIBRARIAN')" class="icon-link">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </a>
-                        <form th:action="@{/deleteBook/{id}(id=${b.id})}" method="post" class="d-inline"
-                              sec:authorize="hasRole('LIBRARIAN')"
-                              onsubmit="return confirm('Delete this book? This cannot be undone.');">
-                            <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </form>
+                <div class="book-grid" th:unless="${#lists.isEmpty(book)}">
+                    <div class="book-card" th:each="b : ${book}"
+                         th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(b.name.hashCode()) % 360} + ', 42%, 34%)'">
+                        <img th:if="${b.coverImageUrl}" th:src="@{${b.coverImageUrl}}" alt="Cover" class="book-cover mb-2">
+                        <div class="book-author" th:text="${b.author}">Author</div>
+                        <div class="book-title" th:text="${b.name}">Book title</div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
+                                <i class="fa-solid fa-list-check"></i>
+                                <span th:text="${#lists.size(b.takeaways)} + ' takeaways · ' + ${b.estimatedReadMinutes} + ' min read'"></span>
+                            </span>
+                        </div>
+                        <div class="book-actions">
+                            <a th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
+                            <form th:action="@{/mylist/{id}(id=${b.id})}" method="post" class="d-inline ajax-bookmark-form">
+                                <button type="submit" class="btn btn-link p-0 icon-link" style="border:none;background:none;" title="Add to My Books">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                </button>
+                            </form>
+                            <a th:href="@{/editBook/{id}(id=${b.id})}" sec:authorize="hasRole('LIBRARIAN')" class="icon-link">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <form th:action="@{/deleteBook/{id}(id=${b.id})}" method="post" class="d-inline"
+                                  sec:authorize="hasRole('LIBRARIAN')"
+                                  onsubmit="return confirm('Delete this book? This cannot be undone.');">
+                                <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </th:block>
         </div>
     </div>
 </main>
