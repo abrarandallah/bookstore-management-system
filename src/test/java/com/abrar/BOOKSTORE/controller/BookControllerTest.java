@@ -128,6 +128,40 @@ class BookControllerTest {
 
         /**
          * Method under test:
+         * {@link BookController#getAllBookResultsFragment(String, String, Model)}
+         */
+        @Test
+        void testGetAllBookResultsFragment() throws Exception {
+                when(bookService.search(Mockito.<String>any(), Mockito.<String>any())).thenReturn(new ArrayList<>());
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/available_books/results")
+                                .param("q", "dune")
+                                .param("sort", "author_asc");
+                MockMvcBuilders.standaloneSetup(bookController)
+                                .build()
+                                .perform(requestBuilder)
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.model().size(3))
+                                .andExpect(MockMvcResultMatchers.model().attributeExists("book"))
+                                .andExpect(MockMvcResultMatchers.view().name("bookList :: resultsFragment"));
+        }
+
+        /**
+         * Method under test: {@link BookController#randomBook()}
+         */
+        @Test
+        void testRandomBook() throws Exception {
+                Book book = new Book(7, "Name", "JaneDoe");
+                when(bookService.getRandomBook()).thenReturn(book);
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/random_book");
+                MockMvcBuilders.standaloneSetup(bookController)
+                                .build()
+                                .perform(requestBuilder)
+                                .andExpect(MockMvcResultMatchers.status().isFound())
+                                .andExpect(MockMvcResultMatchers.redirectedUrl("/available_books/7/read"));
+        }
+
+        /**
+         * Method under test:
          * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, Model)}
          */
         @Test
