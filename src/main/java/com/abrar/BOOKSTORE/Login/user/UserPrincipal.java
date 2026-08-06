@@ -17,14 +17,17 @@ public class UserPrincipal implements UserDetails {
     private String usernameOrEmail;
     @Getter
     private String email;
+    @Getter
+    private String avatarUrl;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(Long id, String usernameOrEmail, String email, String password,
+    public UserPrincipal(Long id, String usernameOrEmail, String email, String avatarUrl, String password,
             Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.usernameOrEmail = usernameOrEmail;
         this.email = email;
+        this.avatarUrl = avatarUrl;
         this.password = password;
         this.authorities = authorities;
     }
@@ -39,6 +42,7 @@ public class UserPrincipal implements UserDetails {
                 user.getId(),
                 user.getUsernameOrEmail(),
                 user.getEmail(),
+                user.getAvatarUrl(),
                 user.getPassword(),
                 authorities);
     }
@@ -53,6 +57,10 @@ public class UserPrincipal implements UserDetails {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     @Override
