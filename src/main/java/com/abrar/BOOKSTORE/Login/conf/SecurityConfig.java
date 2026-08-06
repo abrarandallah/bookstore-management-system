@@ -3,7 +3,17 @@ package com.abrar.BOOKSTORE.Login.conf;
 
 // authorization rules. Every route requires a logged-in session except the
 // handful explicitly listed as public below.
+//
+// Two coexisting auth mechanisms: the browser UI uses session-cookie auth
+// via formLogin (everything below), and a separate JSON API under
+// /api/auth/** authenticates via a JWT bearer token instead (see
+// JwtAuthorizationFilter). The JWT filter is a no-op passthrough when no
+// bearer token is present, so it doesn't interfere with session-based
+// requests - the two simply don't overlap in practice.
 
+import com.abrar.BOOKSTORE.Login.auth.JwtAuthenticationEntryPoint;
+import com.abrar.BOOKSTORE.Login.jwt.JwtAuthorizationFilter;
+import com.abrar.BOOKSTORE.Login.jwt.JwtTokenProvider;
 import com.abrar.BOOKSTORE.Login.user.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +28,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -29,6 +41,9 @@ public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     public SecurityConfig(UserDetailsService userDetailsService) {
@@ -54,15 +69,21 @@ public class SecurityConfig {
     }
 
     @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter() {
+        return new JwtAuthorizationFilter(jwtTokenProvider, userDetailsService);
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> {
                 })
-                // Session-cookie auth (formLogin) is what everything in this app
-                // uses now that the separate JWT/API path is gone, so CSRF applies
-                // everywhere - nothing left that needs exempting.
-                .csrf(csrf -> {
-                })
+                // /api/** authenticates via a Bearer token read from the Authorization
+                // header - never a cookie - so it isn't vulnerable to CSRF and is
+                // exempted here. Every other route uses session-cookie auth via
+                // formLogin and needs CSRF protection, since that's what a forged
+                // cross-site request would ride on.
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 // Without this, browsers send the full page URL - including anything in
                 // the query string, like the password-reset token - as a Referer header
                 // to every external resource the page loads (our Bootstrap/FontAwesome
@@ -71,9 +92,17 @@ public class SecurityConfig {
                         referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/about", "/login", "/register", "/forgot-password", "/reset-password",
+                                "/api/auth/**",
                                 "/css/**", "/js/**", "/images/**", "/img/**", "/uploads/**", "/*.jpg", "/*.png")
                         .permitAll()
                         .anyRequest().authenticated())
+                // Scoped to /api/** only - anything else falls through to formLogin's
+                // own default entry point (redirect to /login), which is what an
+                // expired browser session needs. A blanket override here would
+                // replace that redirect with a bare 401 for the whole site.
+                .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
+                        new JwtAuthenticationEntryPoint(), new AntPathRequestMatcher("/api/**")))
+                .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/login")
                         .usernameParameter("usernameOrEmail")
