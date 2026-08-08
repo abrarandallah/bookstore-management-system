@@ -1,6 +1,4 @@
-
-//generateToken creates a JWT token based on the user's ID.
-//getUserIdFromJWT extracts the user's ID from a JWT token.
+//generateToken creates a JWT token with the username as its subject.
 //validateToken checks the validity and integrity of a JWT token.
 package com.abrar.BOOKSTORE.Login.jwt;
 
@@ -58,15 +56,6 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
-    }
-
-    public Long getUserIdFromJWT(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody();
-
-        return Long.parseLong(claims.getSubject());
     }
 
     public boolean validateToken(String authToken) {
