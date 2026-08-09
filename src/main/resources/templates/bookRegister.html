@@ -63,6 +63,21 @@
             />
           </div>
 
+          <div class="mb-4" th:if="${!#lists.isEmpty(allGenres)}">
+            <span class="eyebrow d-block mb-2">Genres</span>
+            <div class="genre-picker">
+              <label class="genre-chip-toggle" th:each="genre : ${allGenres}">
+                <input
+                  type="checkbox"
+                  name="genreIds"
+                  th:value="${genre.id}"
+                  th:checked="${selectedGenreIds != null and selectedGenreIds.contains(genre.id)}"
+                />
+                <span th:text="${genre.name}"></span>
+              </label>
+            </div>
+          </div>
+
           <hr class="my-4" />
 
           <div class="d-flex justify-content-between align-items-center mb-3">

@@ -4,10 +4,12 @@ import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.BookPage;
+import com.abrar.BOOKSTORE.entity.Genre;
 import com.abrar.BOOKSTORE.entity.MyBookList;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.BookValidator;
 import com.abrar.BOOKSTORE.service.FileStorageService;
+import com.abrar.BOOKSTORE.service.GenreService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(method = { RequestMethod.DELETE,
@@ -36,6 +40,8 @@ public class BookController {
     private FileStorageService fileStorageService;
     @Autowired
     private BookValidator bookValidator;
+    @Autowired
+    private GenreService genreService;
 
     private User currentUser(Principal principal) {
         return userRepository.findByUsernameOrEmail(principal.getName())
@@ -54,17 +60,21 @@ public class BookController {
 
     @GetMapping("/book_register")
     @PreAuthorize("hasRole('LIBRARIAN')")
-    public String BookRegister() {
+    public String BookRegister(Model model) {
+        model.addAttribute("allGenres", genreService.findAll());
         return "bookRegister";
     }
 
     @GetMapping("/available_books")
     public String getAllBook(@RequestParam(required = false) String q,
-            @RequestParam(required = false, defaultValue = "name_asc") String sort, Model model) {
-        List<Book> list = service.search(q, sort);
+            @RequestParam(required = false, defaultValue = "name_asc") String sort,
+            @RequestParam(required = false) Integer genre, Model model) {
+        List<Book> list = service.search(q, genre, sort);
         model.addAttribute("book", list);
         model.addAttribute("q", q);
         model.addAttribute("sort", sort);
+        model.addAttribute("genres", genreService.findAll());
+        model.addAttribute("selectedGenre", genre);
         return "bookList";
     }
 
@@ -76,11 +86,13 @@ public class BookController {
      */
     @GetMapping("/available_books/results")
     public String getAllBookResultsFragment(@RequestParam(required = false) String q,
-            @RequestParam(required = false, defaultValue = "name_asc") String sort, Model model) {
-        List<Book> list = service.search(q, sort);
+            @RequestParam(required = false, defaultValue = "name_asc") String sort,
+            @RequestParam(required = false) Integer genre, Model model) {
+        List<Book> list = service.search(q, genre, sort);
         model.addAttribute("book", list);
         model.addAttribute("q", q);
         model.addAttribute("sort", sort);
+        model.addAttribute("selectedGenre", genre);
         return "bookList :: resultsFragment";
     }
 
@@ -95,7 +107,8 @@ public class BookController {
     @PostMapping("/save")
     @PreAuthorize("hasRole('LIBRARIAN')")
     public String addBook(@ModelAttribute Book b, @RequestParam(required = false) MultipartFile cover,
-            @RequestParam(required = false) String existingCoverImageUrl, Model model) {
+            @RequestParam(required = false) String existingCoverImageUrl,
+            @RequestParam(required = false) List<Integer> genreIds, Model model) {
         // Drop any takeaway rows the librarian left completely empty (extra
         // "add another" rows that never got filled in) before validating or
         // numbering the rest.
@@ -130,9 +143,12 @@ public class BookController {
         if (error != null) {
             model.addAttribute("error", error);
             model.addAttribute("book", b);
+            model.addAttribute("allGenres", genreService.findAll());
+            model.addAttribute("selectedGenreIds", genreIds == null ? List.of() : genreIds);
             // id is 0 for a brand-new book (never persisted), non-zero when editing
             return b.getId() == 0 ? "bookRegister" : "bookEdit";
         }
+        b.setGenres(new LinkedHashSet<>(genreService.findAllById(genreIds)));
         service.save(b);
         return "redirect:/available_books";
     }
@@ -170,6 +186,9 @@ public class BookController {
     public String editBook(@PathVariable("id") int id, Model model) {
         Book b = service.getBookById(id);
         model.addAttribute("book", b);
+        model.addAttribute("allGenres", genreService.findAll());
+        model.addAttribute("selectedGenreIds",
+                b.getGenres().stream().map(Genre::getId).collect(Collectors.toList()));
         return "bookEdit";
     }
 
