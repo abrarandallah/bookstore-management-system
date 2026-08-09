@@ -4,8 +4,10 @@ import com.abrar.BOOKSTORE.controller.dto.BookImportRequest;
 import com.abrar.BOOKSTORE.controller.dto.TakeawayImportRequest;
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.BookPage;
+import com.abrar.BOOKSTORE.entity.Genre;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.BookValidator;
+import com.abrar.BOOKSTORE.service.GenreService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/admin/books")
@@ -29,12 +33,15 @@ public class BookImportController {
     private BookService bookService;
     @Autowired
     private BookValidator bookValidator;
+    @Autowired
+    private GenreService genreService;
 
     private static final String EXAMPLE_JSON = """
             [
               {
                 "name": "The Art of Unfinished Things",
                 "author": "Laila Morningside",
+                "genres": ["Self-Help", "Philosophy"],
                 "takeaways": [
                   { "heading": "Start Before You're Ready", "content": "Progress begins when you stop waiting for perfect conditions." },
                   { "heading": "Celebrate Incompletion", "content": "Unfinished projects hold lessons just as valuable as finished ones." }
@@ -86,6 +93,16 @@ public class BookImportController {
                 }
             }
             book.setTakeaways(pages);
+
+            if (req.getGenres() != null && !req.getGenres().isEmpty()) {
+                Set<Genre> genres = new LinkedHashSet<>();
+                for (String genreName : req.getGenres()) {
+                    if (genreName != null && !genreName.isBlank()) {
+                        genres.add(genreService.findOrCreateByName(genreName));
+                    }
+                }
+                book.setGenres(genres);
+            }
 
             String label = (req.getName() == null || req.getName().isBlank()) ? "row " + (i + 1) : req.getName();
             String error = bookValidator.validate(book);
