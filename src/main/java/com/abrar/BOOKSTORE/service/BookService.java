@@ -34,6 +34,20 @@ public class BookService {
      *               value.
      */
     public List<Book> search(String term, String sortBy) {
+        return search(term, null, sortBy);
+    }
+
+    /**
+     * @param term    free-text match against name/author, or blank for
+     *                everything.
+     * @param genreId restrict results to books tagged with this genre, or
+     *                null for every genre.
+     * @param sortBy  one of: name_asc, author_asc, newest, read_time_asc,
+     *                read_time_desc. Falls back to name_asc for anything
+     *                else, rather than erroring on an unrecognized/tampered
+     *                value.
+     */
+    public List<Book> search(String term, Integer genreId, String sortBy) {
         String safeTerm = term == null ? "" : term.trim();
         String effectiveSort = sortBy == null ? "" : sortBy;
 
@@ -41,7 +55,7 @@ public class BookService {
         // so it can't be pushed down into a JPA Sort - fetch in a stable
         // order and sort by read time in memory instead.
         if (effectiveSort.equals("read_time_asc") || effectiveSort.equals("read_time_desc")) {
-            List<Book> results = bRepo.search(safeTerm, Sort.by("name").ascending());
+            List<Book> results = fetch(safeTerm, genreId, Sort.by("name").ascending());
             Comparator<Book> byReadTime = Comparator.comparingInt(Book::getEstimatedReadMinutes);
             results.sort(effectiveSort.equals("read_time_desc") ? byReadTime.reversed() : byReadTime);
             return results;
@@ -54,7 +68,11 @@ public class BookService {
             case "newest" -> Sort.by("id").descending();
             default -> Sort.by("name").ascending();
         };
-        return bRepo.search(safeTerm, sort);
+        return fetch(safeTerm, genreId, sort);
+    }
+
+    private List<Book> fetch(String term, Integer genreId, Sort sort) {
+        return genreId == null ? bRepo.search(term, sort) : bRepo.searchByGenre(term, genreId, sort);
     }
 
     /**

@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -29,6 +31,14 @@ public class Book {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("pageNumber ASC")
     private List<BookPage> takeaways = new ArrayList<>();
+
+    // Shelf categories this book is tagged with (0 or more). Owning side of
+    // the relationship - the join table is the only place this link is
+    // stored, Genre doesn't carry a reference back.
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "book_genres", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    @OrderBy("name ASC")
+    private Set<Genre> genres = new LinkedHashSet<>();
 
     public Book(int id, String name, String author) {
         super();
@@ -59,6 +69,10 @@ public class Book {
 
     public void setTakeaways(List<BookPage> takeaways) {
         this.takeaways = takeaways;
+    }
+
+    public void setGenres(Set<Genre> genres) {
+        this.genres = genres;
     }
 
     // A rough, honest estimate rather than a precise one: ~90 seconds per
