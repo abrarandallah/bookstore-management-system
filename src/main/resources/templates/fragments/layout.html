@@ -109,6 +109,9 @@
                         <a class="nav-link" href="/available_books">Available Books</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/genres">Genres</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
                         <a class="nav-link" href="/my_books">My Books</a>
                     </li>
                     <li class="nav-item dropdown" sec:authorize="hasRole('LIBRARIAN')">
@@ -125,6 +128,11 @@
                             <li>
                                 <a class="dropdown-item" href="/admin/books/import">
                                     <i class="fa-solid fa-file-import"></i> Bulk Import
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/admin/genres">
+                                    <i class="fa-solid fa-tags"></i> Manage Genres
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
@@ -204,6 +212,8 @@
                 <a href="/">Home</a>
                 <span class="mx-2">·</span>
                 <a href="/available_books">Available Books</a>
+                <span class="mx-2">·</span>
+                <a href="/genres">Genres</a>
                 <span class="mx-2">·</span>
                 <a href="/about">About</a>
             </div>

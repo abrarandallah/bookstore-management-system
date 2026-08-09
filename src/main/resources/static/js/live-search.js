@@ -10,6 +10,7 @@
 
     const input = document.getElementById('search-input');
     const sortSelect = document.getElementById('search-sort');
+    const genreSelect = document.getElementById('search-genre');
     const results = document.getElementById('book-results');
     const clearLink = document.getElementById('search-clear');
 
@@ -23,6 +24,9 @@
             params.set('q', input.value);
         }
         params.set('sort', sortSelect.value);
+        if (genreSelect && genreSelect.value) {
+            params.set('genre', genreSelect.value);
+        }
         return params;
     }
 
@@ -83,6 +87,10 @@
     });
 
     sortSelect.addEventListener('change', () => runSearch());
+
+    if (genreSelect) {
+        genreSelect.addEventListener('change', () => runSearch());
+    }
 
     if (clearLink) {
         clearLink.addEventListener('click', (event) => {

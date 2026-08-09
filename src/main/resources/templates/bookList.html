@@ -23,6 +23,12 @@
                        placeholder="Search by title or author&hellip;" th:value="${q}" autocomplete="off">
             </div>
             <div class="search-divider"></div>
+            <select name="genre" id="search-genre" class="search-sort" th:if="${!#lists.isEmpty(genres)}">
+                <option value="" th:selected="${selectedGenre == null}">All genres</option>
+                <option th:each="g : ${genres}" th:value="${g.id}" th:text="${g.name}"
+                        th:selected="${selectedGenre != null and selectedGenre == g.id}"></option>
+            </select>
+            <div class="search-divider"></div>
             <select name="sort" id="search-sort" class="search-sort">
                 <option value="name_asc" th:selected="${sort == 'name_asc' or sort == null}">Title A&ndash;Z</option>
                 <option value="author_asc" th:selected="${sort == 'author_asc'}">Author A&ndash;Z</option>
@@ -34,17 +40,23 @@
                 <span class="search-submit-text">Search</span>
                 <i class="fa-solid fa-circle-notch fa-spin search-submit-spinner" aria-hidden="true"></i>
             </button>
-            <a th:href="@{/available_books(sort=${sort})}"
+            <a th:href="@{/available_books(sort=${sort}, genre=${selectedGenre})}"
                th:classappend="${q == null or #strings.isEmpty(q)} ? 'd-none' : ''"
                id="search-clear" class="btn btn-link">Clear</a>
         </form>
 
         <div id="book-results">
             <th:block th:fragment="resultsFragment">
-                <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q))}" class="empty-state">
+                <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q)) and selectedGenre == null}" class="empty-state">
                     <span class="eyebrow">Nothing here yet</span>
                     <h3>The shelf is empty</h3>
                     <p>No books have been registered for the store yet.</p>
+                </div>
+
+                <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q)) and selectedGenre != null}" class="empty-state">
+                    <span class="eyebrow">No matches</span>
+                    <h3>No books in this genre yet</h3>
+                    <p>Try a different genre, or clear the filter to see everything.</p>
                 </div>
 
                 <div th:if="${#lists.isEmpty(book) and q != null and !#strings.isEmpty(q)}" class="empty-state">
@@ -59,6 +71,9 @@
                         <img th:if="${b.coverImageUrl}" th:src="@{${b.coverImageUrl}}" alt="Cover" class="book-cover mb-2">
                         <div class="book-author" th:text="${b.author}">Author</div>
                         <div class="book-title" th:text="${b.name}">Book title</div>
+                        <div class="d-flex align-items-center gap-1 flex-wrap mb-1" th:if="${!#sets.isEmpty(b.genres)}">
+                            <span class="genre-badge" th:each="g : ${b.genres}" th:text="${g.name}"></span>
+                        </div>
                         <div class="d-flex align-items-center gap-2 flex-wrap">
                             <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
                                 <i class="fa-solid fa-list-check"></i>
