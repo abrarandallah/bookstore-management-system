@@ -11,6 +11,7 @@ import com.abrar.BOOKSTORE.service.BookValidator;
 import com.abrar.BOOKSTORE.service.FileStorageService;
 import com.abrar.BOOKSTORE.service.GenreService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
+import com.abrar.BOOKSTORE.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,6 +43,8 @@ public class BookController {
     private BookValidator bookValidator;
     @Autowired
     private GenreService genreService;
+    @Autowired
+    private ReviewService reviewService;
 
     private User currentUser(Principal principal) {
         return userRepository.findByUsernameOrEmail(principal.getName())
@@ -75,6 +78,7 @@ public class BookController {
         model.addAttribute("sort", sort);
         model.addAttribute("genres", genreService.findAll());
         model.addAttribute("selectedGenre", genre);
+        model.addAttribute("ratingSummaries", reviewService.summariesForAllBooks());
         return "bookList";
     }
 
@@ -93,6 +97,7 @@ public class BookController {
         model.addAttribute("q", q);
         model.addAttribute("sort", sort);
         model.addAttribute("selectedGenre", genre);
+        model.addAttribute("ratingSummaries", reviewService.summariesForAllBooks());
         return "bookList :: resultsFragment";
     }
 
@@ -175,9 +180,12 @@ public class BookController {
     }
 
     @GetMapping("/available_books/{id}/read")
-    public String readBook(@PathVariable("id") int id, Model model) {
+    public String readBook(@PathVariable("id") int id, Model model, Principal principal) {
         Book b = service.getBookById(id);
         model.addAttribute("book", b);
+        model.addAttribute("reviews", reviewService.getReviewsForBook(id));
+        model.addAttribute("ratingSummary", reviewService.summaryForBook(id));
+        model.addAttribute("ownReview", reviewService.findOwnReview(id, currentUser(principal)).orElse(null));
         return "bookRead";
     }
 
