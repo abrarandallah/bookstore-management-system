@@ -74,6 +74,11 @@
                         <div class="d-flex align-items-center gap-1 flex-wrap mb-1" th:if="${!#sets.isEmpty(b.genres)}">
                             <span class="genre-badge" th:each="g : ${b.genres}" th:text="${g.name}"></span>
                         </div>
+                        <span class="rating-badge mb-1" th:if="${ratingSummaries.get(b.id) != null}">
+                            <i class="fa-solid fa-star"></i>
+                            <span th:text="${#numbers.formatDecimal(ratingSummaries.get(b.id).average, 1, 1)}"></span>
+                            <span class="text-muted">(<span th:text="${ratingSummaries.get(b.id).count}"></span>)</span>
+                        </span>
                         <div class="d-flex align-items-center gap-2 flex-wrap">
                             <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
                                 <i class="fa-solid fa-list-check"></i>

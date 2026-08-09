@@ -864,6 +864,69 @@ a:hover {
   opacity: 0.8;
 }
 
+/* ---- ratings & reviews ------------------------------------------------ */
+
+.rating-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink);
+}
+
+.rating-badge i.fa-star {
+  color: var(--brass);
+}
+
+/* Classic pure-CSS star picker: radios in reverse (5..1) DOM order laid
+   out with row-reverse so they read left-to-right as 1..5, then the
+   :checked/:hover sibling selectors below light up everything from the
+   hovered/checked star through the end of the (reversed) DOM - which,
+   visually, is everything from the start up to that star. */
+.star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 0.15rem;
+  width: fit-content;
+}
+
+.star-rating input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.star-rating label {
+  cursor: pointer;
+  font-size: 1.6rem;
+  color: var(--line);
+  transition: color 0.15s ease;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+  color: var(--brass);
+}
+
+.star-display {
+  color: var(--brass);
+  font-size: 0.85rem;
+}
+
+.star-display .fa-regular {
+  color: var(--line);
+}
+
+.review-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+}
+
 /* ---- takeaway authoring form ---------------------------------------------- */
 
 .takeaway-row {

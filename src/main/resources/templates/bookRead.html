@@ -12,6 +12,12 @@
         <div>
             <span class="eyebrow d-block" th:text="${book.author}">Author</span>
             <h3 class="mb-0" th:text="${book.name}">Book title</h3>
+            <span class="rating-badge mt-1" th:if="${ratingSummary.count > 0}">
+                <i class="fa-solid fa-star"></i>
+                <span th:text="${#numbers.formatDecimal(ratingSummary.average, 1, 1)}">4.3</span>
+                <span class="text-muted">(<span th:text="${ratingSummary.count}"></span> <span th:text="${ratingSummary.count == 1 ? 'review' : 'reviews'}"></span>)</span>
+            </span>
+            <span class="rating-badge mt-1 text-muted" th:unless="${ratingSummary.count > 0}">No reviews yet</span>
         </div>
     </div>
 
@@ -45,6 +51,58 @@
         <p class="text-center mt-2 mb-0 small" style="color: var(--ink-soft); opacity: 0.7;">
             <i class="fa-solid fa-keyboard me-1"></i> Use the &larr; and &rarr; arrow keys to navigate too
         </p>
+    </div>
+
+    <div class="form-panel p-4 mt-4">
+        <span class="eyebrow d-block mb-3" th:text="${ownReview != null ? 'Edit your review' : 'Rate this book'}"></span>
+        <div class="alert alert-danger" th:if="${reviewError}" th:text="${reviewError}"></div>
+        <form th:action="@{/available_books/{id}/review(id=${book.id})}" method="post">
+            <div class="star-rating mb-3">
+                <input type="radio" id="star5" name="rating" value="5" required
+                       th:checked="${ownReview != null and ownReview.rating == 5}">
+                <label for="star5" title="5 stars"><i class="fa-solid fa-star"></i></label>
+                <input type="radio" id="star4" name="rating" value="4" required
+                       th:checked="${ownReview != null and ownReview.rating == 4}">
+                <label for="star4" title="4 stars"><i class="fa-solid fa-star"></i></label>
+                <input type="radio" id="star3" name="rating" value="3" required
+                       th:checked="${ownReview != null and ownReview.rating == 3}">
+                <label for="star3" title="3 stars"><i class="fa-solid fa-star"></i></label>
+                <input type="radio" id="star2" name="rating" value="2" required
+                       th:checked="${ownReview != null and ownReview.rating == 2}">
+                <label for="star2" title="2 stars"><i class="fa-solid fa-star"></i></label>
+                <input type="radio" id="star1" name="rating" value="1" required
+                       th:checked="${ownReview != null and ownReview.rating == 1}">
+                <label for="star1" title="1 star"><i class="fa-solid fa-star"></i></label>
+            </div>
+            <textarea name="comment" class="form-control mb-3" rows="3" maxlength="2000"
+                      placeholder="What did you think? (optional)"
+                      th:text="${ownReview != null ? ownReview.comment : ''}"></textarea>
+            <button type="submit" class="btn btn-primary btn-sm"
+                    th:text="${ownReview != null ? 'Update review' : 'Submit review'}"></button>
+        </form>
+        <form th:if="${ownReview != null}"
+              th:action="@{/available_books/{bookId}/review/{reviewId}/delete(bookId=${book.id}, reviewId=${ownReview.id})}"
+              method="post" class="d-inline mt-2"
+              onsubmit="return confirm('Delete your review?');">
+            <button type="submit" class="btn btn-link btn-sm text-danger p-0">Delete my review</button>
+        </form>
+    </div>
+
+    <div class="mt-4" th:unless="${#lists.isEmpty(reviews)}">
+        <span class="eyebrow d-block mb-3">Reader reviews</span>
+        <div class="review-card mb-3" th:each="r : ${reviews}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="fw-semibold" th:text="${r.user.username}">Reader</span>
+                    <span class="star-display d-block">
+                        <i th:each="i : ${#numbers.sequence(1,5)}"
+                           th:class="${i <= r.rating ? 'fa-solid fa-star' : 'fa-regular fa-star'}"></i>
+                    </span>
+                </div>
+                <span class="text-muted small" th:text="${#temporals.format(r.createdAt, 'MMM d, yyyy')}"></span>
+            </div>
+            <p class="mb-0 mt-2" th:if="${r.comment != null}" th:text="${r.comment}" style="white-space: pre-line;"></p>
+        </div>
     </div>
 </div>
 </main>
