@@ -927,6 +927,50 @@ a:hover {
   padding: 1rem 1.1rem;
 }
 
+/* ---- pagination -------------------------------------------------------- */
+
+.pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: var(--paper-raised);
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+a.page-link:hover {
+  border-color: var(--brass);
+  color: var(--brass);
+}
+
+.page-link.active {
+  background: var(--brass);
+  border-color: var(--brass);
+  color: var(--paper-raised);
+  font-weight: 600;
+}
+
+.page-link.disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
 /* ---- takeaway authoring form ---------------------------------------------- */
 
 .takeaway-row {
