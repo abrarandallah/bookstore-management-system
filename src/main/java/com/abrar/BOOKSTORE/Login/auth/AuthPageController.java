@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,6 +30,9 @@ public class AuthPageController {
 
     @Autowired
     private FileStorageService fileStorageService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/login")
     public String loginPage() {
@@ -61,11 +65,14 @@ public class AuthPageController {
         return "redirect:/login?registered";
     }
 
+    private User currentUser(Authentication authentication) {
+        return userRepository.findByUsernameOrEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Logged-in user not found: " + authentication.getName()));
+    }
+
     @GetMapping("/profile")
     public String profilePage(Authentication authentication, Model model) {
-        User user = userRepository.findByUsernameOrEmail(authentication.getName())
-                .orElseThrow(() -> new IllegalStateException("Logged-in user not found: " + authentication.getName()));
-        model.addAttribute("user", user);
+        model.addAttribute("user", currentUser(authentication));
         return "profile";
     }
 
@@ -77,8 +84,7 @@ public class AuthPageController {
     @PostMapping("/profile/avatar")
     public String uploadAvatar(@RequestParam MultipartFile avatar, Authentication authentication,
             RedirectAttributes redirectAttributes) {
-        User user = userRepository.findByUsernameOrEmail(authentication.getName())
-                .orElseThrow(() -> new IllegalStateException("Logged-in user not found: " + authentication.getName()));
+        User user = currentUser(authentication);
         try {
             user.setAvatarUrl(fileStorageService.store(avatar, "avatars"));
             userRepository.save(user);
@@ -86,5 +92,41 @@ public class AuthPageController {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
         return "redirect:/profile";
+    }
+
+    // In-app password change for an already-authenticated user - distinct
+    // from the /forgot-password + /reset-password flow, which is for users
+    // who are logged OUT and need an email link. Since the session already
+    // proves who they are, this skips the email step entirely and instead
+    // confirms identity by asking for the current password.
+    @GetMapping("/change-password")
+    public String changePasswordForm() {
+        return "changePassword";
+    }
+
+    @PostMapping("/change-password")
+    public String changePasswordSubmit(@RequestParam String currentPassword, @RequestParam String password,
+            @RequestParam String confirmPassword, Authentication authentication, Model model) {
+        User user = currentUser(authentication);
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            model.addAttribute("error", "Current password is incorrect.");
+            return "changePassword";
+        }
+        if (password == null || password.length() < 8) {
+            model.addAttribute("error", "New password must be at least 8 characters.");
+            return "changePassword";
+        }
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("error", "New passwords don't match.");
+            return "changePassword";
+        }
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            model.addAttribute("error", "New password must be different from your current password.");
+            return "changePassword";
+        }
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        model.addAttribute("message", "Your password has been changed.");
+        return "changePassword";
     }
 }

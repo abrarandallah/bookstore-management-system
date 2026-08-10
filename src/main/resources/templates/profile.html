@@ -30,12 +30,21 @@
                 </form>
             </div>
 
+            <div class="form-panel p-4 mt-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <span class="eyebrow d-block mb-1">Security</span>
+                    <p class="mb-0 text-muted small">Keep your account safe with a strong, unique password.</p>
+                </div>
+                <a href="/change-password" class="btn btn-primary">
+                    <i class="fa-solid fa-key me-1"></i> Change Password
+                </a>
+            </div>
+
             <div class="form-panel p-4 mt-3">
                 <span class="eyebrow d-block mb-3">Quick links</span>
                 <div class="d-flex flex-wrap gap-2">
                     <a href="/available_books" class="btn btn-secondary btn-sm">Browse Books</a>
                     <a href="/my_books" class="btn btn-secondary btn-sm">My Books</a>
-                    <a href="/forgot-password" class="btn btn-secondary btn-sm">Change Password</a>
                     <a href="/book_register" class="btn btn-secondary btn-sm"
                        sec:authorize="hasRole('LIBRARIAN')">Register a Book</a>
                     <a href="/admin/users" class="btn btn-secondary btn-sm"

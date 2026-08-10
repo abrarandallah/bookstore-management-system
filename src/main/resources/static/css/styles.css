@@ -1028,6 +1028,14 @@ a.page-link:hover {
   --burgundy: #d97c7c;
   --line: #3a361f;
   --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.4);
+  /* Bootstrap's .text-muted (and anything else reading these Bootstrap
+     variables, e.g. placeholder/disabled text) is hardcoded for a light
+     background - rgba(33,37,41,.75), a near-black gray - and goes
+     essentially invisible against this theme's near-black background.
+     Re-pointing it at --ink-soft's dark-theme value fixes every
+     "text-muted" instance across the site at once instead of one at a time. */
+  --bs-secondary-color: var(--ink-soft);
+  --bs-secondary-color-rgb: 203, 191, 160;
 }
 
 [data-theme="dark"] .alert-danger {
