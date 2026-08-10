@@ -19,6 +19,10 @@
             </span>
             <span class="rating-badge mt-1 text-muted" th:unless="${ratingSummary.count > 0}">No reviews yet</span>
         </div>
+        <a th:href="@{/available_books/{id}/share(id=${book.id})}" class="icon-link ms-auto" title="Share this book"
+           target="_blank" rel="noopener">
+            <i class="fa-solid fa-share-nodes"></i>
+        </a>
     </div>
 
     <div th:if="${#lists.isEmpty(book.takeaways)}" class="empty-state">

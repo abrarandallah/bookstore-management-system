@@ -182,6 +182,19 @@ public class BookController {
         return "redirect:/my_books";
     }
 
+    // Public, unauthenticated "share" view: a lightweight teaser (cover,
+    // author, genres, rating, and just the first takeaway) that anyone with
+    // the link can open without logging in - unlike /read, which is gated.
+    // See SecurityConfig's permitAll list for the matching route.
+    @GetMapping("/available_books/{id}/share")
+    public String shareBook(@PathVariable("id") int id, Model model) {
+        Book b = service.getBookById(id);
+        model.addAttribute("book", b);
+        model.addAttribute("ratingSummary", reviewService.summaryForBook(id));
+        model.addAttribute("teaser", b.getTakeaways().isEmpty() ? null : b.getTakeaways().get(0));
+        return "bookShare";
+    }
+
     @GetMapping("/available_books/{id}/read")
     public String readBook(@PathVariable("id") int id, Model model, Principal principal) {
         Book b = service.getBookById(id);

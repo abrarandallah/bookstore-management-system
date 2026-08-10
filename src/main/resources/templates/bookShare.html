@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:insert="~{fragments/layout :: pageHead(${book.name} + ' - shared by a reader')}"></th:block>
+    <!--/* Open Graph tags so the link actually looks like something when it
+           lands in a chat app or social feed, instead of a bare URL. Kept
+           here rather than in the shared pageHead fragment since only this
+           page needs them. */-->
+    <meta th:if="${book.coverImageUrl}" property="og:image" th:content="@{${book.coverImageUrl}}">
+    <meta property="og:title" th:content="${book.name} + ' by ' + ${book.author}">
+    <meta property="og:description"
+          th:content="${teaser != null ? teaser.heading : (book.name + ' - a book on BookStore, summarized in ' + book.estimatedReadMinutes + ' min.')}">
+    <meta property="og:type" content="book">
+</head>
+<body>
+
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="page-body">
+<div class="container my-5" style="max-width: 560px;">
+
+    <div class="text-center mb-4">
+        <img th:if="${book.coverImageUrl}" th:src="@{${book.coverImageUrl}}" alt="Cover"
+             style="width:120px;height:auto;border-radius:6px;box-shadow:var(--shadow-card);">
+        <span class="eyebrow d-block mt-3" th:text="${book.author}">Author</span>
+        <h2 class="mb-2" th:text="${book.name}">Book title</h2>
+
+        <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap mb-2"
+             th:if="${!#sets.isEmpty(book.genres)}">
+            <span class="genre-badge" th:each="g : ${book.genres}" th:text="${g.name}"></span>
+        </div>
+
+        <span class="rating-badge" th:if="${ratingSummary.count > 0}">
+            <i class="fa-solid fa-star"></i>
+            <span th:text="${#numbers.formatDecimal(ratingSummary.average, 1, 1)}">4.3</span>
+            <span class="text-muted">(<span th:text="${ratingSummary.count}"></span>
+                <span th:text="${ratingSummary.count == 1 ? 'review' : 'reviews'}"></span>)</span>
+        </span>
+        <span class="rating-badge text-muted" th:unless="${ratingSummary.count > 0}">No reviews yet</span>
+
+        <span class="takeaway-tag d-block mt-2" th:if="${!#lists.isEmpty(book.takeaways)}">
+            <i class="fa-solid fa-list-check"></i>
+            <span th:text="${#lists.size(book.takeaways)} + ' takeaways &middot; ' + ${book.estimatedReadMinutes} + ' min read'"></span>
+        </span>
+    </div>
+
+    <!--/* One free takeaway as a taste of the format - not the whole book,
+           just enough that someone deciding whether to sign up can see
+           what they'd actually get. */-->
+    <div class="form-panel p-4 p-md-5 mb-4" th:if="${teaser != null}">
+        <span class="eyebrow d-block mb-2">A first look</span>
+        <h4 th:text="${teaser.heading}">Heading</h4>
+        <p style="white-space: pre-line;" th:text="${teaser.content}">Content</p>
+        <p class="text-muted small mb-0" th:if="${#lists.size(book.takeaways) > 1}">
+            + <span th:text="${#lists.size(book.takeaways) - 1}"></span> more
+            <span th:text="${#lists.size(book.takeaways) - 1 == 1 ? 'takeaway' : 'takeaways'}"></span> inside.
+        </p>
+    </div>
+
+    <div class="empty-state mb-4" th:if="${teaser == null}">
+        <span class="eyebrow">Nothing here yet</span>
+        <h3>No takeaways yet</h3>
+        <p>This book hasn't been summarized yet.</p>
+    </div>
+
+    <div class="text-center">
+        <a sec:authorize="isAuthenticated()" th:href="@{/available_books/{id}/read(id=${book.id})}"
+           class="btn btn-primary">
+            Read the full book <i class="fa-solid fa-arrow-right ms-1"></i>
+        </a>
+        <!--/* Login always lands on /available_books on success (see
+               SecurityConfig's defaultSuccessUrl) - there's no redirect-back
+               support yet, so this intentionally just points at /login
+               rather than promising a return to this exact book. */-->
+        <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn btn-primary">
+            Sign in to read the full book <i class="fa-solid fa-arrow-right ms-1"></i>
+        </a>
+        <p class="text-muted small mt-3 mb-0" sec:authorize="isAnonymous()">
+            New here? <a th:href="@{/register}">Create a free account</a> - it only takes a minute.
+        </p>
+
+        <button type="button" class="btn btn-link mt-2" id="share-copy-btn" onclick="copyShareLink()">
+            <i class="fa-solid fa-link me-1"></i> Copy this link to share
+        </button>
+    </div>
+
+</div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+    function copyShareLink() {
+        navigator.clipboard.writeText(window.location.href).then(function () {
+            const btn = document.getElementById('share-copy-btn');
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Link copied';
+            setTimeout(function () { btn.innerHTML = original; }, 2000);
+        });
+    }
+</script>
+</body>
+</html>

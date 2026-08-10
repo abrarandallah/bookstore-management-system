@@ -93,6 +93,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/about", "/login", "/register", "/forgot-password", "/reset-password",
                                 "/api/auth/**",
+                                // The share page is meant to be opened by anyone the link is sent
+                                // to, logged in or not - that's the whole point of a share link.
+                                "/available_books/*/share",
                                 "/css/**", "/js/**", "/images/**", "/img/**", "/uploads/**", "/*.jpg", "/*.png")
                         .permitAll()
                         .anyRequest().authenticated())

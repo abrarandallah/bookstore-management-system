@@ -8,17 +8,20 @@ import static org.mockito.Mockito.when;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.entity.Book;
+import com.abrar.BOOKSTORE.entity.BookPage;
 import com.abrar.BOOKSTORE.entity.MyBookList;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.FileStorageService;
 import com.abrar.BOOKSTORE.service.GenreService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
 import com.abrar.BOOKSTORE.service.PagedResult;
+import com.abrar.BOOKSTORE.service.RatingSummary;
 import com.abrar.BOOKSTORE.service.ReviewService;
 import com.abrar.BOOKSTORE.service.BookValidator;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -234,6 +237,54 @@ class BookControllerTest {
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("error"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookRegister"));
                 Mockito.verify(bookService, Mockito.never()).save(Mockito.<Book>any());
+        }
+
+        /**
+         * Method under test: {@link BookController#shareBook(int, Model)}
+         * The share page is public - no principal is set up for this
+         * request, unlike {@link #testDeleteMyBook()} - and should still
+         * resolve, with the first takeaway exposed as the teaser.
+         */
+        @Test
+        void testShareBookWithTakeaways() throws Exception {
+                Book book = new Book(1, "Atomic Habits", "James Clear");
+                BookPage takeaway = new BookPage();
+                takeaway.setHeading("Small habits compound");
+                takeaway.setContent("1% better every day adds up.");
+                book.setTakeaways(new ArrayList<>(List.of(takeaway)));
+                when(bookService.getBookById(1)).thenReturn(book);
+                when(reviewService.summaryForBook(1)).thenReturn(new RatingSummary(4.5, 2));
+
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/available_books/{id}/share",
+                                1);
+                MockMvcBuilders.standaloneSetup(bookController)
+                                .build()
+                                .perform(requestBuilder)
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.view().name("bookShare"))
+                                .andExpect(MockMvcResultMatchers.model().attribute("book", book))
+                                .andExpect(MockMvcResultMatchers.model().attribute("teaser", takeaway));
+        }
+
+        /**
+         * Method under test: {@link BookController#shareBook(int, Model)}
+         * A book with no takeaways yet should still render the share page,
+         * just with a null teaser rather than an error.
+         */
+        @Test
+        void testShareBookWithoutTakeaways() throws Exception {
+                Book book = new Book(2, "Untitled Draft", "Jane Doe");
+                when(bookService.getBookById(2)).thenReturn(book);
+                when(reviewService.summaryForBook(2)).thenReturn(new RatingSummary(0.0, 0));
+
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/available_books/{id}/share",
+                                2);
+                MockMvcBuilders.standaloneSetup(bookController)
+                                .build()
+                                .perform(requestBuilder)
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.view().name("bookShare"))
+                                .andExpect(MockMvcResultMatchers.model().attribute("teaser", (Object) null));
         }
 
         /**
