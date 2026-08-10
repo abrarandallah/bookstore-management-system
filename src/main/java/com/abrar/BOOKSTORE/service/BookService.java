@@ -14,6 +14,11 @@ import java.util.List;
 @Service
 public class BookService {
 
+    // How many books show per page on the shelf. Not currently exposed as
+    // a user-choosable option - if that changes, this is the one place
+    // to add a bound/validated size parameter.
+    public static final int DEFAULT_PAGE_SIZE = 12;
+
     @Autowired
     private BookRepository bRepo;
 
@@ -73,6 +78,29 @@ public class BookService {
 
     private List<Book> fetch(String term, Integer genreId, Sort sort) {
         return genreId == null ? bRepo.search(term, sort) : bRepo.searchByGenre(term, genreId, sort);
+    }
+
+    /**
+     * Same filtering/sorting as {@link #search(String, Integer, String)},
+     * sliced down to one page. Slices the already-sorted/filtered list
+     * rather than pushing paging down to the database - see
+     * {@link PagedResult}'s class comment for why.
+     *
+     * @param page 1-indexed page to return. Values outside
+     *             [1, totalPages] are clamped rather than producing an
+     *             out-of-bounds error or an empty result for an
+     *             otherwise-valid query.
+     * @param size items per page; falls back to {@link #DEFAULT_PAGE_SIZE}
+     *             for a non-positive value.
+     */
+    public PagedResult<Book> searchPaged(String term, Integer genreId, String sortBy, int page, int size) {
+        List<Book> all = search(term, genreId, sortBy);
+        int safeSize = size <= 0 ? DEFAULT_PAGE_SIZE : size;
+        int totalPages = Math.max(1, (int) Math.ceil((double) all.size() / safeSize));
+        int safePage = Math.min(Math.max(1, page), totalPages);
+        int fromIndex = Math.min((safePage - 1) * safeSize, all.size());
+        int toIndex = Math.min(fromIndex + safeSize, all.size());
+        return new PagedResult<>(all.subList(fromIndex, toIndex), safePage, safeSize, all.size());
     }
 
     /**
