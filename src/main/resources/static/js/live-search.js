@@ -18,6 +18,11 @@
     let debounceTimer = null;
     let activeController = null;
 
+    // Kept in sync with the URL on load so a bookmarked/back-navigated
+    // link to page 3 (say) starts the JS-driven state on page 3 too,
+    // rather than silently resetting to page 1 on the next AJAX search.
+    let currentPage = parseInt(new URLSearchParams(window.location.search).get('page'), 10) || 1;
+
     function currentParams() {
         const params = new URLSearchParams();
         if (input.value) {
@@ -26,6 +31,9 @@
         params.set('sort', sortSelect.value);
         if (genreSelect && genreSelect.value) {
             params.set('genre', genreSelect.value);
+        }
+        if (currentPage > 1) {
+            params.set('page', currentPage);
         }
         return params;
     }
@@ -82,24 +90,51 @@
 
     input.addEventListener('input', () => {
         updateClearLink();
+        currentPage = 1;
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => runSearch(), DEBOUNCE_MS);
     });
 
-    sortSelect.addEventListener('change', () => runSearch());
+    sortSelect.addEventListener('change', () => {
+        currentPage = 1;
+        runSearch();
+    });
 
     if (genreSelect) {
-        genreSelect.addEventListener('change', () => runSearch());
+        genreSelect.addEventListener('change', () => {
+            currentPage = 1;
+            runSearch();
+        });
     }
 
     if (clearLink) {
         clearLink.addEventListener('click', (event) => {
             event.preventDefault();
             input.value = '';
+            currentPage = 1;
             updateClearLink();
             runSearch();
         });
     }
+
+    // Pagination links live inside #book-results, which gets its
+    // innerHTML replaced on every search - so the listener goes on the
+    // stable container itself (event delegation) rather than on the links
+    // directly, which would stop working the moment the fragment refreshes.
+    results.addEventListener('click', (event) => {
+        const link = event.target.closest('.page-link[data-page]');
+        if (!link) {
+            return;
+        }
+        event.preventDefault();
+        const page = parseInt(link.dataset.page, 10);
+        if (!page || page === currentPage) {
+            return;
+        }
+        currentPage = page;
+        runSearch();
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 
     form.addEventListener('submit', (event) => {
         // The live search already re-runs on every keystroke, so an actual
@@ -107,6 +142,7 @@
         // slower version of what already happened - intercept it too.
         event.preventDefault();
         clearTimeout(debounceTimer);
+        currentPage = 1;
         runSearch();
     });
 
