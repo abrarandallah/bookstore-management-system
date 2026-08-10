@@ -11,6 +11,7 @@ import com.abrar.BOOKSTORE.service.BookValidator;
 import com.abrar.BOOKSTORE.service.FileStorageService;
 import com.abrar.BOOKSTORE.service.GenreService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
+import com.abrar.BOOKSTORE.service.PagedResult;
 import com.abrar.BOOKSTORE.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(method = { RequestMethod.DELETE,
-        RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT })
 public class BookController {
 
     @Autowired
@@ -71,9 +70,11 @@ public class BookController {
     @GetMapping("/available_books")
     public String getAllBook(@RequestParam(required = false) String q,
             @RequestParam(required = false, defaultValue = "name_asc") String sort,
-            @RequestParam(required = false) Integer genre, Model model) {
-        List<Book> list = service.search(q, genre, sort);
-        model.addAttribute("book", list);
+            @RequestParam(required = false) Integer genre,
+            @RequestParam(required = false, defaultValue = "1") int page, Model model) {
+        PagedResult<Book> result = service.searchPaged(q, genre, sort, page, BookService.DEFAULT_PAGE_SIZE);
+        model.addAttribute("book", result.getContent());
+        model.addAttribute("pagination", result);
         model.addAttribute("q", q);
         model.addAttribute("sort", sort);
         model.addAttribute("genres", genreService.findAll());
@@ -91,9 +92,11 @@ public class BookController {
     @GetMapping("/available_books/results")
     public String getAllBookResultsFragment(@RequestParam(required = false) String q,
             @RequestParam(required = false, defaultValue = "name_asc") String sort,
-            @RequestParam(required = false) Integer genre, Model model) {
-        List<Book> list = service.search(q, genre, sort);
-        model.addAttribute("book", list);
+            @RequestParam(required = false) Integer genre,
+            @RequestParam(required = false, defaultValue = "1") int page, Model model) {
+        PagedResult<Book> result = service.searchPaged(q, genre, sort, page, BookService.DEFAULT_PAGE_SIZE);
+        model.addAttribute("book", result.getContent());
+        model.addAttribute("pagination", result);
         model.addAttribute("q", q);
         model.addAttribute("sort", sort);
         model.addAttribute("selectedGenre", genre);
