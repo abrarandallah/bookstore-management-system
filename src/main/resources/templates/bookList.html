@@ -105,6 +105,34 @@
                         </div>
                     </div>
                 </div>
+
+                <nav class="pagination-controls mt-4" th:if="${pagination != null and pagination.totalPages > 1}"
+                     aria-label="Book list pages">
+                    <a th:if="${pagination.hasPrevious}" class="page-link"
+                       th:href="@{/available_books(q=${q}, sort=${sort}, genre=${selectedGenre}, page=${pagination.page - 1})}"
+                       th:attr="data-page=${pagination.page - 1}" aria-label="Previous page">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                    <span th:unless="${pagination.hasPrevious}" class="page-link disabled" aria-hidden="true">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </span>
+
+                    <th:block th:each="p : ${#numbers.sequence(1, pagination.totalPages)}">
+                        <span th:if="${p == pagination.page}" class="page-link active" th:text="${p}"></span>
+                        <a th:unless="${p == pagination.page}" class="page-link"
+                           th:href="@{/available_books(q=${q}, sort=${sort}, genre=${selectedGenre}, page=${p})}"
+                           th:attr="data-page=${p}" th:text="${p}"></a>
+                    </th:block>
+
+                    <a th:if="${pagination.hasNext}" class="page-link"
+                       th:href="@{/available_books(q=${q}, sort=${sort}, genre=${selectedGenre}, page=${pagination.page + 1})}"
+                       th:attr="data-page=${pagination.page + 1}" aria-label="Next page">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                    <span th:unless="${pagination.hasNext}" class="page-link disabled" aria-hidden="true">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </span>
+                </nav>
             </th:block>
         </div>
     </div>
