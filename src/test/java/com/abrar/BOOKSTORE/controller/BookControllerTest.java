@@ -11,7 +11,10 @@ import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.MyBookList;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.FileStorageService;
+import com.abrar.BOOKSTORE.service.GenreService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
+import com.abrar.BOOKSTORE.service.PagedResult;
+import com.abrar.BOOKSTORE.service.ReviewService;
 import com.abrar.BOOKSTORE.service.BookValidator;
 
 import java.security.Principal;
@@ -49,6 +52,12 @@ class BookControllerTest {
         @MockBean
         private FileStorageService fileStorageService;
 
+        @MockBean
+        private GenreService genreService;
+
+        @MockBean
+        private ReviewService reviewService;
+
         private static final Principal READER_PRINCIPAL = () -> "reader";
 
         private void stubCurrentUser() {
@@ -58,7 +67,7 @@ class BookControllerTest {
 
         /**
          * Method under test:
-         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, Model)}
+         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, java.util.List, Model)}
          */
         @Test
         void testAddBook() throws Exception {
@@ -110,29 +119,35 @@ class BookControllerTest {
         }
 
         /**
-         * Method under test: {@link BookController#getAllBook(String, String, Model)}
+         * Method under test:
+         * {@link BookController#getAllBook(String, String, Integer, int, Model)}
          */
         @Test
         void testGetAllBook() throws Exception {
-                when(bookService.search(Mockito.<String>any(), Mockito.<String>any())).thenReturn(new ArrayList<>());
+                when(bookService.searchPaged(Mockito.<String>any(), Mockito.<Integer>any(), Mockito.<String>any(),
+                                anyInt(), anyInt()))
+                                .thenReturn(new PagedResult<>(new ArrayList<>(), 1, BookService.DEFAULT_PAGE_SIZE, 0));
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/available_books");
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(3))
+                                .andExpect(MockMvcResultMatchers.model().size(7))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("book"))
+                                .andExpect(MockMvcResultMatchers.model().attributeExists("pagination"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookList"))
                                 .andExpect(MockMvcResultMatchers.forwardedUrl("bookList"));
         }
 
         /**
          * Method under test:
-         * {@link BookController#getAllBookResultsFragment(String, String, Model)}
+         * {@link BookController#getAllBookResultsFragment(String, String, Integer, int, Model)}
          */
         @Test
         void testGetAllBookResultsFragment() throws Exception {
-                when(bookService.search(Mockito.<String>any(), Mockito.<String>any())).thenReturn(new ArrayList<>());
+                when(bookService.searchPaged(Mockito.<String>any(), Mockito.<Integer>any(), Mockito.<String>any(),
+                                anyInt(), anyInt()))
+                                .thenReturn(new PagedResult<>(new ArrayList<>(), 1, BookService.DEFAULT_PAGE_SIZE, 0));
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/available_books/results")
                                 .param("q", "dune")
                                 .param("sort", "author_asc");
@@ -140,8 +155,9 @@ class BookControllerTest {
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(3))
+                                .andExpect(MockMvcResultMatchers.model().size(6))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("book"))
+                                .andExpect(MockMvcResultMatchers.model().attributeExists("pagination"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookList :: resultsFragment"));
         }
 
@@ -162,7 +178,7 @@ class BookControllerTest {
 
         /**
          * Method under test:
-         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, Model)}
+         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, java.util.List, Model)}
          */
         @Test
         void testAddBook2() throws Exception {
@@ -183,7 +199,7 @@ class BookControllerTest {
 
         /**
          * Method under test:
-         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, Model)}
+         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, java.util.List, Model)}
          * Verifies that submitting a book with blank fields is rejected instead of
          * being saved.
          */
@@ -202,7 +218,7 @@ class BookControllerTest {
 
         /**
          * Method under test:
-         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, Model)}
+         * {@link BookController#addBook(Book, org.springframework.web.multipart.MultipartFile, String, java.util.List, Model)}
          * Otherwise-valid book with zero takeaways should be rejected - the
          * whole point of the format is that a book has at least one.
          */
@@ -221,7 +237,7 @@ class BookControllerTest {
         }
 
         /**
-         * Method under test: {@link BookController#BookRegister()}
+         * Method under test: {@link BookController#BookRegister(Model)}
          */
         @Test
         void testBookRegister() throws Exception {
@@ -230,7 +246,8 @@ class BookControllerTest {
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(0))
+                                .andExpect(MockMvcResultMatchers.model().size(1))
+                                .andExpect(MockMvcResultMatchers.model().attributeExists("allGenres"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookRegister"))
                                 .andExpect(MockMvcResultMatchers.forwardedUrl("bookRegister"));
         }
@@ -279,8 +296,10 @@ class BookControllerTest {
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(1))
+                                .andExpect(MockMvcResultMatchers.model().size(3))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("book"))
+                                .andExpect(MockMvcResultMatchers.model().attributeExists("allGenres"))
+                                .andExpect(MockMvcResultMatchers.model().attributeExists("selectedGenreIds"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookEdit"))
                                 .andExpect(MockMvcResultMatchers.forwardedUrl("bookEdit"));
         }
