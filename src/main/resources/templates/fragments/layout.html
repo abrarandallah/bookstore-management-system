@@ -104,44 +104,11 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
                         <a class="nav-link" href="/available_books">Available Books</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
                         <a class="nav-link" href="/genres">Genres</a>
-                    </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link" href="/my_books">My Books</a>
-                    </li>
-                    <li class="nav-item dropdown" sec:authorize="hasRole('LIBRARIAN')">
-                        <a class="nav-link dropdown-toggle" href="#" id="manageDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            Manage
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="manageDropdown">
-                            <li>
-                                <a class="dropdown-item" href="/book_register">
-                                    <i class="fa-solid fa-plus"></i> New Book Register
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/admin/books/import">
-                                    <i class="fa-solid fa-file-import"></i> Bulk Import
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/admin/genres">
-                                    <i class="fa-solid fa-tags"></i> Manage Genres
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item" href="/admin/users">
-                                    <i class="fa-solid fa-user-gear"></i> Admin
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                 </ul>
                 <ul class="navbar-nav mb-2 mb-lg-0 align-items-lg-center">
@@ -170,6 +137,11 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li>
+                                <a class="dropdown-item" href="/my_books">
+                                    <i class="fa-solid fa-bookmark"></i> My Books
+                                </a>
+                            </li>
+                            <li>
                                 <button type="button" class="dropdown-item" onclick="toggleTheme()">
                                     <i class="fa-solid fa-sun theme-icon-light"></i>
                                     <i class="fa-solid fa-moon theme-icon-dark"></i>
@@ -187,6 +159,33 @@
                                     <i class="fa-solid fa-gear"></i> Settings
                                 </a>
                             </li>
+                            <!--/* Librarian-only management links, folded into the same dropdown
+                                   rather than a separate main-navbar item - keeps the main navbar
+                                   leaner while staying discoverable in the one account menu. */-->
+                            <th:block sec:authorize="hasRole('LIBRARIAN')">
+                                <li><hr class="dropdown-divider"></li>
+                                <li><h6 class="dropdown-header">Manage</h6></li>
+                                <li>
+                                    <a class="dropdown-item" href="/book_register">
+                                        <i class="fa-solid fa-plus"></i> New Book Register
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/books/import">
+                                        <i class="fa-solid fa-file-import"></i> Bulk Import
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/genres">
+                                        <i class="fa-solid fa-tags"></i> Manage Genres
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/users">
+                                        <i class="fa-solid fa-user-gear"></i> Admin
+                                    </a>
+                                </li>
+                            </th:block>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form th:action="@{/logout}" method="post">
@@ -215,7 +214,7 @@
                 <span class="mx-2">·</span>
                 <a href="/genres">Genres</a>
                 <span class="mx-2">·</span>
-                <a href="/about">About</a>
+                <a href="/#how-it-works">About</a>
             </div>
         </div>
     </footer>

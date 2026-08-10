@@ -640,6 +640,11 @@ a:hover {
   border-radius: var(--radius);
   padding: 0.6rem 0.8rem;
   background-color: var(--paper-raised);
+  /* Without this, file inputs fall back to the browser's default text
+     color for the selected filename, which is a dark navy - invisible
+     against the dark theme's near-black background. Tying it to --ink
+     keeps it readable in both themes automatically. */
+  color: var(--ink);
 }
 
 .form-control:focus {

@@ -22,7 +22,7 @@
                     <a href="/random_book" class="btn btn-outline-brass" sec:authorize="isAuthenticated()">
                         <i class="fa-solid fa-dice me-1"></i> Surprise Me
                     </a>
-                    <a href="/about" class="btn btn-outline-brass">How it works</a>
+                    <a href="#how-it-works" class="btn btn-outline-brass">How it works</a>
                 </div>
             </div>
             <div class="col-lg-6 text-center">
@@ -31,6 +31,40 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!--/* Folded in from the old standalone /about page - it wasn't
+           substantial enough to earn its own primary navbar item. */-->
+    <div class="container my-5" id="how-it-works" style="max-width: 720px;">
+        <span class="eyebrow">How it works</span>
+        <h2 class="mb-4">About BookStore</h2>
+
+        <p>
+            Most books have a handful of ideas worth remembering, wrapped in a few hundred pages
+            of story, examples, and repetition. BookStore strips that down: every book here is
+            distilled into 1&ndash;10 short takeaways &mdash; a few sentences each, capturing the
+            core idea rather than the full argument.
+        </p>
+        <p>
+            It's meant for a first taste of a book you're deciding whether to read in full, or for
+            when you just want the useful part without the time commitment. A typical book takes
+            a few minutes to read here, not a few hours.
+        </p>
+
+        <div class="form-panel p-4 my-4">
+            <h6 class="mb-3">What you can do</h6>
+            <ul class="mb-0">
+                <li>Browse and search the shelf, sorted however's useful to you</li>
+                <li>Read any book's takeaways in the built-in reader</li>
+                <li>Bookmark books to your own "My Books" list</li>
+                <li>Librarians can register new books and their takeaways, including bulk import</li>
+            </ul>
+        </div>
+
+        <p class="text-muted small">
+            Have feedback or found something broken? Reach out to whoever's running this instance &mdash;
+            there's no dedicated support line here, it's a small independent project.
+        </p>
     </div>
 </main>
 

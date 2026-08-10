@@ -46,6 +46,16 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
+		<!-- Bean Validation provider (Hibernate Validator). jakarta.validation-api
+		     below only supplies the @NotBlank/@Valid annotations themselves -
+		     without an actual implementation on the classpath, Spring Boot's
+		     ValidationAutoConfiguration never activates and @Valid silently does
+		     nothing, in tests and in the real running app alike. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
 		<!-- Spring Boot Starter Security -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

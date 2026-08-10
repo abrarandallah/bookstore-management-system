@@ -6,6 +6,7 @@ import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.BookPage;
 import com.abrar.BOOKSTORE.entity.Genre;
 import com.abrar.BOOKSTORE.entity.MyBookList;
+import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.BookValidator;
 import com.abrar.BOOKSTORE.service.FileStorageService;
@@ -22,9 +23,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -57,7 +61,10 @@ public class BookController {
 
     @GetMapping("/about")
     public String about() {
-        return "about";
+        // The standalone page was folded into the home page's "How it works"
+        // section (item 4) - this keeps any old /about links/bookmarks
+        // working instead of 404ing.
+        return "redirect:/#how-it-works";
     }
 
     @GetMapping("/book_register")
@@ -161,10 +168,28 @@ public class BookController {
         return "redirect:/available_books";
     }
 
+    // The MyBookList row only stores a name/author snapshot from when the
+    // book was added, so the page has to look the real Book up by id to show
+    // cover/genres/rating the same way bookList.html does. Books that have
+    // since been removed from the store are skipped rather than blowing up
+    // the whole page.
     @GetMapping("/my_books")
     public String getMyBooks(Model model, Principal principal) {
         List<MyBookList> list = myBookService.getMyBooks(currentUser(principal));
-        model.addAttribute("book", list);
+        List<Book> books = new ArrayList<>();
+        Map<Integer, Long> myBookListIdByBookId = new HashMap<>();
+        for (MyBookList entry : list) {
+            try {
+                Book b = service.getBookById(entry.getBookId());
+                books.add(b);
+                myBookListIdByBookId.put(b.getId(), entry.getId());
+            } catch (ResourceNotFoundException ex) {
+                // Book was deleted from the store since it was added here.
+            }
+        }
+        model.addAttribute("book", books);
+        model.addAttribute("myBookListIdByBookId", myBookListIdByBookId);
+        model.addAttribute("ratingSummaries", reviewService.summariesForAllBooks());
         return "myBooks";
     }
 
