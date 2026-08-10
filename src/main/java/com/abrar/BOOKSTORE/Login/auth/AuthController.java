@@ -19,7 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RestController
@@ -62,9 +61,6 @@ public class AuthController {
                         loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // Generate JWT token
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         String token = jwtTokenProvider.generateToken(authentication);
 

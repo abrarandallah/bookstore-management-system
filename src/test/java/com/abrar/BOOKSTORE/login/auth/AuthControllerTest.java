@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @ContextConfiguration(classes = { AuthController.class })
 @ExtendWith(SpringExtension.class)
@@ -54,6 +55,12 @@ class AuthControllerTest {
         private org.springframework.test.web.servlet.MockMvc mockMvc() {
                 return MockMvcBuilders.standaloneSetup(authController)
                                 .setControllerAdvice(new AuthExceptionHandler())
+                                // standaloneSetup doesn't auto-configure a Validator the
+                                // way a full Spring Boot context does, so @Valid on
+                                // SignupRequest/LoginRequest was silently doing nothing -
+                                // blank-field requests sailed straight through into the
+                                // controller body instead of being rejected with 400.
+                                .setValidator(new LocalValidatorFactoryBean())
                                 .build();
         }
 
