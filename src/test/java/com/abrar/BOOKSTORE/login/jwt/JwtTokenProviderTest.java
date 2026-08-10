@@ -79,7 +79,13 @@ class JwtTokenProviderTest {
     @Test
     void testValidateTokenRejectsATokenSignedWithADifferentSecret() {
         JwtTokenProvider otherProvider = new JwtTokenProvider();
-        otherProvider.setJwtSecret("bU5vdGhlclNlY3JldEtleVRoYXRJc0NvbXBsZXRlbHlEaWZmZXJlbnRGcm9tVGhlT3RoZXJPbmU=");
+        // Must be a real 512-bit (64-byte decoded) key, same as this test
+        // class's own @TestPropertySource secret above - HS512 rejects
+        // anything shorter with a WeakKeyException, thrown here before
+        // validateToken() is ever reached. (The previous secret string
+        // here decoded to only 448 bits - 64 bits short.)
+        otherProvider.setJwtSecret(
+                "od+BZZho6EWWWAF/7rkKDxoeB9y2FaU7AY/nC2X7mlEjQw9Rx95AoSkEE+gupAu1R+qrOCFTkKYVpxF+Muf6yQ==");
         otherProvider.setJwtExpirationInMs(3600000);
         String tokenFromOtherProvider = otherProvider.generateToken("someone");
 
