@@ -22,6 +22,9 @@
                 <div class="alert alert-danger" th:if="${param.error != null}">
                     Invalid username/email or password.
                 </div>
+                <div class="alert alert-danger" th:if="${param.rateLimited != null}">
+                    Too many login attempts. Please try again in a few minutes.
+                </div>
                 <form th:action="@{/login}" method="post">
                     <div class="mb-3">
                         <label for="usernameOrEmail" class="form-label">Username or Email</label>

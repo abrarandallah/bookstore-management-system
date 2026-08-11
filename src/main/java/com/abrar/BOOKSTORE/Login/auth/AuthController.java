@@ -9,9 +9,11 @@ import com.abrar.BOOKSTORE.Login.jwt.JwtTokenProvider;
 import com.abrar.BOOKSTORE.Login.conf.LoginRequest;
 import com.abrar.BOOKSTORE.Login.conf.SignupRequest;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,15 +33,18 @@ public class AuthController {
     private final UserRepository userRepository;
     @Getter
     private final PasswordEncoder passwordEncoder;
+    private final RateLimiter rateLimiter;
 
     public AuthController(AuthenticationManager authenticationManager,
             JwtTokenProvider jwtTokenProvider,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            RateLimiter rateLimiter) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.rateLimiter = rateLimiter;
     }
 
     // Here, SignupRequest and LoginRequest are DTOs (Data Transfer Objects) that
@@ -54,7 +59,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+        // Same brute-force protection RateLimiter already gives /forgot-password,
+        // applied here too since this JSON endpoint was previously unthrottled.
+        // Prefixed so this doesn't share its attempt budget with password-reset,
+        // which keys RateLimiter by bare IP.
+        if (!rateLimiter.allow("login:" + request.getRemoteAddr())) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(ApiResponse.error("Too many login attempts. Please try again in a few minutes."));
+        }
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsernameOrEmail(),

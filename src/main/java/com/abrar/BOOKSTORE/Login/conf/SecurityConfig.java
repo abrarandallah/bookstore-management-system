@@ -12,6 +12,8 @@ package com.abrar.BOOKSTORE.Login.conf;
 // requests - the two simply don't overlap in practice.
 
 import com.abrar.BOOKSTORE.Login.auth.JwtAuthenticationEntryPoint;
+import com.abrar.BOOKSTORE.Login.auth.LoginRateLimitFilter;
+import com.abrar.BOOKSTORE.Login.auth.RateLimiter;
 import com.abrar.BOOKSTORE.Login.jwt.JwtAuthorizationFilter;
 import com.abrar.BOOKSTORE.Login.jwt.JwtTokenProvider;
 import com.abrar.BOOKSTORE.Login.user.CustomUserDetailsService;
@@ -46,6 +48,9 @@ public class SecurityConfig {
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
+    private RateLimiter rateLimiter;
+
+    @Autowired
     public SecurityConfig(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
@@ -71,6 +76,11 @@ public class SecurityConfig {
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
         return new JwtAuthorizationFilter(jwtTokenProvider, userDetailsService);
+    }
+
+    @Bean
+    public LoginRateLimitFilter loginRateLimitFilter() {
+        return new LoginRateLimitFilter(rateLimiter);
     }
 
     @Bean
@@ -106,6 +116,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
                         new JwtAuthenticationEntryPoint(), new AntPathRequestMatcher("/api/**")))
                 .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(loginRateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/login")
                         .usernameParameter("usernameOrEmail")

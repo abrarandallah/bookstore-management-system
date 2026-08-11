@@ -57,7 +57,16 @@ public class AuthPageController {
     public String registerUser(@Valid @ModelAttribute SignupRequest signupRequest, BindingResult bindingResult,
             Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("error", "Please fill in all fields.");
+            // Show the actual validation message (e.g. "Password must be at
+            // least 8 characters long.") instead of a generic one, so the
+            // user knows what to fix instead of just seeing "fill in all
+            // fields" - the fields may well already be filled in with an
+            // invalid value.
+            String error = bindingResult.getFieldErrors().stream()
+                    .findFirst()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .orElse("Please fill in all fields.");
+            model.addAttribute("error", error);
             return "register";
         }
         try {

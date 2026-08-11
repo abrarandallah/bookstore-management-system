@@ -2,6 +2,7 @@ package com.abrar.BOOKSTORE.controller;
 
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
+import com.abrar.BOOKSTORE.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,8 @@ public class AdminController {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AccountService accountService;
 
     @GetMapping("/users")
     public String listUsers(Model model) {
@@ -70,6 +73,36 @@ public class AdminController {
         target.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(target);
         model.addAttribute("message", "Password updated for " + target.getUsernameOrEmail() + ".");
+        model.addAttribute("users", userRepository.findAll());
+        return "admin/users";
+    }
+
+    // Deleting your own account through this admin route is blocked -
+    // self-deletion already has its own dedicated flow (/delete-account)
+    // that re-confirms the current password before a permanent, cascading
+    // delete. Allowing it here too would let an admin remove themselves
+    // with a single click and no such confirmation.
+    @PostMapping("/users/{id}/delete")
+    public String deleteUser(@PathVariable long id, Authentication authentication, Model model) {
+        User target = userRepository.findById(id).orElse(null);
+        if (target == null) {
+            return "redirect:/admin/users";
+        }
+        User currentUser = userRepository.findByUsernameOrEmail(authentication.getName()).orElse(null);
+        if (currentUser != null && currentUser.getId() == target.getId()) {
+            model.addAttribute("error",
+                    "You can't delete your own account here - use Delete Account in Settings instead.");
+            model.addAttribute("users", userRepository.findAll());
+            return "admin/users";
+        }
+        try {
+            accountService.deleteAccount(target);
+        } catch (IllegalStateException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("users", userRepository.findAll());
+            return "admin/users";
+        }
+        model.addAttribute("message", "Deleted " + target.getUsernameOrEmail() + ".");
         model.addAttribute("users", userRepository.findAll());
         return "admin/users";
     }

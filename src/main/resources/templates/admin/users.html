@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: pageHead('Manage Users')}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
@@ -45,6 +45,7 @@
                 <th>Role</th>
                 <th>Change Role</th>
                 <th>Reset Password</th>
+                <th>Delete</th>
             </tr>
             </thead>
             <tbody>
@@ -77,6 +78,14 @@
                                placeholder="New password" minlength="8" required style="width: 160px;">
                         <button type="submit" class="btn btn-sm btn-outline-danger">Reset</button>
                     </form>
+                </td>
+                <td>
+                    <form th:if="${u.usernameOrEmail != #authentication.name}"
+                          th:action="@{/admin/users/{id}/delete(id=${u.id})}" method="post"
+                          onsubmit="return confirm('Permanently delete this user and everything tied to their account? This cannot be undone.');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                    <span th:unless="${u.usernameOrEmail != #authentication.name}" class="text-muted small">That's you</span>
                 </td>
             </tr>
             </tbody>

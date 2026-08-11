@@ -7,11 +7,13 @@ import static org.mockito.Mockito.when;
 import com.abrar.BOOKSTORE.Login.auth.AuthController;
 import com.abrar.BOOKSTORE.Login.auth.AuthExceptionHandler;
 import com.abrar.BOOKSTORE.Login.auth.AuthService;
+import com.abrar.BOOKSTORE.Login.auth.RateLimiter;
 import com.abrar.BOOKSTORE.Login.conf.SignupRequest;
 import com.abrar.BOOKSTORE.Login.jwt.JwtTokenProvider;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -49,8 +51,17 @@ class AuthControllerTest {
         private PasswordEncoder passwordEncoder;
         @MockBean
         private AuthService authService;
+        @MockBean
+        private RateLimiter rateLimiter;
 
         private final ObjectMapper mapper = new ObjectMapper();
+
+        @BeforeEach
+        void allowByDefault() {
+                // Individual tests override this when they want to exercise the
+                // rate-limited path; everything else should behave as before.
+                when(rateLimiter.allow(Mockito.anyString())).thenReturn(true);
+        }
 
         private org.springframework.test.web.servlet.MockMvc mockMvc() {
                 return MockMvcBuilders.standaloneSetup(authController)
@@ -137,6 +148,22 @@ class AuthControllerTest {
                                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
                                                 .value("Invalid username or password."));
+        }
+
+        @Test
+        void testLoginRejectsWhenRateLimited() throws Exception {
+                when(rateLimiter.allow(Mockito.anyString())).thenReturn(false);
+
+                String body = "{\"usernameOrEmail\":\"reader\",\"password\":\"password123\"}";
+                MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/api/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body);
+
+                mockMvc().perform(request)
+                                .andExpect(MockMvcResultMatchers.status().isTooManyRequests())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                                                .value("Too many login attempts. Please try again in a few minutes."));
+                Mockito.verify(authenticationManager, Mockito.never()).authenticate(Mockito.any());
         }
 
         @Test
