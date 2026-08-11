@@ -5,6 +5,7 @@
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main class="page-body">
+    <!-- Hero Section -->
     <div class="container hero-section">
         <div class="row align-items-center g-5">
             <div class="col-lg-6 hero-copy">
@@ -27,14 +28,13 @@
             </div>
             <div class="col-lg-6 text-center">
                 <div class="hero-figure">
-                    <img src="/bg.jpg" alt="A library section" style="max-width: 460px;"/>
+                    <img src="/bg.jpg" alt="A library section" class="book-cover"/>
                 </div>
             </div>
         </div>
     </div>
 
-    <!--/* Folded in from the old standalone /about page - it wasn't
-           substantial enough to earn its own primary navbar item. */-->
+    <!-- About Section -->
     <div class="container my-5" id="how-it-works" style="max-width: 720px;">
         <span class="eyebrow">How it works</span>
         <h2 class="mb-4">About BookStore</h2>
@@ -51,7 +51,7 @@
             a few minutes to read here, not a few hours.
         </p>
 
-        <div class="form-panel p-4 my-4">
+        <div class="card p-4 my-4">
             <h6 class="mb-3">What you can do</h6>
             <ul class="mb-0">
                 <li>Browse and search the shelf, sorted however's useful to you</li>
@@ -65,6 +65,38 @@
             Have feedback or found something broken? Reach out to whoever's running this instance &mdash;
             there's no dedicated support line here, it's a small independent project.
         </p>
+    </div>
+
+    <!-- Community Section -->
+    <div class="container my-5">
+        <span class="eyebrow">Readers</span>
+        <h2 class="mb-4">Join the community</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="hero-figure">
+                    <img src="/readers1.jpeg" alt="Reader in armchair" class="book-cover"/>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="hero-figure">
+                    <img src="/readers2.jpeg" alt="Reader by window" class="book-cover"/>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="hero-figure">
+                    <img src="/readers3.jpeg" alt="Children reading together" class="book-cover"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Closing Section -->
+    <div class="container my-5 text-center">
+        <span class="eyebrow">Take a break</span>
+        <h2 class="mb-4">Read anywhere</h2>
+        <div class="hero-figure">
+            <img src="/nature.jpeg" alt="Reading outdoors under a tree" class="book-cover"/>
+        </div>
     </div>
 </main>
 
