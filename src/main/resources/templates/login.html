@@ -11,7 +11,7 @@
             <div class="auth-card p-4">
                 <h4>Welcome back</h4>
                 <div class="alert alert-success" th:if="${param.registered != null}">
-                    Account created successfully. Please log in.
+                    Account created successfully. Check your email for a verification link before logging in.
                 </div>
                 <div class="alert alert-success" th:if="${param.reset != null}">
                     Your password has been reset. Please log in.
@@ -19,8 +19,14 @@
                 <div class="alert alert-success" th:if="${param.accountDeleted != null}">
                     Your account has been deleted.
                 </div>
+                <div class="alert alert-success" th:if="${param.verified != null}">
+                    Your email has been verified. Please log in.
+                </div>
                 <div class="alert alert-danger" th:if="${param.error != null}">
                     Invalid username/email or password.
+                </div>
+                <div class="alert alert-danger" th:if="${param.unverified != null}">
+                    Please verify your email before logging in. <a href="/resend-verification">Resend verification email</a>
                 </div>
                 <div class="alert alert-danger" th:if="${param.rateLimited != null}">
                     Too many login attempts. Please try again in a few minutes.

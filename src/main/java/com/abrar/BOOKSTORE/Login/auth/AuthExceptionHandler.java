@@ -4,6 +4,7 @@ import com.abrar.BOOKSTORE.Login.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,6 +42,14 @@ public class AuthExceptionHandler {
         // Thrown by AuthService.registerUser() when the username/email is already
         // taken.
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ApiResponse> handleDisabledException(DisabledException ex) {
+        // Thrown by the AuthenticationManager when the account exists and the
+        // password is correct, but User.verified is still false.
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error("Please verify your email before logging in."));
     }
 
     @ExceptionHandler(AuthenticationException.class)

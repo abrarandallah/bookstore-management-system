@@ -24,6 +24,27 @@ public class EmailService {
     private String fromAddress;
 
     @Async
+    public void sendVerificationEmail(String toEmail, String token) {
+        String link = baseUrl + "/verify-email?token=" + token;
+        SimpleMailMessage message = new SimpleMailMessage();
+        if (fromAddress != null && !fromAddress.isBlank()) {
+            message.setFrom(fromAddress);
+        }
+        message.setTo(toEmail);
+        message.setSubject("Verify your BookStore email");
+        message.setText("Welcome! Please confirm your email address to finish setting up your account.\n\n" +
+                "Verify your email here (valid for 24 hours):\n" + link +
+                "\n\nIf you didn't create this account, you can ignore this email.");
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            // Same reasoning as sendPasswordResetEmail: don't leak SMTP errors to
+            // the user, just log so an operator can see delivery is broken.
+            log.error("Failed to send verification email to {}: {}", toEmail, e.getMessage());
+        }
+    }
+
+    @Async
     public void sendPasswordResetEmail(String toEmail, String token) {
         String link = baseUrl + "/reset-password?token=" + token;
         SimpleMailMessage message = new SimpleMailMessage();

@@ -28,6 +28,14 @@ public class User implements UserDetails {
     private String role;
     @Getter
     private String avatarUrl;
+    // Defaults to true so existing rows are grandfathered in as verified when
+    // this column is first added to the DB (see columnDefinition). New
+    // signups explicitly flip this to false in AuthService.registerUser and
+    // require clicking the link from EmailService.sendVerificationEmail
+    // before they can log in - see UserPrincipal.isEnabled().
+    @Getter
+    @Column(nullable = false, columnDefinition = "TINYINT(1) NOT NULL DEFAULT 1")
+    private boolean verified = true;
 
     public User() {
     }
@@ -78,6 +86,10 @@ public class User implements UserDetails {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
 
     @Override

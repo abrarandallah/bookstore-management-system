@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: pageHead('Resend Verification Email')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="page-body">
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="auth-card p-4">
+                <h4>Resend Verification Email</h4>
+                <div class="alert alert-info" th:if="${message}" th:text="${message}"></div>
+                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+                <p class="text-muted small">Enter your username or email and we'll send you a new verification link.</p>
+                <form th:action="@{/resend-verification}" method="post">
+                    <div class="mb-3">
+                        <label for="usernameOrEmail" class="form-label">Username or Email</label>
+                        <input type="text" class="form-control" id="usernameOrEmail" name="usernameOrEmail" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Send Verification Link</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

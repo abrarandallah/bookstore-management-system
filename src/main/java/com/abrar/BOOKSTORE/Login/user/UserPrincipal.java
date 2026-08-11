@@ -21,6 +21,11 @@ public class UserPrincipal implements UserDetails {
     private String avatarUrl;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
+    // Defaults true so the existing 6-arg constructor (used directly by
+    // JwtTokenProviderTest) keeps behaving as before; UserPrincipal.create()
+    // below is the only real caller and always sets this explicitly from
+    // User.isVerified().
+    private boolean verified = true;
 
     public UserPrincipal(Long id, String usernameOrEmail, String email, String avatarUrl, String password,
             Collection<? extends GrantedAuthority> authorities) {
@@ -38,13 +43,15 @@ public class UserPrincipal implements UserDetails {
                 .singleton(new SimpleGrantedAuthority(user.getRole()));
 
         // Create a new UserPrincipal instance using the user's details
-        return new UserPrincipal(
+        UserPrincipal principal = new UserPrincipal(
                 user.getId(),
                 user.getUsernameOrEmail(),
                 user.getEmail(),
                 user.getAvatarUrl(),
                 user.getPassword(),
                 authorities);
+        principal.setVerified(user.isVerified());
+        return principal;
     }
 
     public void setId(Long id) {
@@ -61,6 +68,10 @@ public class UserPrincipal implements UserDetails {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
 
     @Override
@@ -98,7 +109,10 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        // Gates both session (formLogin) and JWT (/api/auth/login) login,
+        // since both go through the same DaoAuthenticationProvider fed by
+        // CustomUserDetailsService.loadUserByUsername() -> this class.
+        return verified;
     }
 
     @Override

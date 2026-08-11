@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -102,6 +103,7 @@ public class SecurityConfig {
                         referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/about", "/login", "/register", "/forgot-password", "/reset-password",
+                                "/verify-email", "/resend-verification",
                                 "/api/auth/**",
                                 // The share page is meant to be opened by anyone the link is sent
                                 // to, logged in or not - that's the whole point of a share link.
@@ -122,6 +124,14 @@ public class SecurityConfig {
                         .usernameParameter("usernameOrEmail")
                         .passwordParameter("password")
                         .defaultSuccessUrl("/available_books", true)
+                        // Default failure behavior redirects to /login?error for every
+                        // AuthenticationException, which would tell an unverified user
+                        // their password was wrong. Distinguish that case so login.html
+                        // can point them at /resend-verification instead.
+                        .failureHandler((request, response, exception) -> {
+                            String redirectParam = exception instanceof DisabledException ? "unverified" : "error";
+                            response.sendRedirect(request.getContextPath() + "/login?" + redirectParam);
+                        })
                         .permitAll())
                 .logout(logout -> logout.permitAll());
 

@@ -1,5 +1,6 @@
 package com.abrar.BOOKSTORE.service;
 
+import com.abrar.BOOKSTORE.Login.user.EmailVerificationTokenRepository;
 import com.abrar.BOOKSTORE.Login.user.PasswordResetTokenRepository;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
@@ -20,11 +21,14 @@ public class AccountService {
     private ReviewRepository reviewRepository;
     @Autowired
     private PasswordResetTokenRepository passwordResetTokenRepository;
+    @Autowired
+    private EmailVerificationTokenRepository emailVerificationTokenRepository;
 
     /**
      * Permanently deletes the given user's account and everything scoped to
      * it: their "my books" list, their reviews, and any pending
-     * password-reset token. Book entities themselves are never touched -
+     * password-reset or email-verification token. Book entities themselves are
+     * never touched -
      * a Book isn't owned by a particular user (its "author" is just a text
      * field, not a foreign key to User), so there's nothing on Book to
      * cascade.
@@ -44,6 +48,7 @@ public class AccountService {
                     "Can't delete the last librarian account - promote another user to librarian first.");
         }
         passwordResetTokenRepository.deleteByUser(user);
+        emailVerificationTokenRepository.deleteByUser(user);
         myBookRepository.deleteByUser(user);
         reviewRepository.deleteByUser(user);
         userRepository.delete(user);
