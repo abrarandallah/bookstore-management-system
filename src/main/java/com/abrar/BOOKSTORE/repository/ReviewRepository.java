@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,4 +33,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // book (an N+1 pattern) instead of one query total.
     @Query("SELECT r.book.id, AVG(r.rating), COUNT(r) FROM Review r GROUP BY r.book.id")
     List<Object[]> ratingSummaries();
+
+    @Transactional
+    void deleteByUser(User user);
 }

@@ -16,6 +16,9 @@
                 <div class="alert alert-success" th:if="${param.reset != null}">
                     Your password has been reset. Please log in.
                 </div>
+                <div class="alert alert-success" th:if="${param.accountDeleted != null}">
+                    Your account has been deleted.
+                </div>
                 <div class="alert alert-danger" th:if="${param.error != null}">
                     Invalid username/email or password.
                 </div>

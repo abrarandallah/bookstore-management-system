@@ -3,11 +3,14 @@ package com.abrar.BOOKSTORE.Login.auth;
 import com.abrar.BOOKSTORE.Login.conf.SignupRequest;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
+import com.abrar.BOOKSTORE.service.AccountService;
 import com.abrar.BOOKSTORE.service.FileStorageService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,6 +36,9 @@ public class AuthPageController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AccountService accountService;
 
     @GetMapping("/login")
     public String loginPage() {
@@ -128,5 +134,37 @@ public class AuthPageController {
         userRepository.save(user);
         model.addAttribute("message", "Your password has been changed.");
         return "changePassword";
+    }
+
+    @GetMapping("/delete-account")
+    public String deleteAccountForm() {
+        return "deleteAccount";
+    }
+
+    // Requires re-entering the current password, same as change-password
+    // above - the session already proves who's logged in, but a
+    // permanent, cascading delete warrants an extra identity check beyond
+    // "whoever currently holds this browser session".
+    @PostMapping("/delete-account")
+    public String deleteAccountSubmit(@RequestParam String currentPassword, Authentication authentication,
+            HttpServletRequest request, Model model) {
+        User user = currentUser(authentication);
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            model.addAttribute("error", "Current password is incorrect.");
+            return "deleteAccount";
+        }
+        try {
+            accountService.deleteAccount(user);
+        } catch (IllegalStateException ex) {
+            model.addAttribute("error", ex.getMessage());
+            return "deleteAccount";
+        }
+        // The account (and the session's backing DB row) no longer exists -
+        // invalidate the session and clear the security context directly
+        // rather than redirecting to /logout, so there's no window where a
+        // now-stale session is still considered authenticated.
+        request.getSession().invalidate();
+        SecurityContextHolder.clearContext();
+        return "redirect:/login?accountDeleted";
     }
 }

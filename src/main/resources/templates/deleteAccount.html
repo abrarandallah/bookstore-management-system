@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: pageHead('Delete Account')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="page-body">
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="auth-card p-4">
+                <h4 class="text-danger">Delete Account</h4>
+                <p class="text-muted small">
+                    This permanently deletes your account, your "My Books" list, and any
+                    reviews you've written. Books themselves aren't affected. This can't
+                    be undone.
+                </p>
+                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+                <form th:action="@{/delete-account}" method="post"
+                      onsubmit="return confirm('This will permanently delete your account and everything tied to it. This cannot be undone. Continue?');">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Confirm your password</label>
+                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">
+                        <i class="fa-solid fa-trash me-1"></i> Permanently Delete My Account
+                    </button>
+                </form>
+            </div>
+
+            <div class="text-center mt-3">
+                <a th:href="@{/profile}">Cancel and go back</a>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

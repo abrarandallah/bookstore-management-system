@@ -4,6 +4,7 @@ import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.entity.MyBookList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,4 +19,7 @@ public interface MyBookRepository extends JpaRepository<MyBookList, Long> {
     Optional<MyBookList> findByIdAndUser(long id, User user);
 
     boolean existsByBookIdAndUser(int bookId, User user);
+
+    @Transactional
+    void deleteByUser(User user);
 }
