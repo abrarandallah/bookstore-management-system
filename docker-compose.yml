@@ -1,0 +1,63 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: book
+      MYSQL_USER: ${DB_USERNAME:-abrar}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-abrar}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-abrar}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${DB_PASSWORD:-abrar}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_USERNAME: ${DB_USERNAME:-abrar}
+      DB_PASSWORD: ${DB_PASSWORD:-abrar}
+      UPLOAD_DIR: /app/uploads
+      LIBRARIAN_USERNAME: ${LIBRARIAN_USERNAME:-librarian}
+      LIBRARIAN_EMAIL: ${LIBRARIAN_EMAIL:-librarian@bookstore.local}
+      LIBRARIAN_PASSWORD: ${LIBRARIAN_PASSWORD:-change-this-password}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8081}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_SSL_ENABLE: ${MAIL_SSL_ENABLE:-false}
+    volumes:
+      # Uploaded covers/avatars survive `docker compose down` without needing
+      # to rebuild the image or lose data.
+      - uploads-data:/app/uploads
+      # The JWT signing key normally lives at ~/.bookstore-jwt-secret on
+      # whatever host runs the app - inside a container that's a throwaway
+      # filesystem, so without this volume every `docker compose up` would
+      # generate a new key and invalidate every previously issued JWT.
+      - jwt-secret:/root
+
+volumes:
+  mysql-data:
+  uploads-data:
+  jwt-secret:
