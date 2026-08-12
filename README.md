@@ -28,12 +28,29 @@ Boot 3.1.2, Java 17, Thymeleaf, MySQL, and Spring Security 6.
 - Maven
 - MySQL running locally (or update the datasource URL for a remote instance)
 
-## Running locally
+## Running with Docker (recommended - no local MySQL or Maven needed)
 
-1. Create a MySQL database named `book` (or change `spring.datasource.url`).
-2. Set the environment variables below as needed (all have working defaults
-   for local dev except the mail credentials).
-3. `mvn spring-boot:run`
+1. `cp .env.example .env` and fill in real values (at minimum, set
+   `MAIL_USERNAME`/`MAIL_PASSWORD` if you want verification/reset emails to
+   actually be delivered - everything else has a working default).
+2. `docker compose up --build`
+3. Open `http://localhost:8081`.
+
+That's it - MySQL, the app, uploaded files, and the JWT signing key all
+persist in Docker volumes across restarts (`docker compose down` keeps them;
+`docker compose down -v` wipes everything for a clean slate).
+
+## Running locally without Docker
+
+1. Create a MySQL database named `book` (or set `DB_HOST`/`DB_PORT`/`DB_NAME`
+   to point elsewhere).
+2. Set the environment variables below. A `.env` file by itself does
+   **nothing** here - only docker-compose reads it automatically. For a
+   manual run you need these as real environment variables: either
+   `export` them in the same terminal you'll run the app from (add the
+   `export` lines to `~/.zshrc`/`~/.bashrc` so they survive new terminals),
+   or set them in your IDE's Run Configuration.
+3. `./mvnw spring-boot:run` (or `mvnw.cmd spring-boot:run` on Windows)
 4. The app starts on `http://localhost:8081` by default.
 
 On first run, a librarian account is created automatically using the
@@ -44,6 +61,9 @@ librarian, since regular signup always creates a `ROLE_USER` account.
 
 | Variable             | Default                             | Purpose                                                                                                                                                                                                                                              |
 | -------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DB_HOST`            | `localhost`                         | MySQL host (docker-compose sets this to `mysql` automatically)                                                                                                                                                                                       |
+| `DB_PORT`            | `3306`                              | MySQL port                                                                                                                                                                                                                                           |
+| `DB_NAME`            | `book`                              | MySQL database name                                                                                                                                                                                                                                  |
 | `DB_USERNAME`        | `abrar`                             | MySQL username                                                                                                                                                                                                                                       |
 | `DB_PASSWORD`        | `abrar`                             | MySQL password                                                                                                                                                                                                                                       |
 | `JWT_SECRET`         | auto-generated                      | Signing key for JWT API tokens. If not set, one is generated on first run and saved to `~/.bookstore-jwt-secret`, then reused on subsequent runs. Only set this yourself if you need a fixed value (e.g. multiple app instances sharing one secret). |
