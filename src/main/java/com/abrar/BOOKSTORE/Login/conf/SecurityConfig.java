@@ -87,8 +87,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> {
-                })
                 // /api/** authenticates via a Bearer token read from the Authorization
                 // header - never a cookie - so it isn't vulnerable to CSRF and is
                 // exempted here. Every other route uses session-cookie auth via

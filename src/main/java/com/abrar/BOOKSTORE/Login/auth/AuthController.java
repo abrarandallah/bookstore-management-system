@@ -55,7 +55,8 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
         authService.registerUser(signupRequest);
-        return ResponseEntity.ok(new ApiResponse(true, "User registered successfully."));
+        return ResponseEntity.ok(new ApiResponse(true,
+                "User registered successfully. Check your email to verify your account before logging in."));
     }
 
     @PostMapping("/login")
