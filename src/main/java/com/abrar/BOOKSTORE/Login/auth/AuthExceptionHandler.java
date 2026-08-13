@@ -1,6 +1,7 @@
 package com.abrar.BOOKSTORE.Login.auth;
 
 import com.abrar.BOOKSTORE.Login.ApiResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -42,6 +43,16 @@ public class AuthExceptionHandler {
         // Thrown by AuthService.registerUser() when the username/email is already
         // taken.
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        // Safety net for the same race window described in
+        // AuthPageController.registerUser(): two signups for the same email
+        // arriving close together could both pass the existsByUsernameOrEmail()
+        // check before either finishes saving.
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("Username or email is already in use."));
     }
 
     @ExceptionHandler(DisabledException.class)
