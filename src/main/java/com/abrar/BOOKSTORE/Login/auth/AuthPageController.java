@@ -8,6 +8,7 @@ import com.abrar.BOOKSTORE.service.FileStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -74,6 +75,15 @@ public class AuthPageController {
         } catch (AuthenticationServiceException ex) {
             // e.g. duplicate username/email - show the error instead of a 500 page
             model.addAttribute("error", ex.getMessage());
+            model.addAttribute("signupRequest", signupRequest);
+            return "register";
+        } catch (DataIntegrityViolationException ex) {
+            // Safety net for the DB unique constraint on email/usernameOrEmail:
+            // existsByUsernameOrEmail() above already checks for this, but two
+            // signups for the same email arriving at nearly the same instant
+            // could both pass that check before either finishes saving. Same
+            // user-facing message as the expected case above.
+            model.addAttribute("error", "Username or email is already in use.");
             model.addAttribute("signupRequest", signupRequest);
             return "register";
         }
