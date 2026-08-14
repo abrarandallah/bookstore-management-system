@@ -5,7 +5,9 @@ import com.abrar.BOOKSTORE.Login.user.PasswordResetTokenRepository;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.repository.MyBookRepository;
+import com.abrar.BOOKSTORE.repository.ReadingProgressRepository;
 import com.abrar.BOOKSTORE.repository.ReviewRepository;
+import com.abrar.BOOKSTORE.repository.UserAchievementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +25,16 @@ public class AccountService {
     private PasswordResetTokenRepository passwordResetTokenRepository;
     @Autowired
     private EmailVerificationTokenRepository emailVerificationTokenRepository;
+    @Autowired
+    private ReadingProgressRepository readingProgressRepository;
+    @Autowired
+    private UserAchievementRepository userAchievementRepository;
 
     /**
      * Permanently deletes the given user's account and everything scoped to
-     * it: their "my books" list, their reviews, and any pending
-     * password-reset or email-verification token. Book entities themselves are
-     * never touched -
+     * it: their "my books" list, their reviews, their reading progress and
+     * achievements, and any pending password-reset or email-verification
+     * token. Book entities themselves are never touched -
      * a Book isn't owned by a particular user (its "author" is just a text
      * field, not a foreign key to User), so there's nothing on Book to
      * cascade.
@@ -49,6 +55,8 @@ public class AccountService {
         }
         passwordResetTokenRepository.deleteByUser(user);
         emailVerificationTokenRepository.deleteByUser(user);
+        readingProgressRepository.deleteByUser(user);
+        userAchievementRepository.deleteByUser(user);
         myBookRepository.deleteByUser(user);
         reviewRepository.deleteByUser(user);
         userRepository.delete(user);
