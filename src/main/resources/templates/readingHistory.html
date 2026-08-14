@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: pageHead('Reading History')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="page-body">
+    <div class="container my-5">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">Your progress</span>
+                <h2>Reading History</h2>
+            </div>
+            <a th:href="@{/available_books}" class="btn btn-outline-brass">
+                <i class="fa-solid fa-magnifying-glass me-1"></i> Browse more books
+            </a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(history)}" class="empty-state">
+            <span class="eyebrow">Nothing here yet</span>
+            <h3>You haven't started reading anything yet</h3>
+            <p>Open any book's takeaways and your progress will show up here.</p>
+            <a th:href="@{/available_books}" class="btn btn-primary">Browse available books</a>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(history)}">
+            <div class="form-panel p-3 p-md-4 mb-3" th:each="rp : ${history}">
+                <div class="d-flex align-items-center gap-3">
+                    <img th:if="${rp.book.coverImageUrl}" th:src="@{${rp.book.coverImageUrl}}" alt="Cover"
+                         style="width:48px;height:auto;border-radius:4px;">
+                    <div class="flex-grow-1">
+                        <a th:href="@{/available_books/{id}/read(id=${rp.book.id})}" class="fw-semibold text-decoration-none"
+                           th:text="${rp.book.name}">Book title</a>
+                        <div class="small text-muted" th:text="${rp.book.author}">Author</div>
+
+                        <div th:if="${rp.finished}" class="small mt-1">
+                            <i class="fa-solid fa-circle-check" style="color: var(--brass, #b08d57);"></i>
+                            Finished <span th:text="${#temporals.format(rp.finishedAt, 'MMM d, yyyy')}">date</span>
+                        </div>
+                        <div th:unless="${rp.finished}" class="mt-2">
+                            <div class="reader-progress-bar">
+                                <div class="reader-progress-fill"
+                                     th:style="'width: ' + ${((rp.currentPage + 1) * 100) / #lists.size(rp.book.takeaways)} + '%'"></div>
+                            </div>
+                            <span class="small text-muted">
+                                Takeaway <span th:text="${rp.currentPage + 1}"></span> of
+                                <span th:text="${#lists.size(rp.book.takeaways)}"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

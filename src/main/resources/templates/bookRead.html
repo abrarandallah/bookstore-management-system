@@ -32,6 +32,11 @@
     </div>
 
     <div th:unless="${#lists.isEmpty(book.takeaways)}" class="reader-panel form-panel p-4 p-md-5">
+        <form id="finish-form" th:action="@{/available_books/{id}/finish(id=${book.id})}" method="post"></form>
+        <form id="progress-form" th:action="@{/available_books/{id}/progress(id=${book.id})}" method="post"
+              class="d-none">
+            <input type="hidden" name="page" id="progress-page-input" value="0">
+        </form>
         <div class="reader-progress mb-4">
             <span class="eyebrow" id="reader-progress-label">Takeaway 1 of <span th:text="${#lists.size(book.takeaways)}"></span></span>
             <div class="reader-progress-bar mt-2">
@@ -114,8 +119,11 @@
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 <script th:inline="javascript">
-    let readerIndex = 0;
+    let readerIndex = /*[[${resumePage}]]*/ 0;
     const readerTotal = /*[[${#lists.size(book.takeaways)}]]*/ 0;
+    // Clamp in case the book's takeaways were edited (fewer pages now) since
+    // this reader's saved position was recorded.
+    readerIndex = Math.min(Math.max(readerIndex, 0), Math.max(readerTotal - 1, 0));
 
     function readerRender() {
         document.querySelectorAll('.reader-page').forEach((el) => {
@@ -133,13 +141,26 @@
         }
     }
 
+    function saveProgress() {
+        const form = document.getElementById('progress-form');
+        document.getElementById('progress-page-input').value = readerIndex;
+        // Best-effort: a dropped progress ping just means resuming later
+        // starts a page or two earlier, not worth surfacing an error for.
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            body: new FormData(form),
+        }).catch(() => {});
+    }
+
     function readerGo(delta) {
         if (readerIndex === readerTotal - 1 && delta === 1) {
-            window.location.href = '/available_books';
+            document.getElementById('finish-form').submit();
             return;
         }
         readerIndex = Math.min(Math.max(readerIndex + delta, 0), readerTotal - 1);
         readerRender();
+        saveProgress();
     }
 
     if (readerTotal > 0) {

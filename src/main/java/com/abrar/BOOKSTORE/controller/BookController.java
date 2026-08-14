@@ -6,13 +6,16 @@ import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.BookPage;
 import com.abrar.BOOKSTORE.entity.Genre;
 import com.abrar.BOOKSTORE.entity.MyBookList;
+import com.abrar.BOOKSTORE.entity.ReadingProgress;
 import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
+import com.abrar.BOOKSTORE.service.AchievementService;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.BookValidator;
 import com.abrar.BOOKSTORE.service.FileStorageService;
 import com.abrar.BOOKSTORE.service.GenreService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
 import com.abrar.BOOKSTORE.service.PagedResult;
+import com.abrar.BOOKSTORE.service.ReadingProgressService;
 import com.abrar.BOOKSTORE.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +51,10 @@ public class BookController {
     private GenreService genreService;
     @Autowired
     private ReviewService reviewService;
+    @Autowired
+    private ReadingProgressService readingProgressService;
+    @Autowired
+    private AchievementService achievementService;
 
     private User currentUser(Principal principal) {
         return userRepository.findByUsernameOrEmail(principal.getName())
@@ -227,7 +234,40 @@ public class BookController {
         model.addAttribute("reviews", reviewService.getReviewsForBook(id));
         model.addAttribute("ratingSummary", reviewService.summaryForBook(id));
         model.addAttribute("ownReview", reviewService.findOwnReview(id, currentUser(principal)).orElse(null));
+        ReadingProgress progress = readingProgressService.getOrCreate(currentUser(principal), b);
+        // Resuming a finished book restarts the reader at page 1 rather than
+        // dropping them back on the last page they already finished at.
+        model.addAttribute("resumePage", progress.isFinished() ? 0 : progress.getCurrentPage());
         return "bookRead";
+    }
+
+    @PostMapping("/available_books/{id}/progress")
+    @ResponseBody
+    public ResponseEntity<Void> saveProgress(@PathVariable("id") int id, @RequestParam int page,
+            Principal principal) {
+        Book b = service.getBookById(id);
+        readingProgressService.updatePage(currentUser(principal), b, page);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/available_books/{id}/finish")
+    public String finishBook(@PathVariable("id") int id, Model model, Principal principal) {
+        Book b = service.getBookById(id);
+        User user = currentUser(principal);
+        ReadingProgress progress = readingProgressService.getOrCreate(user, b);
+        boolean alreadyFinished = progress.isFinished();
+        progress = readingProgressService.markFinished(user, b);
+        model.addAttribute("book", b);
+        model.addAttribute("newAchievements",
+                alreadyFinished ? List.of() : achievementService.checkBookCompletionAchievements(user, progress));
+        return "bookFinished";
+    }
+
+    @GetMapping("/reading-history")
+    public String readingHistory(Model model, Principal principal) {
+        User user = currentUser(principal);
+        model.addAttribute("history", readingProgressService.getHistory(user));
+        return "readingHistory";
     }
 
     @GetMapping("/editBook/{id}")
