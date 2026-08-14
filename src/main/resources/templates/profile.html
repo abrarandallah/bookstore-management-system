@@ -21,6 +21,9 @@
                 <h5 class="mb-1" th:text="${user.username}"></h5>
                 <p class="text-muted mb-2" th:text="${user.email}"></p>
                 <span class="pill-tag" th:text="${user.role == 'ROLE_LIBRARIAN'} ? 'Librarian' : 'Reader'"></span>
+                <span class="pill-tag" th:if="${finishedBooksCount >= 15}" style="margin-left: 6px;">🔥 Voracious Reader</span>
+                <span class="pill-tag" th:if="${finishedBooksCount >= 5 and finishedBooksCount < 15}" style="margin-left: 6px;">🐛 Bookworm</span>
+                <span class="pill-tag" th:if="${finishedBooksCount >= 1 and finishedBooksCount < 5}" style="margin-left: 6px;">📖 First Chapter</span>
 
                 <form th:action="@{/profile/avatar}" method="post" enctype="multipart/form-data"
                       class="d-flex justify-content-center align-items-center gap-2 mt-3">
@@ -41,10 +44,26 @@
             </div>
 
             <div class="form-panel p-4 mt-3">
+                <span class="eyebrow d-block mb-3">Achievements <span class="text-muted" th:text="'(' + ${#lists.size(achievements)} + ')'"></span></span>
+                <p class="text-muted small" th:if="${#lists.isEmpty(achievements)}">
+                    Finish a book to start unlocking achievements - see your progress on the
+                    <a href="/reading-history">Reading History</a> page.
+                </p>
+                <div class="d-flex flex-wrap gap-3" th:unless="${#lists.isEmpty(achievements)}">
+                    <div th:each="ua : ${achievements}" class="text-center" style="min-width: 100px;"
+                         th:title="${ua.achievement.description}">
+                        <div style="font-size: 1.8rem;" th:text="${ua.achievement.icon}">🏆</div>
+                        <div class="small fw-semibold" th:text="${ua.achievement.name}">Achievement</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-panel p-4 mt-3">
                 <span class="eyebrow d-block mb-3">Quick links</span>
                 <div class="d-flex flex-wrap gap-2">
                     <a href="/available_books" class="btn btn-secondary btn-sm">Browse Books</a>
                     <a href="/my_books" class="btn btn-secondary btn-sm">My Books</a>
+                    <a href="/reading-history" class="btn btn-secondary btn-sm">Reading History</a>
                     <a href="/book_register" class="btn btn-secondary btn-sm"
                        sec:authorize="hasRole('LIBRARIAN')">Register a Book</a>
                     <a href="/admin/users" class="btn btn-secondary btn-sm"

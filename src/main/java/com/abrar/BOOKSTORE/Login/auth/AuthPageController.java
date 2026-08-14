@@ -4,7 +4,9 @@ import com.abrar.BOOKSTORE.Login.conf.SignupRequest;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.service.AccountService;
+import com.abrar.BOOKSTORE.service.AchievementService;
 import com.abrar.BOOKSTORE.service.FileStorageService;
+import com.abrar.BOOKSTORE.service.ReadingProgressService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,12 @@ public class AuthPageController {
 
     @Autowired
     private FileStorageService fileStorageService;
+
+    @Autowired
+    private AchievementService achievementService;
+
+    @Autowired
+    private ReadingProgressService readingProgressService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -97,7 +105,10 @@ public class AuthPageController {
 
     @GetMapping("/profile")
     public String profilePage(Authentication authentication, Model model) {
-        model.addAttribute("user", currentUser(authentication));
+        User user = currentUser(authentication);
+        model.addAttribute("user", user);
+        model.addAttribute("achievements", achievementService.getEarnedAchievements(user));
+        model.addAttribute("finishedBooksCount", readingProgressService.countFinished(user));
         return "profile";
     }
 
