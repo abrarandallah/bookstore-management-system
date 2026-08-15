@@ -15,8 +15,7 @@
         <div th:if="${!#lists.isEmpty(newAchievements)}" class="mt-3 mb-4">
             <span class="eyebrow d-block mb-3">Achievement unlocked</span>
             <div class="d-flex flex-wrap justify-content-center gap-3">
-                <div th:each="a : ${newAchievements}" class="achievement-badge p-3"
-                     style="border: 1px solid var(--border-soft); border-radius: 10px; min-width: 160px;">
+                <div th:each="a : ${newAchievements}" class="achievement-badge badge-pop p-3">
                     <div style="font-size: 2rem;" th:text="${a.icon}">🏆</div>
                     <div class="fw-semibold mt-1" th:text="${a.name}">Achievement name</div>
                     <div class="small text-muted" th:text="${a.description}">Description</div>
@@ -32,7 +31,81 @@
 </div>
 </main>
 
+<canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+    // Small paper-scrap confetti burst in the site's own palette, rather
+    // than a generic circular-confetti library - fits the vintage-ledger
+    // theme better than off-the-shelf confetti.
+    (function () {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            return;
+        }
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        const colors = ['#a8792f', '#c99a44', '#7a2e2e', '#20291f', '#fffdf7'];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const gravity = 0.12;
+        const particles = Array.from({ length: 70 }, () => ({
+            x: Math.random() * canvas.width,
+            y: -20 - Math.random() * canvas.height * 0.4,
+            w: 5 + Math.random() * 5,
+            h: 8 + Math.random() * 6,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rotation: Math.random() * Math.PI * 2,
+            spin: (Math.random() - 0.5) * 0.2,
+            vy: 1.5 + Math.random() * 2,
+            vx: (Math.random() - 0.5) * 1.5,
+            sway: Math.random() * Math.PI * 2,
+            opacity: 1,
+        }));
+
+        let start = null;
+        const durationMs = 3200;
+
+        function tick(timestamp) {
+            if (!start) start = timestamp;
+            const elapsed = timestamp - start;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((p) => {
+                p.vy += gravity * 0.02;
+                p.y += p.vy;
+                p.sway += 0.05;
+                p.x += p.vx + Math.sin(p.sway) * 0.6;
+                p.rotation += p.spin;
+                if (elapsed > durationMs * 0.6) {
+                    p.opacity = Math.max(0, 1 - (elapsed - durationMs * 0.6) / (durationMs * 0.4));
+                }
+
+                ctx.save();
+                ctx.globalAlpha = p.opacity;
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                ctx.restore();
+            });
+
+            if (elapsed < durationMs) {
+                requestAnimationFrame(tick);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                canvas.remove();
+            }
+        }
+
+        requestAnimationFrame(tick);
+    })();
+</script>
 </body>
 </html>

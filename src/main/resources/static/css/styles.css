@@ -347,13 +347,48 @@ a:hover {
   flex-direction: column;
   gap: 0.6rem;
   overflow: hidden;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s ease, background-color 0.3s ease, border-color 0.3s ease;
+  animation: card-rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--card-index, 0) * 0.05s);
 }
 
+/* Cards alternate tilt direction so a row of lifted books doesn't look
+   uniform - like actually picking one up off a shelf. */
 .book-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 10px rgba(32, 41, 31, 0.1), 0 14px 30px rgba(32, 41, 31, 0.12);
+  transform: translateY(-7px) rotate(-1.3deg) scale(1.015);
+  box-shadow: 0 10px 14px rgba(32, 41, 31, 0.12), 0 20px 36px rgba(32, 41, 31, 0.14);
+  z-index: 1;
 }
+
+.book-card:nth-child(even):hover {
+  transform: translateY(-7px) rotate(1.3deg) scale(1.015);
+}
+
+@keyframes card-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Per-card stagger delay, purely via nth-child so both the initial
+   server-rendered grid and the AJAX-swapped results fragment get it for
+   free. Caps out so a long grid doesn't leave the last row waiting. */
+.book-grid .book-card { --card-index: 0; }
+.book-grid .book-card:nth-child(2) { --card-index: 1; }
+.book-grid .book-card:nth-child(3) { --card-index: 2; }
+.book-grid .book-card:nth-child(4) { --card-index: 3; }
+.book-grid .book-card:nth-child(5) { --card-index: 4; }
+.book-grid .book-card:nth-child(6) { --card-index: 5; }
+.book-grid .book-card:nth-child(7) { --card-index: 6; }
+.book-grid .book-card:nth-child(8) { --card-index: 7; }
+.book-grid .book-card:nth-child(n+9) { --card-index: 8; }
 
 .book-card::before {
   content: "";
@@ -999,8 +1034,9 @@ a.page-link:hover {
 
 .reader-progress-fill {
   height: 100%;
-  background: var(--brass);
-  transition: width 0.2s ease;
+  width: 0;
+  background: linear-gradient(90deg, var(--brass), var(--brass-bright));
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .reader-page h4 {
@@ -1075,16 +1111,47 @@ a.page-link:hover {
   font-size: 1rem;
 }
 
-.theme-icon-dark {
-  display: none;
+.theme-icon-stack {
+  position: relative;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
 }
 
-[data-theme="dark"] .theme-icon-light {
-  display: none;
+.theme-icon-stack .theme-icon-light,
+.theme-icon-stack .theme-icon-dark {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-[data-theme="dark"] .theme-icon-dark {
-  display: inline;
+.theme-icon-stack .theme-icon-light {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.theme-icon-stack .theme-icon-dark {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.4);
+}
+
+[data-theme="dark"] .theme-icon-stack .theme-icon-light {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.4);
+}
+
+[data-theme="dark"] .theme-icon-stack .theme-icon-dark {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* Site-wide crossfade so flipping the theme doesn't just snap - colors
+   ease across the whole page at once. */
+body, .form-panel, .auth-card, .card, .reader-panel,
+.empty-state, .navbar, .search-field, .search-sort, input, textarea,
+select, .achievement-badge, .review-card, .takeaway-row {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
 }
 
 /* ---- reader font size preference ---------------------------------------- */
@@ -1095,4 +1162,141 @@ a.page-link:hover {
 
 :root[data-reader-font-size="large"] .reader-page p {
   font-size: 1.25rem;
+}
+
+/* ---- achievement badges -------------------------------------------------- */
+
+.achievement-badge {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-width: 160px;
+  background: var(--paper-raised);
+}
+
+.badge-pop {
+  animation: badge-pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  animation-delay: calc(var(--badge-index, 0) * 0.12s);
+}
+
+@keyframes badge-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(10px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08) translateY(0);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+.badge-pop:nth-child(1) { --badge-index: 0; }
+.badge-pop:nth-child(2) { --badge-index: 1; }
+.badge-pop:nth-child(3) { --badge-index: 2; }
+.badge-pop:nth-child(4) { --badge-index: 3; }
+.badge-pop:nth-child(5) { --badge-index: 4; }
+.badge-pop:nth-child(6) { --badge-index: 5; }
+.badge-pop:nth-child(n+7) { --badge-index: 6; }
+
+/* ---- confetti (bookFinished.html) ---------------------------------------- */
+
+.confetti-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2000;
+}
+
+/* ---- skeleton shimmer (live book search) ---------------------------------- */
+
+.skeleton-card {
+  position: relative;
+  background: var(--paper-raised);
+  border-radius: var(--radius);
+  padding: 1.3rem 1.25rem 1.1rem 1.6rem;
+  height: 190px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.skeleton-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: var(--line);
+}
+
+.skeleton-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg,
+    transparent 30%,
+    rgba(168, 121, 47, 0.14) 50%,
+    transparent 70%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.3s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  from { background-position: 140% 0; }
+  to { background-position: -40% 0; }
+}
+
+/* ---- reader page-turn ------------------------------------------------------ */
+
+.reader-panel {
+  perspective: 1200px;
+}
+
+.reader-page {
+  transform-origin: left center;
+  backface-visibility: hidden;
+}
+
+.reader-page.turning-next {
+  animation: page-turn-next 0.4s ease;
+}
+
+.reader-page.turning-prev {
+  animation: page-turn-prev 0.4s ease;
+}
+
+@keyframes page-turn-next {
+  from {
+    opacity: 0;
+    transform: rotateY(-10deg) translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(0) translateX(0);
+  }
+}
+
+@keyframes page-turn-prev {
+  from {
+    opacity: 0;
+    transform: rotateY(10deg) translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(0) translateX(0);
+  }
+}
+
+/* ---- reduced motion ------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
