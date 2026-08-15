@@ -46,6 +46,10 @@
         clearLink.classList.toggle('d-none', !hasQuery);
     }
 
+    function skeletonGridHtml() {
+        return '<div class="book-grid">' + '<div class="skeleton-card"></div>'.repeat(8) + '</div>';
+    }
+
     function runSearch({ pushHistory = true } = {}) {
         const params = currentParams();
 
@@ -56,6 +60,13 @@
 
         form.classList.add('is-loading');
         results.classList.add('search-results-updating');
+
+        // Only swap in the shimmer skeleton if the request is slow enough to
+        // actually notice - avoids a skeleton flash on every fast keystroke.
+        const skeletonTimer = setTimeout(() => {
+            results.innerHTML = skeletonGridHtml();
+            results.classList.remove('search-results-updating');
+        }, 220);
 
         fetch('/available_books/results?' + params.toString(), {
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -68,6 +79,7 @@
                 return response.text();
             })
             .then((html) => {
+                clearTimeout(skeletonTimer);
                 results.innerHTML = html;
                 if (pushHistory) {
                     const url = '/available_books' + (params.toString() ? '?' + params.toString() : '');
@@ -75,6 +87,7 @@
                 }
             })
             .catch((err) => {
+                clearTimeout(skeletonTimer);
                 if (err.name !== 'AbortError') {
                     // Live search failed silently rather than breaking the
                     // page - the plain form submit below is always still
@@ -83,6 +96,7 @@
                 }
             })
             .finally(() => {
+                clearTimeout(skeletonTimer);
                 form.classList.remove('is-loading');
                 results.classList.remove('search-results-updating');
             });
