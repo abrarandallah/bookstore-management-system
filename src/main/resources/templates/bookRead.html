@@ -125,9 +125,17 @@
     // this reader's saved position was recorded.
     readerIndex = Math.min(Math.max(readerIndex, 0), Math.max(readerTotal - 1, 0));
 
-    function readerRender() {
+    function readerRender(direction) {
         document.querySelectorAll('.reader-page').forEach((el) => {
-            el.style.display = (parseInt(el.getAttribute('data-index')) === readerIndex) ? 'block' : 'none';
+            const isTarget = parseInt(el.getAttribute('data-index')) === readerIndex;
+            el.classList.remove('turning-next', 'turning-prev');
+            if (isTarget && direction) {
+                // Restart the animation even if this page was already
+                // mid-flip (e.g. rapid arrow-key presses).
+                void el.offsetWidth;
+                el.classList.add(direction > 0 ? 'turning-next' : 'turning-prev');
+            }
+            el.style.display = isTarget ? 'block' : 'none';
         });
         document.getElementById('reader-progress-label').textContent = 'Takeaway ' + (readerIndex + 1) + ' of ' + readerTotal;
         document.getElementById('reader-progress-fill').style.width = (((readerIndex + 1) / readerTotal) * 100) + '%';
@@ -159,12 +167,23 @@
             return;
         }
         readerIndex = Math.min(Math.max(readerIndex + delta, 0), readerTotal - 1);
-        readerRender();
+        readerRender(delta);
         saveProgress();
     }
 
     if (readerTotal > 0) {
         readerRender();
+        // readerRender() above already set the fill's final width
+        // synchronously, before the browser's had a chance to paint the 0%
+        // state from the CSS, so nothing would visibly animate. Re-applying
+        // the same target width two frames later gives it a real 0% frame
+        // to transition from on first load.
+        const fill = document.getElementById('reader-progress-fill');
+        const targetWidth = fill.style.width;
+        fill.style.width = '0%';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            fill.style.width = targetWidth;
+        }));
         // Arrow-key navigation alongside the Previous/Next buttons - skipped
         // while focus is on a form control so it doesn't hijack typing
         // elsewhere on the page.

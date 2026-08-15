@@ -39,8 +39,8 @@
                         </div>
                         <div th:unless="${rp.finished}" class="mt-2">
                             <div class="reader-progress-bar">
-                                <div class="reader-progress-fill"
-                                     th:style="'width: ' + ${((rp.currentPage + 1) * 100) / #lists.size(rp.book.takeaways)} + '%'"></div>
+                                <div class="reader-progress-fill history-progress-fill"
+                                     th:attr="data-target-width=${((rp.currentPage + 1) * 100) / #lists.size(rp.book.takeaways)} + '%'"></div>
                             </div>
                             <span class="small text-muted">
                                 Takeaway <span th:text="${rp.currentPage + 1}"></span> of
@@ -56,5 +56,14 @@
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+    // Bars start at width:0 (set via CSS) so this has a real 0% frame to
+    // transition from, instead of snapping straight to the saved progress.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.querySelectorAll('.history-progress-fill').forEach((el) => {
+            el.style.width = el.getAttribute('data-target-width');
+        });
+    }));
+</script>
 </body>
 </html>
