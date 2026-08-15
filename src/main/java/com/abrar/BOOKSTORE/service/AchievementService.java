@@ -53,7 +53,7 @@ public class AchievementService {
         tryAward(user, CODE_FIVE_BOOKS, finishedCount >= 5, newlyEarned);
         tryAward(user, CODE_FIFTEEN_BOOKS, finishedCount >= 15, newlyEarned);
 
-        Set<Long> distinctGenreIds = new HashSet<>();
+        Set<Integer> distinctGenreIds = new HashSet<>();
         for (ReadingProgress rp : finished) {
             for (Genre g : rp.getBook().getGenres()) {
                 distinctGenreIds.add(g.getId());
