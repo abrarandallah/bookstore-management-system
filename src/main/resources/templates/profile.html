@@ -50,10 +50,14 @@
                     <a href="/reading-history">Reading History</a> page.
                 </p>
                 <div class="d-flex flex-wrap gap-3" th:unless="${#lists.isEmpty(achievements)}">
-                    <div th:each="ua : ${achievements}" class="text-center badge-pop" style="min-width: 100px;"
+                    <div th:each="ua : ${achievements}" class="medal medal-compact badge-pop"
                          th:title="${ua.achievement.description}">
-                        <div style="font-size: 1.8rem;" th:text="${ua.achievement.icon}">🏆</div>
-                        <div class="small fw-semibold" th:text="${ua.achievement.name}">Achievement</div>
+                        <div class="medal-seal">
+                            <div class="medal-seal-face">
+                                <span class="medal-icon" th:text="${ua.achievement.icon}">🏆</span>
+                            </div>
+                        </div>
+                        <div class="medal-name" th:text="${ua.achievement.name}">Achievement</div>
                     </div>
                 </div>
             </div>

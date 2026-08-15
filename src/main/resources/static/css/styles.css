@@ -6,14 +6,16 @@
 
 :root {
   /* Palette */
-  --ink: #20291f;
-  --ink-soft: #4a4638;
-  --paper: #f1e9d2;
-  --paper-raised: #fffdf7;
-  --brass: #a8792f;
-  --brass-bright: #c99a44;
-  --burgundy: #7a2e2e;
-  --line: #ded2ae;
+  --ink: #17140f;
+  --ink-soft: #4a4030;
+  --paper: #eee3c6;
+  --paper-raised: #fffcf5;
+  --brass: #9c6b24;
+  --brass-bright: #e3ac4f;
+  --brass-deep: #6b4816;
+  --burgundy: #6b1f24;
+  --burgundy-bright: #a5433f;
+  --line: #d3c193;
 
   /* Type */
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;
@@ -21,7 +23,27 @@
   --font-mono: "Courier Prime", "Courier New", monospace;
 
   --radius: 4px;
-  --shadow-card: 0 2px 4px rgba(32, 41, 31, 0.06), 0 8px 24px rgba(32, 41, 31, 0.08);
+  --shadow-card: 0 2px 4px rgba(23, 20, 15, 0.08), 0 10px 28px rgba(23, 20, 15, 0.14);
+  /* A crisp, un-blurred offset - reserved for the handful of elements that
+     should read as physically stamped/pressed (buttons, medallions, hero
+     photo), rather than applied everywhere. */
+  --shadow-hard: 3px 3px 0 var(--ink);
+}
+
+/* ---- paper grain --------------------------------------------------------- */
+/* A faint noise texture over the whole page so flat colour fields read as
+   paper stock, not a digital fill. Neutral grey + blend mode, so it holds up
+   in both themes without a separate override. */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
 /* ---- base ------------------------------------------------------------- */
@@ -85,9 +107,20 @@ a:hover {
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--brass);
+}
+
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 1.1rem;
+  height: 1.5px;
+  margin-right: 0.5rem;
+  margin-bottom: 0.15rem;
+  background: var(--brass);
+  vertical-align: middle;
 }
 
 /* ---- navbar ------------------------------------------------------------ */
@@ -237,10 +270,24 @@ a:hover {
 /* ---- buttons ------------------------------------------------------------ */
 
 .btn {
-  font-weight: 600;
-  border-radius: var(--radius);
+  font-weight: 700;
+  border-radius: 3px;
   font-size: 0.92rem;
-  padding: 0.55rem 1.3rem;
+  padding: 0.6rem 1.35rem;
+  border: 1.5px solid transparent;
+  box-shadow: var(--shadow-hard);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease,
+              background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--ink);
 }
 
 .btn-primary {
@@ -256,7 +303,7 @@ a:hover {
 }
 
 .btn-outline-brass {
-  background: transparent;
+  background: var(--paper-raised);
   border: 1.5px solid var(--ink);
   color: var(--ink);
 }
@@ -267,15 +314,20 @@ a:hover {
 }
 
 .btn-secondary {
-  background-color: transparent;
+  background-color: var(--paper-raised);
   border: 1.5px solid var(--line);
   color: var(--ink-soft);
+  box-shadow: 3px 3px 0 var(--line);
 }
 
 .btn-secondary:hover {
   border-color: var(--brass);
   color: var(--ink);
-  background-color: var(--paper-raised);
+  box-shadow: 4px 4px 0 var(--brass);
+}
+
+.btn-secondary:active {
+  box-shadow: 0 0 0 var(--line);
 }
 
 /* ---- hero --------------------------------------------------------------- */
@@ -284,14 +336,33 @@ a:hover {
   padding: 4.5rem 0 3.5rem;
 }
 
+.hero-copy {
+  position: relative;
+}
+
+.hero-copy::before {
+  content: "\2766";
+  position: absolute;
+  top: -4.5rem;
+  left: -2rem;
+  font-size: 13rem;
+  line-height: 1;
+  color: var(--brass);
+  opacity: 0.1;
+  z-index: -1;
+  pointer-events: none;
+}
+
 .hero-copy .eyebrow {
   display: inline-block;
   margin-bottom: 0.9rem;
 }
 
 .hero-copy h1 {
-  font-size: clamp(2.2rem, 4vw, 3.4rem);
-  line-height: 1.1;
+  font-size: clamp(2.6rem, 5.5vw, 4.3rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
   margin-bottom: 1.1rem;
 }
 
@@ -308,7 +379,7 @@ a:hover {
 
 .hero-figure img {
   border: 10px solid var(--paper-raised);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-hard);
   border-radius: 2px;
   transform: rotate(-2deg);
   max-width: 100%;
@@ -340,6 +411,7 @@ a:hover {
 .book-card {
   position: relative;
   background: var(--paper-raised);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   padding: 1.3rem 1.25rem 1.1rem 1.6rem;
@@ -688,7 +760,7 @@ a:hover {
 }
 
 .card {
-  border: none;
+  border: 1px solid var(--line);
   box-shadow: var(--shadow-card);
   border-radius: var(--radius);
 }
@@ -1055,15 +1127,17 @@ a.page-link:hover {
    below) need their own override. */
 
 [data-theme="dark"] {
-  --ink: #f1e9d2;
+  --ink: #f4ecd6;
   --ink-soft: #cbbfa0;
-  --paper: #1c1a15;
-  --paper-raised: #262319;
-  --brass: #c99a44;
-  --brass-bright: #e0b563;
-  --burgundy: #d97c7c;
-  --line: #3a361f;
-  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.4);
+  --paper: #17140f;
+  --paper-raised: #241f16;
+  --brass: #e3ac4f;
+  --brass-bright: #f0c274;
+  --brass-deep: #a5732a;
+  --burgundy: #d9827e;
+  --burgundy-bright: #e8a29d;
+  --line: #3a3320;
+  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.35), 0 10px 28px rgba(0, 0, 0, 0.42);
   /* Bootstrap's .text-muted (and anything else reading these Bootstrap
      variables, e.g. placeholder/disabled text) is hardcoded for a light
      background - rgba(33,37,41,.75), a near-black gray - and goes
@@ -1150,7 +1224,7 @@ a.page-link:hover {
    ease across the whole page at once. */
 body, .form-panel, .auth-card, .card, .reader-panel,
 .empty-state, .navbar, .search-field, .search-sort, input, textarea,
-select, .achievement-badge, .review-card, .takeaway-row {
+select, .medal, .review-card, .takeaway-row {
   transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
 }
 
@@ -1164,13 +1238,120 @@ select, .achievement-badge, .review-card, .takeaway-row {
   font-size: 1.25rem;
 }
 
-/* ---- achievement badges -------------------------------------------------- */
+/* ---- achievement medallions ------------------------------------------------ */
+/* A wax-seal / campaign-medal treatment: fluted foil rim, embossed icon,
+   a foil-sheen sweep on reveal and hover, burgundy ribbon tails. Used full-
+   size on the finish-book celebration, and as .medal-compact (no tails, no
+   description) in the profile page's inline row. */
 
-.achievement-badge {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  min-width: 160px;
-  background: var(--paper-raised);
+.medal {
+  text-align: center;
+  padding: 0.9rem 0.9rem 0.6rem;
+}
+
+.medal-tails {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: -6px;
+}
+
+.medal-tail {
+  width: 9px;
+  height: 20px;
+  background: linear-gradient(180deg, var(--burgundy-bright), var(--burgundy));
+  clip-path: polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%);
+}
+
+.medal-tail:first-child { transform: rotate(-9deg); }
+.medal-tail:last-child { transform: rotate(9deg); }
+
+.medal-seal {
+  position: relative;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  margin: 0.4rem auto 0.6rem;
+  background: repeating-conic-gradient(var(--brass-deep) 0deg 9deg, var(--brass) 9deg 18deg);
+  box-shadow: var(--shadow-hard), inset 0 0 0 3px var(--paper-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.medal-seal-face {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--brass-bright), var(--brass) 55%, var(--brass-deep) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.5), inset 0 -3px 5px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.medal-seal-face::after {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.65) 50%, transparent 58%);
+  transform: translate(-130%, -130%);
+}
+
+.badge-pop .medal-seal-face::after {
+  animation: foil-sweep 1.1s ease-out 0.5s;
+}
+
+.medal:hover .medal-seal-face::after {
+  animation: foil-sweep 0.8s ease-out;
+}
+
+@keyframes foil-sweep {
+  to { transform: translate(130%, 130%); }
+}
+
+.medal-icon {
+  font-size: 1.65rem;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+}
+
+.medal-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+
+.medal-desc {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  margin-top: 0.15rem;
+}
+
+.medal-compact {
+  min-width: 92px;
+  padding: 0.5rem 0.4rem 0;
+}
+
+.medal-compact .medal-seal {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 0.4rem;
+}
+
+.medal-compact .medal-seal-face {
+  width: 40px;
+  height: 40px;
+}
+
+.medal-compact .medal-icon {
+  font-size: 1.2rem;
+}
+
+.medal-compact .medal-name {
+  font-size: 0.76rem;
 }
 
 .badge-pop {

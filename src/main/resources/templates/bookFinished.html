@@ -15,10 +15,18 @@
         <div th:if="${!#lists.isEmpty(newAchievements)}" class="mt-3 mb-4">
             <span class="eyebrow d-block mb-3">Achievement unlocked</span>
             <div class="d-flex flex-wrap justify-content-center gap-3">
-                <div th:each="a : ${newAchievements}" class="achievement-badge badge-pop p-3">
-                    <div style="font-size: 2rem;" th:text="${a.icon}">🏆</div>
-                    <div class="fw-semibold mt-1" th:text="${a.name}">Achievement name</div>
-                    <div class="small text-muted" th:text="${a.description}">Description</div>
+                <div th:each="a : ${newAchievements}" class="medal badge-pop">
+                    <div class="medal-tails">
+                        <div class="medal-tail"></div>
+                        <div class="medal-tail"></div>
+                    </div>
+                    <div class="medal-seal">
+                        <div class="medal-seal-face">
+                            <span class="medal-icon" th:text="${a.icon}">🏆</span>
+                        </div>
+                    </div>
+                    <div class="medal-name" th:text="${a.name}">Achievement name</div>
+                    <div class="medal-desc" th:text="${a.description}">Description</div>
                 </div>
             </div>
         </div>
