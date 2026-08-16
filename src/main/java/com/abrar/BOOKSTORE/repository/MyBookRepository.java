@@ -22,4 +22,7 @@ public interface MyBookRepository extends JpaRepository<MyBookList, Long> {
 
     @Transactional
     void deleteByUser(User user);
+
+    @Transactional
+    void deleteByBookId(int bookId);
 }

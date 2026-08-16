@@ -3,10 +3,14 @@ package com.abrar.BOOKSTORE.service;
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import com.abrar.BOOKSTORE.repository.BookRepository;
+import com.abrar.BOOKSTORE.repository.MyBookRepository;
+import com.abrar.BOOKSTORE.repository.ReadingProgressRepository;
+import com.abrar.BOOKSTORE.repository.ReviewRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -21,6 +25,12 @@ public class BookService {
 
     @Autowired
     private BookRepository bRepo;
+    @Autowired
+    private ReviewRepository reviewRepository;
+    @Autowired
+    private MyBookRepository myBookRepository;
+    @Autowired
+    private ReadingProgressRepository readingProgressRepository;
 
     public void save(Book b) {
         bRepo.save(b);
@@ -130,15 +140,20 @@ public class BookService {
     }
 
     /**
-     * @throws ResourceNotFoundException if no book exists with the given id,
-     *                                   instead of letting an
-     *                                   EmptyResultDataAccessException escape from
-     *                                   deleteById().
+     * Deletes a book and everything scoped to it that would otherwise
+     * violate a foreign key: reviews, "my books" bookmarks, and reading
+     * progress. Takeaway pages and genre tags clean up on their own -
+     * takeaways via JPA cascade on Book.takeaways, genre tags because
+     * Hibernate clears the book_genres join rows automatically for the
+     * owning side of a @ManyToMany.
      */
+    @Transactional
     public void deleteById(int id) {
-        if (!bRepo.existsById(id)) {
-            throw new ResourceNotFoundException("Book not found with id: " + id);
-        }
-        bRepo.deleteById(id);
+        Book book = bRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
+        reviewRepository.deleteByBook(book);
+        myBookRepository.deleteByBookId(id);
+        readingProgressRepository.deleteByBook(book);
+        bRepo.delete(book);
     }
 }

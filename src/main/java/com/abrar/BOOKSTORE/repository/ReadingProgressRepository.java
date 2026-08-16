@@ -18,4 +18,7 @@ public interface ReadingProgressRepository extends JpaRepository<ReadingProgress
 
     @Transactional
     void deleteByUser(User user);
+
+    @Transactional
+    void deleteByBook(Book book);
 }

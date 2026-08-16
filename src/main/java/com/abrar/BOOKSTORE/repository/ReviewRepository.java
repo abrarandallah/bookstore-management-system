@@ -1,7 +1,9 @@
 package com.abrar.BOOKSTORE.repository;
 
 import com.abrar.BOOKSTORE.Login.user.User;
+import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.Review;
+import com.abrar.BOOKSTORE.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,4 +38,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Transactional
     void deleteByUser(User user);
+
+    @Transactional
+    void deleteByBook(Book book);
 }
