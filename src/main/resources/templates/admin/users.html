@@ -83,7 +83,7 @@
                 <td>
                     <form th:if="${u.usernameOrEmail != #authentication.name}"
                           th:action="@{/admin/users/{id}/delete(id=${u.id})}" method="post"
-                          onsubmit="return confirm('Permanently delete this user and everything tied to their account? This cannot be undone.');">
+                          onsubmit="return appConfirm(event, 'Permanently delete this user and everything tied to their account? This cannot be undone.');">
                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                     </form>
                     <span th:unless="${u.usernameOrEmail != #authentication.name}" class="text-muted small">That's you</span>

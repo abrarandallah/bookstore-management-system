@@ -101,7 +101,7 @@
                             </a>
                             <form th:action="@{/deleteBook/{id}(id=${b.id})}" method="post" class="d-inline"
                                   sec:authorize="hasRole('LIBRARIAN')"
-                                  onsubmit="return confirm('Delete this book? This cannot be undone.');">
+                                  onsubmit="return appConfirm(event, 'Delete this book? This cannot be undone.');">
                                 <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
@@ -145,6 +145,5 @@
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 <script th:src="@{/js/live-search.js}"></script>
-<script th:src="@{/js/toast.js}"></script>
 </body>
 </html>

@@ -17,7 +17,7 @@
                 </p>
                 <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
                 <form th:action="@{/delete-account}" method="post"
-                      onsubmit="return confirm('This will permanently delete your account and everything tied to it. This cannot be undone. Continue?');">
+                      onsubmit="return appConfirm(event, 'This will permanently delete your account and everything tied to it. This cannot be undone. Continue?');">
                     <div class="mb-3">
                         <label for="currentPassword" class="form-label">Confirm your password</label>
                         <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>

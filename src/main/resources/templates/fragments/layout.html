@@ -36,6 +36,8 @@
     <th:block th:fragment="scripts">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
                 integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+        <script th:src="@{/js/toast.js}"></script>
+        <script th:src="@{/js/confirm-modal.js}"></script>
         <script>
             function toggleTheme() {
                 const current = document.documentElement.getAttribute('data-theme');
@@ -62,7 +64,7 @@
             function removeTakeaway(button) {
                 const rows = document.querySelectorAll('#takeaways-container .takeaway-row');
                 if (rows.length <= 1) {
-                    alert('You need at least 1 takeaway.');
+                    window.showToast('You need at least 1 takeaway.', { icon: 'triangle-exclamation', isError: true });
                     return;
                 }
                 button.closest('.takeaway-row').remove();
@@ -71,7 +73,7 @@
             function addTakeaway() {
                 const container = document.getElementById('takeaways-container');
                 if (container.querySelectorAll('.takeaway-row').length >= 10) {
-                    alert('Maximum 10 takeaways.');
+                    window.showToast('Maximum 10 takeaways.', { icon: 'triangle-exclamation', isError: true });
                     return;
                 }
                 const row = document.createElement('div');

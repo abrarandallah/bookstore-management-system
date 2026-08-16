@@ -92,7 +92,7 @@
         <form th:if="${ownReview != null}"
               th:action="@{/available_books/{bookId}/review/{reviewId}/delete(bookId=${book.id}, reviewId=${ownReview.id})}"
               method="post" class="d-inline mt-2"
-              onsubmit="return confirm('Delete your review?');">
+              onsubmit="return appConfirm(event, 'Delete your review?');">
             <button type="submit" class="btn btn-link btn-sm text-danger p-0">Delete my review</button>
         </form>
     </div>
