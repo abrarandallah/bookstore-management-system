@@ -44,7 +44,8 @@
             </div>
         </div>
 
-        <div th:each="page, iter : ${book.takeaways}" class="reader-page" th:data-index="${iter.index}">
+        <div th:each="page, iter : ${book.takeaways}" class="reader-page" th:data-index="${iter.index}"
+             th:style="${iter.index == resumePage} ? 'display:block' : ''">
             <h4 th:text="${page.heading}">Heading</h4>
             <p th:text="${page.content}" style="white-space: pre-line;">Content</p>
         </div>
