@@ -43,6 +43,16 @@
                         <span th:text="${#lists.size(b.takeaways)} + ' takeaways · ' + ${b.estimatedReadMinutes} + ' min read'"></span>
                     </span>
                 </div>
+                <div class="mt-2" th:if="${progressByBook.get(b.id) != null}">
+                    <div class="reader-progress-bar">
+                        <div class="reader-progress-fill"
+                             th:style="'width:' + (((progressByBook.get(b.id).currentPage + 1) * 100) / #lists.size(b.takeaways)) + '%'"></div>
+                    </div>
+                    <span class="small text-muted">
+                        Takeaway <span th:text="${progressByBook.get(b.id).currentPage + 1}"></span> of
+                        <span th:text="${#lists.size(b.takeaways)}"></span>
+                    </span>
+                </div>
                 <div class="book-actions">
                     <a th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
                     <form th:action="@{/deleteMyBook/{id}(id=${myBookListIdByBookId.get(b.id)})}" method="post"
