@@ -96,13 +96,15 @@
                                target="_blank" rel="noopener">
                                 <i class="fa-solid fa-share-nodes"></i>
                             </a>
-                            <a th:href="@{/editBook/{id}(id=${b.id})}" sec:authorize="hasRole('LIBRARIAN')" class="icon-link">
+                            <a th:href="@{/editBook/{id}(id=${b.id})}" sec:authorize="hasRole('LIBRARIAN')" class="icon-link"
+                               title="Edit book" aria-label="Edit book">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
                             <form th:action="@{/deleteBook/{id}(id=${b.id})}" method="post" class="d-inline"
                                   sec:authorize="hasRole('LIBRARIAN')"
                                   onsubmit="return appConfirm(event, 'Delete this book? This cannot be undone.');">
-                                <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;">
+                                <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;"
+                                        title="Delete book" aria-label="Delete book">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
