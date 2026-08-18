@@ -220,10 +220,12 @@
             </div>
             <div>
                 <a href="/">Home</a>
-                <span class="mx-2">·</span>
-                <a href="/available_books">Available Books</a>
-                <span class="mx-2">·</span>
-                <a href="/genres">Genres</a>
+                <th:block sec:authorize="isAuthenticated()">
+                    <span class="mx-2">·</span>
+                    <a href="/available_books">Available Books</a>
+                    <span class="mx-2">·</span>
+                    <a href="/genres">Genres</a>
+                </th:block>
                 <span class="mx-2">·</span>
                 <a href="/#how-it-works">About</a>
             </div>
