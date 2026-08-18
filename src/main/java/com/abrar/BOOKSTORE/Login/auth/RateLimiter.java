@@ -1,5 +1,6 @@
 package com.abrar.BOOKSTORE.Login.auth;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -33,5 +34,24 @@ public class RateLimiter {
             attempts.addLast(now);
             return true;
         }
+    }
+
+    // Without this, every distinct IP that ever calls allow() gets a
+    // permanent entry in the map, even once its attempts have all aged out -
+    // a slow leak over weeks/months of uptime. Runs hourly and just drops
+    // keys whose deque is empty after trimming expired attempts.
+    @Scheduled(fixedRate = 60 * 60 * 1000)
+    public void evictStaleEntries() {
+        Instant cutoff = Instant.now().minusSeconds(WINDOW_SECONDS);
+        attemptsByKey.forEach((key, attempts) -> {
+            synchronized (attempts) {
+                while (!attempts.isEmpty() && attempts.peekFirst().isBefore(cutoff)) {
+                    attempts.pollFirst();
+                }
+                if (attempts.isEmpty()) {
+                    attemptsByKey.remove(key, attempts);
+                }
+            }
+        });
     }
 }
