@@ -14,7 +14,13 @@ public interface ReadingProgressRepository extends JpaRepository<ReadingProgress
 
     List<ReadingProgress> findByUserOrderByLastReadAtDesc(User user);
 
+    List<ReadingProgress> findByUserAndBookIn(User user, List<Book> books);
+
     long countByUserAndFinishedAtIsNotNull(User user);
+
+    // Scoped to the owning user so one user can't delete another's history
+    // row just by guessing/crafting an id.
+    Optional<ReadingProgress> findByIdAndUser(Long id, User user);
 
     @Transactional
     void deleteByUser(User user);

@@ -197,6 +197,7 @@ public class BookController {
         model.addAttribute("book", books);
         model.addAttribute("myBookListIdByBookId", myBookListIdByBookId);
         model.addAttribute("ratingSummaries", reviewService.summariesForAllBooks());
+        model.addAttribute("progressByBook", readingProgressService.getInProgressByBook(currentUser(principal), books));
         return "myBooks";
     }
 
@@ -268,6 +269,13 @@ public class BookController {
         User user = currentUser(principal);
         model.addAttribute("history", readingProgressService.getHistory(user));
         return "readingHistory";
+    }
+
+    // POST-only: mutates data, same reasoning as /mylist/{id} above.
+    @PostMapping("/reading-history/{id}/delete")
+    public String deleteHistoryEntry(@PathVariable("id") Long id, Principal principal) {
+        readingProgressService.deleteHistoryEntry(id, currentUser(principal));
+        return "redirect:/reading-history";
     }
 
     @GetMapping("/editBook/{id}")

@@ -48,6 +48,13 @@
                             </span>
                         </div>
                     </div>
+                    <form th:action="@{/reading-history/{id}/delete(id=${rp.id})}" method="post"
+                          onsubmit="return appConfirm(event, 'Remove this from your reading history?', {gentle: true, confirmLabel: 'Remove'});">
+                        <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;"
+                                title="Remove from history" aria-label="Remove from history">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

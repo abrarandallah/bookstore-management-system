@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class ReadingProgressService {
@@ -56,5 +59,29 @@ public class ReadingProgressService {
 
     public long countFinished(User user) {
         return readingProgressRepository.countByUserAndFinishedAtIsNotNull(user);
+    }
+
+    /**
+     * Progress rows for a batch of books, keyed by book id - used by the "My
+     * Books" page to show an in-progress indicator without a query per book.
+     * Finished books and books never opened are left out of the map.
+     */
+    public Map<Integer, ReadingProgress> getInProgressByBook(User user, List<Book> books) {
+        if (books.isEmpty()) {
+            return Map.of();
+        }
+        return readingProgressRepository.findByUserAndBookIn(user, books).stream()
+                .filter(p -> !p.isFinished())
+                .collect(Collectors.toMap(p -> p.getBook().getId(), Function.identity()));
+    }
+
+    /**
+     * Removes a single reading-history entry (dismiss from history). Scoped
+     * to the owning user; silently no-ops if the id doesn't belong to them
+     * or doesn't exist, so this stays idempotent for double-clicks.
+     */
+    public void deleteHistoryEntry(Long progressId, User user) {
+        readingProgressRepository.findByIdAndUser(progressId, user)
+                .ifPresent(readingProgressRepository::delete);
     }
 }
