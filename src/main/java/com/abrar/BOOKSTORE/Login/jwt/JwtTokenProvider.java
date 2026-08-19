@@ -2,7 +2,12 @@
 //validateToken checks the validity and integrity of a JWT token.
 package com.abrar.BOOKSTORE.Login.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,29 +17,54 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class JwtTokenProvider {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private TokenBlacklist tokenBlacklist;
+
     @Value("${app.jwtSecret}")
     private String jwtSecret;
 
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
 
+    // jjwt's HS512 signing key must be at least 64 bytes - Keys.hmacShaKeyFor
+    // enforces that instead of silently accepting a too-short secret the way
+    // the old signWith(SignatureAlgorithm, String) overload did.
+    private Key signingKey() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+    }
+
     public String generateToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return buildToken(userDetails.getUsername());
+    }
+
+    public String generateToken(String username) {
+        return buildToken(username);
+    }
+
+    private String buildToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .subject(username)
+                // A unique id per token, so a specific token can be revoked
+                // (see TokenBlacklist) without needing to store the whole
+                // token text or invalidate every token for the user.
+                .id(UUID.randomUUID().toString())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(signingKey())
                 .compact();
     }
 
@@ -49,27 +79,31 @@ public class JwtTokenProvider {
         return null;
     }
 
+    private Claims parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith((javax.crypto.SecretKey) signingKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
     // Get the username from the token
     public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
+        return parseClaims(token).getSubject();
     }
 
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            Claims claims = parseClaims(authToken);
+            if (tokenBlacklist.isRevoked(claims.getId())) {
+                return false;
+            }
             return true;
-        } catch (SignatureException ex) {
-            // Invalid JWT signature
-        } catch (MalformedJwtException ex) {
-            // Invalid JWT token
         } catch (ExpiredJwtException ex) {
             // Expired JWT token
-        } catch (UnsupportedJwtException ex) {
-            // Unsupported JWT token
+        } catch (JwtException ex) {
+            // Covers SignatureException, MalformedJwtException,
+            // UnsupportedJwtException - all invalid/tampered tokens.
         } catch (IllegalArgumentException ex) {
             // JWT claims string is empty
         }
@@ -81,16 +115,15 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public String generateToken(String username) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
+    /**
+     * Revokes the given (already-validated) token so it's rejected by
+     * {@link #validateToken(String)} for the remainder of its natural
+     * lifetime, even though it hasn't actually expired yet. Called on
+     * logout - see AuthController.
+     */
+    public void revoke(String token) {
+        Claims claims = parseClaims(token);
+        tokenBlacklist.revoke(claims.getId(), claims.getExpiration().toInstant());
     }
 
     public void setJwtSecret(String jwtSecret) {
