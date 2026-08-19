@@ -12,6 +12,9 @@ import static org.mockito.Mockito.when;
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import com.abrar.BOOKSTORE.repository.BookRepository;
+import com.abrar.BOOKSTORE.repository.MyBookRepository;
+import com.abrar.BOOKSTORE.repository.ReadingProgressRepository;
+import com.abrar.BOOKSTORE.repository.ReviewRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class BookServiceTest {
     @MockBean
     private BookRepository bookRepository;
+
+    @MockBean
+    private ReviewRepository reviewRepository;
+
+    @MockBean
+    private MyBookRepository myBookRepository;
+
+    @MockBean
+    private ReadingProgressRepository readingProgressRepository;
 
     @Autowired
     private BookService bookService;
@@ -98,14 +110,28 @@ class BookServiceTest {
 
     /**
      * Method under test: {@link BookService#deleteById(int)}
+     * Verifies the cascade: reviews, my-books entries, and reading progress
+     * are cleaned up before the book row itself is deleted (see item 11 -
+     * this used to crash with an unhandled foreign-key violation).
      */
     @Test
     void testDeleteById() {
-        when(bookRepository.existsById(Mockito.<Integer>any())).thenReturn(true);
-        doNothing().when(bookRepository).deleteById(Mockito.<Integer>any());
+        Book book = new Book();
+        book.setId(1);
+        book.setName("Name");
+        book.setAuthor("JaneDoe");
+        when(bookRepository.findById(1)).thenReturn(Optional.of(book));
+        doNothing().when(reviewRepository).deleteByBook(book);
+        doNothing().when(myBookRepository).deleteByBookId(1);
+        doNothing().when(readingProgressRepository).deleteByBook(book);
+        doNothing().when(bookRepository).delete(book);
+
         bookService.deleteById(1);
-        verify(bookRepository).deleteById(Mockito.<Integer>any());
-        assertTrue(bookService.getAllBook().isEmpty());
+
+        verify(reviewRepository).deleteByBook(book);
+        verify(myBookRepository).deleteByBookId(1);
+        verify(readingProgressRepository).deleteByBook(book);
+        verify(bookRepository).delete(book);
     }
 
     /**
@@ -113,7 +139,7 @@ class BookServiceTest {
      */
     @Test
     void testDeleteByIdNotFound() {
-        when(bookRepository.existsById(Mockito.<Integer>any())).thenReturn(false);
+        when(bookRepository.findById(1)).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> bookService.deleteById(1));
     }
 

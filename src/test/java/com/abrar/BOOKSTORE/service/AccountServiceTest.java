@@ -7,11 +7,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.abrar.BOOKSTORE.Login.user.EmailVerificationTokenRepository;
 import com.abrar.BOOKSTORE.Login.user.PasswordResetTokenRepository;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.repository.MyBookRepository;
+import com.abrar.BOOKSTORE.repository.ReadingProgressRepository;
 import com.abrar.BOOKSTORE.repository.ReviewRepository;
+import com.abrar.BOOKSTORE.repository.UserAchievementRepository;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,10 +44,22 @@ class AccountServiceTest {
     @MockBean
     private PasswordResetTokenRepository passwordResetTokenRepository;
 
+    @MockBean
+    private EmailVerificationTokenRepository emailVerificationTokenRepository;
+
+    @MockBean
+    private ReadingProgressRepository readingProgressRepository;
+
+    @MockBean
+    private UserAchievementRepository userAchievementRepository;
+
     @Test
     void testDeleteAccountRemovesEverythingScopedToTheUser() {
         User user = new User("reader", "reader@example.com", "hash", "ROLE_USER");
         doNothing().when(passwordResetTokenRepository).deleteByUser(user);
+        doNothing().when(emailVerificationTokenRepository).deleteByUser(user);
+        doNothing().when(readingProgressRepository).deleteByUser(user);
+        doNothing().when(userAchievementRepository).deleteByUser(user);
         doNothing().when(myBookRepository).deleteByUser(user);
         doNothing().when(reviewRepository).deleteByUser(user);
         doNothing().when(userRepository).delete(user);
@@ -52,6 +67,9 @@ class AccountServiceTest {
         accountService.deleteAccount(user);
 
         verify(passwordResetTokenRepository).deleteByUser(user);
+        verify(emailVerificationTokenRepository).deleteByUser(user);
+        verify(readingProgressRepository).deleteByUser(user);
+        verify(userAchievementRepository).deleteByUser(user);
         verify(myBookRepository).deleteByUser(user);
         verify(reviewRepository).deleteByUser(user);
         verify(userRepository).delete(user);
@@ -60,18 +78,27 @@ class AccountServiceTest {
     @Test
     void testDeleteAccountDeletesDependentDataBeforeTheUserRow() {
         // Order matters here: the User row can't be deleted while a
-        // password-reset token or review still holds a foreign key to it.
+        // password-reset token, verification token, reading progress,
+        // achievement, my-books entry, or review still holds a foreign key
+        // to it.
         User user = new User("reader", "reader@example.com", "hash", "ROLE_USER");
         doNothing().when(passwordResetTokenRepository).deleteByUser(user);
+        doNothing().when(emailVerificationTokenRepository).deleteByUser(user);
+        doNothing().when(readingProgressRepository).deleteByUser(user);
+        doNothing().when(userAchievementRepository).deleteByUser(user);
         doNothing().when(myBookRepository).deleteByUser(user);
         doNothing().when(reviewRepository).deleteByUser(user);
         doNothing().when(userRepository).delete(user);
 
         accountService.deleteAccount(user);
 
-        InOrder inOrder = Mockito.inOrder(passwordResetTokenRepository, myBookRepository, reviewRepository,
+        InOrder inOrder = Mockito.inOrder(passwordResetTokenRepository, emailVerificationTokenRepository,
+                readingProgressRepository, userAchievementRepository, myBookRepository, reviewRepository,
                 userRepository);
         inOrder.verify(passwordResetTokenRepository).deleteByUser(user);
+        inOrder.verify(emailVerificationTokenRepository).deleteByUser(user);
+        inOrder.verify(readingProgressRepository).deleteByUser(user);
+        inOrder.verify(userAchievementRepository).deleteByUser(user);
         inOrder.verify(myBookRepository).deleteByUser(user);
         inOrder.verify(reviewRepository).deleteByUser(user);
         inOrder.verify(userRepository).delete(user);
