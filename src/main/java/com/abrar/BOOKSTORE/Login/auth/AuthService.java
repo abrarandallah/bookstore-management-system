@@ -29,11 +29,27 @@ public class AuthService {
     private EmailService emailService;
 
     public void registerUser(SignupRequest signupRequest) {
-        // Check if the username is already taken
-        if (userRepository.existsByUsernameOrEmail(signupRequest.getUsername(), signupRequest.getEmail())) {
-            throw new AuthenticationServiceException("Username or email is already in use.");
+        // Username collisions are shown to the user directly - picking an
+        // already-taken handle is normal signup friction, not a privacy leak.
+        if (userRepository.existsByUsername(signupRequest.getUsername())) {
+            throw new AuthenticationServiceException("Username is already in use.");
         }
 
+        // Email collisions are NOT shown to the user - unlike a username, an
+        // email address is tied to a real identity, so confirming "this
+        // email is already registered" would let an attacker enumerate
+        // which addresses have accounts here. Instead this silently no-ops
+        // (no new user, no verification email) and notifies the *existing*
+        // account's inbox instead - the only place someone who actually
+        // owns that address will see it. Either way the caller (see
+        // AuthController/AuthPageController) shows the same generic
+        // "check your email" success message.
+        userRepository.findByEmail(signupRequest.getEmail()).ifPresentOrElse(
+                existing -> emailService.sendAccountAlreadyExistsEmail(existing.getEmail()),
+                () -> createUser(signupRequest));
+    }
+
+    private void createUser(SignupRequest signupRequest) {
         // Create a new user object. New signups start unverified - they can't
         // log in (see UserPrincipal.isEnabled()) until they click the link
         // sent below. Existing users predating this feature are unaffected:
