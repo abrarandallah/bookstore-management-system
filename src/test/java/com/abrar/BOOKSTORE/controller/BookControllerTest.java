@@ -16,6 +16,8 @@ import com.abrar.BOOKSTORE.service.GenreService;
 import com.abrar.BOOKSTORE.service.MyBookListService;
 import com.abrar.BOOKSTORE.service.PagedResult;
 import com.abrar.BOOKSTORE.service.RatingSummary;
+import com.abrar.BOOKSTORE.service.ReadingProgressService;
+import com.abrar.BOOKSTORE.service.AchievementService;
 import com.abrar.BOOKSTORE.service.ReviewService;
 import com.abrar.BOOKSTORE.service.BookValidator;
 
@@ -60,6 +62,12 @@ class BookControllerTest {
 
         @MockBean
         private ReviewService reviewService;
+
+        @MockBean
+        private ReadingProgressService readingProgressService;
+
+        @MockBean
+        private AchievementService achievementService;
 
         private static final Principal READER_PRINCIPAL = () -> "reader";
 
@@ -364,13 +372,15 @@ class BookControllerTest {
         void testGetMyBooks() throws Exception {
                 stubCurrentUser();
                 when(myBookListService.getMyBooks(Mockito.<User>any())).thenReturn(new ArrayList<>());
+                when(readingProgressService.getInProgressByBook(Mockito.<User>any(), Mockito.<List<Book>>any()))
+                                .thenReturn(java.util.Map.of());
                 MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/my_books")
                                 .principal(READER_PRINCIPAL);
                 MockMvcBuilders.standaloneSetup(bookController)
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(1))
+                                .andExpect(MockMvcResultMatchers.model().size(4))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("book"))
                                 .andExpect(MockMvcResultMatchers.view().name("myBooks"))
                                 .andExpect(MockMvcResultMatchers.forwardedUrl("myBooks"));
