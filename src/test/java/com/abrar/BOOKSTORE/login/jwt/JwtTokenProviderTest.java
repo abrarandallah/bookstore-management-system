@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.abrar.BOOKSTORE.Login.jwt.JwtTokenProvider;
+import com.abrar.BOOKSTORE.Login.jwt.TokenBlacklist;
 import com.abrar.BOOKSTORE.Login.user.UserPrincipal;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
-@ContextConfiguration(classes = { JwtTokenProvider.class })
+@ContextConfiguration(classes = { JwtTokenProvider.class, TokenBlacklist.class })
 @ExtendWith(SpringExtension.class)
 // A real base64-encoded 64-byte key - HS512 requires at least 512 bits, and
 // JJWT 0.11.x's signWith(SignatureAlgorithm, String) overload treats the
@@ -114,6 +115,27 @@ class JwtTokenProviderTest {
         when(request.getHeader("Authorization")).thenReturn("Basic dXNlcjpwYXNz");
 
         assertNull(jwtTokenProvider.resolveToken(request));
+    }
+
+    @Test
+    void testValidateTokenRejectsARevokedToken() {
+        String token = jwtTokenProvider.generateToken(authenticationFor("reader"));
+        assertTrue(jwtTokenProvider.validateToken(token));
+
+        jwtTokenProvider.revoke(token);
+
+        assertFalse(jwtTokenProvider.validateToken(token));
+    }
+
+    @Test
+    void testRevokeOnlyAffectsTheRevokedToken() {
+        String tokenA = jwtTokenProvider.generateToken(authenticationFor("reader"));
+        String tokenB = jwtTokenProvider.generateToken(authenticationFor("reader"));
+
+        jwtTokenProvider.revoke(tokenA);
+
+        assertFalse(jwtTokenProvider.validateToken(tokenA));
+        assertTrue(jwtTokenProvider.validateToken(tokenB));
     }
 
     @Test
