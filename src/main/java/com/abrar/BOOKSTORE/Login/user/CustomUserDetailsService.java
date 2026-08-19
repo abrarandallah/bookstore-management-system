@@ -1,9 +1,8 @@
-
 //This service loads user details from your
 // repository based on the username or email.
 package com.abrar.BOOKSTORE.Login.user;
 
-import org.apache.velocity.exception.ResourceNotFoundException;
+import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
