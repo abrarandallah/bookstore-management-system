@@ -102,8 +102,12 @@ class AuthControllerTest {
         }
 
         @Test
-        void testSignupRejectsDuplicateUsernameOrEmail() throws Exception {
-                doThrow(new AuthenticationServiceException("Username or email is already in use."))
+        void testSignupRejectsDuplicateUsername() throws Exception {
+                // AuthService only ever throws AuthenticationServiceException for a
+                // duplicate *username* - a duplicate email is handled without
+                // throwing, to avoid leaking which emails are registered (see
+                // AuthService.registerUser and AuthServiceTest).
+                doThrow(new AuthenticationServiceException("Username is already in use."))
                                 .when(authService).registerUser(Mockito.any());
 
                 MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/api/auth/signup")
@@ -114,7 +118,26 @@ class AuthControllerTest {
                 mockMvc().perform(request)
                                 .andExpect(MockMvcResultMatchers.status().isConflict())
                                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
-                                                .value("Username or email is already in use."));
+                                                .value("Username is already in use."));
+        }
+
+        @Test
+        void testSignupWithAnAlreadyRegisteredEmailStillReturnsGenericSuccess() throws Exception {
+                // AuthService silently no-ops (and emails the existing account
+                // instead) rather than throwing - so from the HTTP caller's
+                // perspective this looks identical to a brand-new signup. This
+                // test exists specifically to guard that indistinguishability.
+                doNothing().when(authService).registerUser(Mockito.any());
+
+                MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/api/auth/signup")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(
+                                                new SignupRequest("reader", "already-registered@example.com",
+                                                                "password123")));
+
+                mockMvc().perform(request)
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(true));
         }
 
         @Test
@@ -176,5 +199,43 @@ class AuthControllerTest {
                 mockMvc().perform(request)
                                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
                 Mockito.verify(authenticationManager, Mockito.never()).authenticate(Mockito.any());
+        }
+
+        @Test
+        void testLogoutRevokesAValidToken() throws Exception {
+                when(jwtTokenProvider.resolveToken(Mockito.any())).thenReturn("a.b.c");
+                when(jwtTokenProvider.validateToken("a.b.c")).thenReturn(true);
+
+                MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/api/auth/logout")
+                                .header("Authorization", "Bearer a.b.c");
+
+                mockMvc().perform(request)
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(true));
+                Mockito.verify(jwtTokenProvider).revoke("a.b.c");
+        }
+
+        @Test
+        void testLogoutRejectsMissingToken() throws Exception {
+                when(jwtTokenProvider.resolveToken(Mockito.any())).thenReturn(null);
+
+                MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/api/auth/logout");
+
+                mockMvc().perform(request)
+                                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+                Mockito.verify(jwtTokenProvider, Mockito.never()).revoke(Mockito.any());
+        }
+
+        @Test
+        void testLogoutRejectsAlreadyInvalidToken() throws Exception {
+                when(jwtTokenProvider.resolveToken(Mockito.any())).thenReturn("expired.token.here");
+                when(jwtTokenProvider.validateToken("expired.token.here")).thenReturn(false);
+
+                MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/api/auth/logout")
+                                .header("Authorization", "Bearer expired.token.here");
+
+                mockMvc().perform(request)
+                                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+                Mockito.verify(jwtTokenProvider, Mockito.never()).revoke(Mockito.any());
         }
 }
