@@ -81,17 +81,21 @@ public class AuthPageController {
         try {
             authService.registerUser(signupRequest);
         } catch (AuthenticationServiceException ex) {
-            // e.g. duplicate username/email - show the error instead of a 500 page
+            // Only reachable for a duplicate *username* - AuthService
+            // deliberately doesn't throw for a duplicate email, to avoid
+            // leaking which emails are registered. Show the error instead
+            // of a 500 page.
             model.addAttribute("error", ex.getMessage());
             model.addAttribute("signupRequest", signupRequest);
             return "register";
         } catch (DataIntegrityViolationException ex) {
-            // Safety net for the DB unique constraint on email/usernameOrEmail:
-            // existsByUsernameOrEmail() above already checks for this, but two
-            // signups for the same email arriving at nearly the same instant
-            // could both pass that check before either finishes saving. Same
-            // user-facing message as the expected case above.
-            model.addAttribute("error", "Username or email is already in use.");
+            // Safety net for the DB unique constraint on username/email:
+            // AuthService's own checks already cover this, but two signups
+            // for the same username/email arriving at nearly the same
+            // instant could both pass those checks before either finishes
+            // saving. Deliberately kept generic (doesn't say which field
+            // collided) for the same enumeration reason as above.
+            model.addAttribute("error", "Registration failed. Please check your details and try again.");
             model.addAttribute("signupRequest", signupRequest);
             return "register";
         }
