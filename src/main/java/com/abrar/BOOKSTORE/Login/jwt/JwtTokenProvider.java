@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.UUID;
 
@@ -39,7 +39,7 @@ public class JwtTokenProvider {
     // jjwt's HS512 signing key must be at least 64 bytes - Keys.hmacShaKeyFor
     // enforces that instead of silently accepting a too-short secret the way
     // the old signWith(SignatureAlgorithm, String) overload did.
-    private Key signingKey() {
+    private SecretKey signingKey() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
@@ -81,7 +81,7 @@ public class JwtTokenProvider {
 
     private Claims parseClaims(String token) {
         return Jwts.parser()
-                .verifyWith((javax.crypto.SecretKey) signingKey())
+                .verifyWith(signingKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
