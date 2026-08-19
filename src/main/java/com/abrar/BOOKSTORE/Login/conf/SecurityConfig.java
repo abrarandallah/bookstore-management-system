@@ -97,12 +97,31 @@ public class SecurityConfig {
                 // the query string, like the password-reset token - as a Referer header
                 // to every external resource the page loads (our Bootstrap/FontAwesome
                 // CDNs). no-referrer strips that entirely, for every page on the site.
-                .headers(headers -> headers.referrerPolicy(
-                        referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
+                .headers(headers -> headers
+                        .referrerPolicy(
+                                referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
+                        // Restricts where the browser will load scripts/styles/images/fonts
+                        // from. 'self' plus the two CDNs the templates actually use
+                        // (Bootstrap + FontAwesome, both served from cdnjs) and inline
+                        // styles, which several templates rely on. object-src/base-uri/
+                        // form-action are locked down since nothing in this app needs
+                        // plugins, a non-default <base>, or cross-origin form posts.
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(
+                                "default-src 'self'; "
+                                        + "script-src 'self' https://cdnjs.cloudflare.com; "
+                                        + "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
+                                        + "font-src 'self' https://cdnjs.cloudflare.com; "
+                                        + "img-src 'self' data:; "
+                                        + "object-src 'none'; "
+                                        + "base-uri 'self'; "
+                                        + "form-action 'self'")))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/about", "/login", "/register", "/forgot-password", "/reset-password",
                                 "/verify-email", "/resend-verification",
                                 "/api/auth/**",
+                                // Container/orchestrator healthchecks (see docker-compose.yml)
+                                // hit this directly, with no session or bearer token.
+                                "/actuator/health",
                                 // The share page is meant to be opened by anyone the link is sent
                                 // to, logged in or not - that's the whole point of a share link.
                                 "/available_books/*/share",
