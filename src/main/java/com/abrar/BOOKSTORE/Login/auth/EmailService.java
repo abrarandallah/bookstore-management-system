@@ -44,6 +44,32 @@ public class EmailService {
         }
     }
 
+    // Sent instead of creating a duplicate account when someone signs up
+    // with an email that's already registered - see
+    // AuthService.registerUser. The signup form still shows the normal
+    // "check your email" success message either way, so this is the only
+    // place the existing owner finds out; nothing is ever shown to the
+    // person who submitted the form.
+    @Async
+    public void sendAccountAlreadyExistsEmail(String toEmail) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        if (fromAddress != null && !fromAddress.isBlank()) {
+            message.setFrom(fromAddress);
+        }
+        message.setTo(toEmail);
+        message.setSubject("Someone tried to sign up with your BookStore email");
+        message.setText("Someone just tried to create a new BookStore account using this email address, " +
+                "but an account with this email already exists.\n\n" +
+                "If this was you, you can log in normally, or use \"Forgot password\" if you don't " +
+                "remember your password.\n\n" +
+                "If this wasn't you, no account was created and you can ignore this email.");
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            log.error("Failed to send account-already-exists notice to {}: {}", toEmail, e.getMessage());
+        }
+    }
+
     @Async
     public void sendPasswordResetEmail(String toEmail, String token) {
         String link = baseUrl + "/reset-password?token=" + token;
