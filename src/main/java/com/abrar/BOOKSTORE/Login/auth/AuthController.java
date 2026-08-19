@@ -82,4 +82,21 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(token));
     }
 
+    // Without this, a token issued here stayed valid for its full
+    // jwtExpirationInMs lifetime no matter what the client did - there was
+    // no way to actually invalidate one before it expired on its own. This
+    // revokes the specific token presented, via JwtTokenProvider/
+    // TokenBlacklist, so it's rejected by JwtAuthorizationFilter on every
+    // request from now on even though it hasn't technically expired yet.
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("No valid bearer token to log out."));
+        }
+        jwtTokenProvider.revoke(token);
+        return ResponseEntity.ok(new ApiResponse(true, "Logged out."));
+    }
+
 }
