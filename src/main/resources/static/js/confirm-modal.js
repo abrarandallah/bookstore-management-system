@@ -24,7 +24,21 @@
 
             function close(result) {
                 overlay.classList.remove('is-visible');
-                overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+                // Remove the overlay once, however we get there. Some
+                // browsers/environments (notably prefers-reduced-motion,
+                // which forces a near-zero transition-duration in this
+                // app's CSS) never fire transitionend for a transition
+                // that short - without this fallback the invisible,
+                // full-screen overlay would stay in the DOM and silently
+                // block every click on the page until the next navigation.
+                let removed = false;
+                function removeOverlay() {
+                    if (removed) return;
+                    removed = true;
+                    overlay.remove();
+                }
+                overlay.addEventListener('transitionend', removeOverlay, { once: true });
+                setTimeout(removeOverlay, 250);
                 document.removeEventListener('keydown', onKeydown);
                 resolve(result);
             }

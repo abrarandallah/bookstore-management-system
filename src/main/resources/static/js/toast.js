@@ -29,7 +29,18 @@
 
         setTimeout(() => {
             note.classList.remove('is-visible');
-            note.addEventListener('transitionend', () => note.remove(), { once: true });
+            // Same transitionend-may-never-fire risk as confirm-modal.js
+            // (see there for why) - fall back to a timeout so leftover
+            // invisible toasts don't pile up in the stack and push new
+            // ones out of position.
+            let removed = false;
+            function removeNote() {
+                if (removed) return;
+                removed = true;
+                note.remove();
+            }
+            note.addEventListener('transitionend', removeNote, { once: true });
+            setTimeout(removeNote, 300);
         }, duration);
     };
 
