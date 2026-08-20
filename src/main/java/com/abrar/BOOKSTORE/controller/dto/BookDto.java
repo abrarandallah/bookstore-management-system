@@ -18,7 +18,6 @@ public record BookDto(
         String name,
         String author,
         String coverImageUrl,
-        int estimatedReadMinutes,
         List<TakeawayDto> takeaways,
         List<String> genres) {
 
@@ -36,6 +35,6 @@ public record BookDto(
                 .map(Genre::getName)
                 .toList();
         return new BookDto(book.getId(), book.getName(), book.getAuthor(), book.getCoverImageUrl(),
-                book.getEstimatedReadMinutes(), takeaways, genreNames);
+                takeaways, genreNames);
     }
 }
