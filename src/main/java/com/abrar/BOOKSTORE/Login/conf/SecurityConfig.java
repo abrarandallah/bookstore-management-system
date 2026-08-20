@@ -129,11 +129,24 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest().authenticated())
                 // Scoped to /api/** only - anything else falls through to formLogin's
-                // own default entry point (redirect to /login), which is what an
-                // expired browser session needs. A blanket override here would
-                // replace that redirect with a bare 401 for the whole site.
-                .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
-                        new JwtAuthenticationEntryPoint(), new AntPathRequestMatcher("/api/**")))
+                // own redirect-to-/login behavior, which is what an expired browser
+                // session needs.
+                //
+                // IMPORTANT: this only works because there are TWO mappings below.
+                // With just one, Spring Security's defaultAuthenticationEntryPointFor()
+                // ignores the RequestMatcher entirely and uses that single entry point
+                // as the app-wide default regardless of path - see
+                // ExceptionHandlingConfigurer#createDefaultEntryPoint() and
+                // https://github.com/spring-projects/spring-security/issues/13787.
+                // (This used to be exactly that single-mapping case here, which meant
+                // every unauthenticated visitor to any page - not just /api/** - got a
+                // bare 401 instead of a redirect to /login; caught by
+                // AdminControllerSecurityTest.)
+                .exceptionHandling(ex -> ex
+                        .defaultAuthenticationEntryPointFor(
+                                new JwtAuthenticationEntryPoint(), new AntPathRequestMatcher("/api/**"))
+                        .defaultAuthenticationEntryPointFor(
+                                new LoginUrlAuthenticationEntryPoint("/login"), new AntPathRequestMatcher("/**")))
                 .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(loginRateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
