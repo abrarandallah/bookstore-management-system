@@ -9,8 +9,12 @@ RUN mvn -q dependency:go-offline
 COPY src ./src
 RUN mvn -q package -DskipTests
 
-# Runtime stage: just the JRE and the built jar.
+# Runtime stage: just the JRE, curl (for docker-compose's app healthcheck
+# against /actuator/health - not present in the base image by default),
+# and the built jar.
 FROM eclipse-temurin:17-jre
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /build/target/*.jar app.jar
 EXPOSE 8081
