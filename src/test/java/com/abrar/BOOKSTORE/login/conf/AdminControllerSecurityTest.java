@@ -10,10 +10,12 @@ import com.abrar.BOOKSTORE.Login.conf.SecurityConfig;
 import com.abrar.BOOKSTORE.Login.jwt.JwtTokenProvider;
 import com.abrar.BOOKSTORE.Login.user.CustomUserDetailsService;
 import com.abrar.BOOKSTORE.Login.user.User;
+import com.abrar.BOOKSTORE.Login.user.UserPrincipal;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.controller.AdminController;
 import com.abrar.BOOKSTORE.service.AccountService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,9 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 /**
  * Targets the specific gap called out in the code review: "no test that
@@ -36,6 +42,15 @@ import org.springframework.test.web.servlet.MockMvc;
  * Uses @Import(SecurityConfig.class) rather than the standalone MockMvc
  * setup the other controller tests use, specifically so the real security
  * filter chain and method-security aspect are both exercised.
+ *
+ * Authenticated requests here use {@link #asUser} (a real UserPrincipal,
+ * via the {@code user(UserDetails)} post-processor) rather than
+ * {@code @WithMockUser} - fragments/layout.html reads
+ * {@code #authentication.principal.avatarUrl}, which only exists on this
+ * app's own UserPrincipal, not on @WithMockUser's default
+ * org.springframework.security.core.userdetails.User. That mismatch is a
+ * test-setup gap only; production always goes through
+ * CustomUserDetailsService, which returns a real UserPrincipal.
  */
 @WebMvcTest(AdminController.class)
 @Import(SecurityConfig.class)
@@ -62,6 +77,12 @@ class AdminControllerSecurityTest {
     @MockBean
     private com.abrar.BOOKSTORE.Login.auth.RateLimiter rateLimiter;
 
+    private static RequestPostProcessor asUser(String username, String role) {
+        UserDetails principal = new UserPrincipal(1L, username, username + "@example.com", null, "hash",
+                Collections.singleton(new SimpleGrantedAuthority(role)));
+        return SecurityMockMvcRequestPostProcessors.user(principal);
+    }
+
     @Test
     @WithAnonymousUser
     void testAdminUsersRedirectsAnAnonymousVisitorToLogin() throws Exception {
@@ -70,53 +91,57 @@ class AdminControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "reader", roles = "USER")
     void testAdminUsersRejectsARegularUser() throws Exception {
-        mockMvc.perform(get("/admin/users"))
+        mockMvc.perform(get("/admin/users").with(asUser("reader", "ROLE_USER")))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "librarian", roles = "LIBRARIAN")
     void testAdminUsersAllowsALibrarian() throws Exception {
         when(userRepository.findAll()).thenReturn(List.of());
 
-        mockMvc.perform(get("/admin/users"))
+        mockMvc.perform(get("/admin/users").with(asUser("librarian", "ROLE_LIBRARIAN")))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @WithMockUser(username = "reader", roles = "USER")
     void testChangeRoleRejectsARegularUserEvenWithAValidCsrfToken() throws Exception {
         // Confirms the rejection is the @PreAuthorize role check, not
         // just a missing CSRF token - a regular user with a perfectly
         // valid token still can't reach this endpoint.
-        mockMvc.perform(post("/admin/users/1/role")
+        MockHttpServletRequestBuilder request = post("/admin/users/1/role")
                 .param("role", "ROLE_LIBRARIAN")
-                .with(csrf()))
+                .with(asUser("reader", "ROLE_USER"))
+                .with(csrf());
+
+        mockMvc.perform(request)
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "librarian", roles = "LIBRARIAN")
     void testChangeRoleAllowsALibrarianWithAValidCsrfToken() throws Exception {
         User target = new User(2L, "reader", "hash", "ROLE_USER");
         when(userRepository.findById(2L)).thenReturn(Optional.of(target));
         when(userRepository.countByRole("ROLE_LIBRARIAN")).thenReturn(2L);
 
-        mockMvc.perform(post("/admin/users/2/role")
+        MockHttpServletRequestBuilder request = post("/admin/users/2/role")
                 .param("role", "ROLE_LIBRARIAN")
-                .with(csrf()))
+                .with(asUser("librarian", "ROLE_LIBRARIAN"))
+                .with(csrf());
+
+        mockMvc.perform(request)
                 .andExpect(status().is3xxRedirection());
     }
 
     @Test
-    @WithMockUser(username = "librarian", roles = "LIBRARIAN")
     void testChangeRoleRejectsAMissingCsrfTokenEvenForALibrarian() throws Exception {
         // The flip side of the test above: role alone isn't enough either -
         // CSRF protection still applies to this session-authenticated route.
-        mockMvc.perform(post("/admin/users/2/role")
-                .param("role", "ROLE_LIBRARIAN"))
+        MockHttpServletRequestBuilder request = post("/admin/users/2/role")
+                .param("role", "ROLE_LIBRARIAN")
+                .with(asUser("librarian", "ROLE_LIBRARIAN"));
+
+        mockMvc.perform(request)
                 .andExpect(status().isForbidden());
     }
 }
