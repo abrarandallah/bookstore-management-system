@@ -2,6 +2,7 @@ package com.abrar.BOOKSTORE.controller;
 
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
+import com.abrar.BOOKSTORE.controller.dto.BookDto;
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.BookPage;
 import com.abrar.BOOKSTORE.entity.Genre;
@@ -302,16 +303,18 @@ public class BookController {
         return "redirect:/my_books";
     }
 
+    // Returns a DTO rather than the Book entity directly - serializing the
+    // entity would walk its lazy takeaways/genres collections straight from
+    // JPA, which only happens to work today because Open-Session-In-View is
+    // on (Spring Boot's default) and couples this response's shape 1:1 to
+    // the persistence model regardless. service.getBookById() already
+    // throws ResourceNotFoundException (handled by GlobalControllerAdvice
+    // as a 404) for a missing id, so there's no null case to handle here.
     @GetMapping("/{id:\\d+}")
     @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')") // Secure this endpoint for authenticated users
-    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
-        // Your code to retrieve the book by ID
+    public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
         Book book = service.getBookById(Math.toIntExact(id));
-        if (book != null) {
-            return ResponseEntity.ok(book);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(BookDto.from(book));
     }
 
 }
