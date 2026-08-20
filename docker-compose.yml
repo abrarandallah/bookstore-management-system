@@ -33,6 +33,14 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    healthcheck:
+      # curl is installed in the Dockerfile's runtime stage specifically
+      # for this - the base eclipse-temurin JRE image doesn't include it.
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     environment:
       DB_HOST: mysql
       DB_USERNAME: ${DB_USERNAME:-abrar}
