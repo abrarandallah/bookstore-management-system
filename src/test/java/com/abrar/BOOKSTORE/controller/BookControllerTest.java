@@ -432,6 +432,31 @@ class BookControllerTest {
         }
 
         /**
+         * Method under test: {@link BookController#getBookById(Long)}
+         * The JSON response should be shaped like
+         * {@link com.abrar.BOOKSTORE.controller.dto.BookDto}
+         * (flat takeaways/genres, no lazy-collection surprises) rather than
+         * the raw entity.
+         */
+        @Test
+        void testGetBookByIdReturnsDtoShape() throws Exception {
+                Book book = new Book(3, "Deep Work", "Cal Newport");
+                BookPage takeaway = new BookPage(1, "Focus is a skill", "Practice sustained attention.");
+                book.setTakeaways(new ArrayList<>(List.of(takeaway)));
+                when(bookService.getBookById(3)).thenReturn(book);
+
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/{id}", 3);
+                MockMvcBuilders.standaloneSetup(bookController)
+                                .build()
+                                .perform(requestBuilder)
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(3))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Deep Work"))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.takeaways[0].heading")
+                                                .value("Focus is a skill"));
+        }
+
+        /**
          * Method under test: {@link BookController#home()}
          */
         @Test
