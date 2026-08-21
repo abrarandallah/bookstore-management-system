@@ -135,10 +135,18 @@ public class SecurityConfig {
                                 // Container/orchestrator healthchecks (see docker-compose.yml)
                                 // hit this directly, with no session or bearer token.
                                 "/actuator/health",
+                                // Browsing and reading are open to everyone - only the
+                                // personal actions tied to an account (saving reading
+                                // progress, marking finished, "My Books", reviews, reading
+                                // history) stay behind the anyRequest().authenticated()
+                                // catch-all below. See BookController#readBook, which
+                                // already handles a null Principal for this route.
+                                "/available_books", "/available_books/results", "/available_books/*/read",
+                                "/random_book", "/genres",
                                 // The share page is meant to be opened by anyone the link is sent
                                 // to, logged in or not - that's the whole point of a share link.
                                 "/available_books/*/share",
-                                "/css/**", "/js/**", "/images/**", "/img/**", "/uploads/**", "/*.jpg", "/*.png")
+                                "/css/**", "/js/**", "/images/**", "/img/**", "/uploads/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 // Scoped to /api/** only - anything else falls through to formLogin's
