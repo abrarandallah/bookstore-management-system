@@ -77,8 +77,13 @@ public class BookController {
 
     @GetMapping("/book_register")
     @PreAuthorize("hasRole('LIBRARIAN')")
-    public String BookRegister(Model model) {
+    public String BookRegister(@RequestParam(required = false, defaultValue = "single") String tab, Model model) {
         model.addAttribute("allGenres", genreService.findAll());
+        // Both tabs' markup renders into the page regardless of which is
+        // active (see bookRegister.html) - the Bulk Import tab needs this
+        // even when landing here via ?tab=bulk.
+        model.addAttribute("exampleJson", BookImportController.EXAMPLE_JSON);
+        model.addAttribute("activeTab", "bulk".equals(tab) ? "bulk" : "single");
         return "bookRegister";
     }
 
@@ -169,7 +174,12 @@ public class BookController {
             model.addAttribute("allGenres", genreService.findAll());
             model.addAttribute("selectedGenreIds", genreIds == null ? List.of() : genreIds);
             // id is 0 for a brand-new book (never persisted), non-zero when editing
-            return b.getId() == 0 ? "bookRegister" : "bookEdit";
+            if (b.getId() == 0) {
+                model.addAttribute("exampleJson", BookImportController.EXAMPLE_JSON);
+                model.addAttribute("activeTab", "single");
+                return "bookRegister";
+            }
+            return "bookEdit";
         }
         b.setGenres(new LinkedHashSet<>(genreService.findAllById(genreIds)));
         service.save(b);
@@ -235,11 +245,23 @@ public class BookController {
         model.addAttribute("book", b);
         model.addAttribute("reviews", reviewService.getReviewsForBook(id));
         model.addAttribute("ratingSummary", reviewService.summaryForBook(id));
-        model.addAttribute("ownReview", reviewService.findOwnReview(id, currentUser(principal)).orElse(null));
-        ReadingProgress progress = readingProgressService.getOrCreate(currentUser(principal), b);
-        // Resuming a finished book restarts the reader at page 1 rather than
-        // dropping them back on the last page they already finished at.
-        model.addAttribute("resumePage", progress.isFinished() ? 0 : progress.getCurrentPage());
+        // Reading progress and "your review" only make sense for a logged-in
+        // reader - an anonymous visitor can still read every takeaway, they
+        // just start at page 1 every visit and can't rate/review (both of
+        // those need somewhere to persist to). See SecurityConfig's
+        // permitAll list for this route, and bookRead.html's
+        // sec:authorize blocks for the personal bits.
+        if (principal != null) {
+            User user = currentUser(principal);
+            model.addAttribute("ownReview", reviewService.findOwnReview(id, user).orElse(null));
+            ReadingProgress progress = readingProgressService.getOrCreate(user, b);
+            // Resuming a finished book restarts the reader at page 1 rather than
+            // dropping them back on the last page they already finished at.
+            model.addAttribute("resumePage", progress.isFinished() ? 0 : progress.getCurrentPage());
+        } else {
+            model.addAttribute("ownReview", null);
+            model.addAttribute("resumePage", 0);
+        }
         return "bookRead";
     }
 

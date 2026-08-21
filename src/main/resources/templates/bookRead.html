@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: pageHead(${book.name})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
@@ -63,7 +63,7 @@
         </p>
     </div>
 
-    <div class="form-panel p-4 mt-4">
+    <div class="form-panel p-4 mt-4" sec:authorize="isAuthenticated()">
         <span class="eyebrow d-block mb-3" th:text="${ownReview != null ? 'Edit your review' : 'Rate this book'}"></span>
         <div class="alert alert-danger" th:if="${reviewError}" th:text="${reviewError}"></div>
         <form th:action="@{/available_books/{id}/review(id=${book.id})}" method="post">
@@ -97,6 +97,12 @@
             <button type="submit" class="btn btn-link btn-sm text-danger p-0">Delete my review</button>
         </form>
     </div>
+    <div class="form-panel p-4 mt-4 text-center" sec:authorize="isAnonymous()">
+        <span class="eyebrow d-block mb-2">Rate this book</span>
+        <p class="mb-3 text-muted">Log in to rate and review this book, and to pick up your reading progress next time.</p>
+        <a th:href="@{/login}" class="btn btn-primary btn-sm">Log in</a>
+        <a th:href="@{/register}" class="btn btn-outline-brass btn-sm">Create an account</a>
+    </div>
 
     <div class="mt-4" th:unless="${#lists.isEmpty(reviews)}">
         <span class="eyebrow d-block mb-3">Reader reviews</span>
@@ -122,6 +128,11 @@
 <script th:inline="javascript">
     let readerIndex = /*[[${resumePage}]]*/ 0;
     const readerTotal = /*[[${#lists.size(book.takeaways)}]]*/ 0;
+    // Anonymous visitors can still read every page - they just don't have
+    // anywhere to persist progress/completion to, so those two server
+    // calls are skipped for them (see BookController#readBook and
+    // SecurityConfig, which leaves /progress and /finish behind login).
+    const isLoggedIn = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
     // Clamp in case the book's takeaways were edited (fewer pages now) since
     // this reader's saved position was recorded.
     readerIndex = Math.min(Math.max(readerIndex, 0), Math.max(readerTotal - 1, 0));
@@ -151,6 +162,9 @@
     }
 
     function saveProgress() {
+        if (!isLoggedIn) {
+            return;
+        }
         const form = document.getElementById('progress-form');
         document.getElementById('progress-page-input').value = readerIndex;
         // Best-effort: a dropped progress ping just means resuming later
@@ -164,7 +178,11 @@
 
     function readerGo(delta) {
         if (readerIndex === readerTotal - 1 && delta === 1) {
-            document.getElementById('finish-form').submit();
+            if (isLoggedIn) {
+                document.getElementById('finish-form').submit();
+            } else {
+                window.showToast('Log in to save your progress and mark this as finished.', { icon: 'circle-info' });
+            }
             return;
         }
         readerIndex = Math.min(Math.max(readerIndex + delta, 0), readerTotal - 1);
