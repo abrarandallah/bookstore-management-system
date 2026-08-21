@@ -102,16 +102,28 @@ public class SecurityConfig {
                         .referrerPolicy(
                                 referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
                         // Restricts where the browser will load scripts/styles/images/fonts
-                        // from. 'self' plus the two CDNs the templates actually use
-                        // (Bootstrap + FontAwesome, both served from cdnjs) and inline
-                        // styles, which several templates rely on. object-src/base-uri/
-                        // form-action are locked down since nothing in this app needs
-                        // plugins, a non-default <base>, or cross-origin form posts.
+                        // from, matched against what fragments/layout.html and the page
+                        // templates actually load:
+                        // - Bootstrap CSS+JS from jsdelivr
+                        // - Google Fonts stylesheet (fonts.googleapis.com) + the actual
+                        // font files it points to (fonts.gstatic.com)
+                        // - FontAwesome from cdnjs
+                        // - 'unsafe-inline' on script-src because several pages
+                        // (layout.html's theme toggle, settings.html, bookRead.html,
+                        // readingHistory.html, bookFinished.html, bookShare.html) use
+                        // inline <script> blocks rather than external files - tightening
+                        // this further would mean moving all of those to external files
+                        // and/or a nonce-based CSP, which is a bigger follow-up, not a
+                        // one-line header change.
+                        // object-src/base-uri/form-action are locked down since nothing in
+                        // this app needs plugins, a non-default <base>, or cross-origin
+                        // form posts.
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
                                 "default-src 'self'; "
-                                        + "script-src 'self' https://cdnjs.cloudflare.com; "
-                                        + "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
-                                        + "font-src 'self' https://cdnjs.cloudflare.com; "
+                                        + "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+                                        + "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net "
+                                        + "https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
+                                        + "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
                                         + "img-src 'self' data:; "
                                         + "object-src 'none'; "
                                         + "base-uri 'self'; "
