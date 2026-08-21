@@ -98,6 +98,46 @@
                 <i class="fa-solid fa-feather-pointed brand-mark"></i>
                 <span>BookStore</span>
             </a>
+            <!--/* Always visible regardless of window size (unlike the navbar-toggler
+                   below, which only shows once the main nav collapses) - a quick way
+                   to reach the handful of account actions without opening the full
+                   nav or hunting for the avatar. Deliberately kept small: just the
+                   personal items, not every page in the app. */-->
+            <div class="dropdown quick-menu order-lg-2 ms-auto ms-lg-3" sec:authorize="isAuthenticated()">
+                <button class="btn quick-menu-toggle" type="button" id="quickMenuToggle" data-bs-toggle="dropdown"
+                        aria-expanded="false" title="Account menu" aria-label="Account menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quickMenuToggle">
+                    <li>
+                        <a class="dropdown-item" href="/profile">
+                            <i class="fa-solid fa-user"></i> Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/settings">
+                            <i class="fa-solid fa-gear"></i> Settings
+                        </a>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item" onclick="toggleTheme()">
+                            <span class="theme-icon-stack me-1">
+                                <i class="fa-solid fa-sun theme-icon-light"></i>
+                                <i class="fa-solid fa-moon theme-icon-dark"></i>
+                            </span>
+                            Toggle theme
+                        </button>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="dropdown-item logout-link">
+                                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -106,10 +146,10 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <li class="nav-item">
                         <a class="nav-link" href="/available_books">Available Books</a>
                     </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <li class="nav-item">
                         <a class="nav-link" href="/genres">Genres</a>
                     </li>
                 </ul>
@@ -140,6 +180,7 @@
                             <span class="user-menu-name" th:text="${#authentication.principal.username}">User</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><h6 class="dropdown-header">My Library</h6></li>
                             <li>
                                 <a class="dropdown-item" href="/my_books">
                                     <i class="fa-solid fa-bookmark"></i> My Books
@@ -148,6 +189,40 @@
                             <li>
                                 <a class="dropdown-item" href="/reading-history">
                                     <i class="fa-solid fa-book-open-reader"></i> Reading History
+                                </a>
+                            </li>
+                            <!--/* Librarian-only management links, folded into the same dropdown
+                                   rather than a separate main-navbar item - keeps the main navbar
+                                   leaner while staying discoverable in the one account menu. */-->
+                            <th:block sec:authorize="hasRole('LIBRARIAN')">
+                                <li><hr class="dropdown-divider"></li>
+                                <li><h6 class="dropdown-header">Librarian Tools</h6></li>
+                                <li>
+                                    <a class="dropdown-item" href="/book_register">
+                                        <i class="fa-solid fa-plus"></i> Add Books
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/genres">
+                                        <i class="fa-solid fa-tags"></i> Manage Genres
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/users">
+                                        <i class="fa-solid fa-user-gear"></i> Manage Users
+                                    </a>
+                                </li>
+                            </th:block>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Account</h6></li>
+                            <li>
+                                <a class="dropdown-item" href="/profile">
+                                    <i class="fa-solid fa-user"></i> Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/settings">
+                                    <i class="fa-solid fa-gear"></i> Settings
                                 </a>
                             </li>
                             <li>
@@ -159,45 +234,6 @@
                                     Toggle theme
                                 </button>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item" href="/profile">
-                                    <i class="fa-solid fa-user"></i> Profile
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/settings">
-                                    <i class="fa-solid fa-gear"></i> Settings
-                                </a>
-                            </li>
-                            <!--/* Librarian-only management links, folded into the same dropdown
-                                   rather than a separate main-navbar item - keeps the main navbar
-                                   leaner while staying discoverable in the one account menu. */-->
-                            <th:block sec:authorize="hasRole('LIBRARIAN')">
-                                <li><hr class="dropdown-divider"></li>
-                                <li><h6 class="dropdown-header">Manage</h6></li>
-                                <li>
-                                    <a class="dropdown-item" href="/book_register">
-                                        <i class="fa-solid fa-plus"></i> New Book Register
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="/admin/books/import">
-                                        <i class="fa-solid fa-file-import"></i> Bulk Import
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="/admin/genres">
-                                        <i class="fa-solid fa-tags"></i> Manage Genres
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="/admin/users">
-                                        <i class="fa-solid fa-user-gear"></i> Admin
-                                    </a>
-                                </li>
-                            </th:block>
-                            <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form th:action="@{/logout}" method="post">
                                     <button type="submit" class="dropdown-item logout-link">
@@ -220,12 +256,10 @@
             </div>
             <div>
                 <a href="/">Home</a>
-                <th:block sec:authorize="isAuthenticated()">
-                    <span class="mx-2">·</span>
-                    <a href="/available_books">Available Books</a>
-                    <span class="mx-2">·</span>
-                    <a href="/genres">Genres</a>
-                </th:block>
+                <span class="mx-2">·</span>
+                <a href="/available_books">Available Books</a>
+                <span class="mx-2">·</span>
+                <a href="/genres">Genres</a>
                 <span class="mx-2">·</span>
                 <a href="/#how-it-works">About</a>
             </div>
