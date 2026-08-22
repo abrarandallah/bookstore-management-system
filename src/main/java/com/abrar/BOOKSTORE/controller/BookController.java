@@ -69,10 +69,7 @@ public class BookController {
 
     @GetMapping("/about")
     public String about() {
-        // The standalone page was folded into the home page's "How it works"
-        // section (item 4) - this keeps any old /about links/bookmarks
-        // working instead of 404ing.
-        return "redirect:/#how-it-works";
+        return "about";
     }
 
     @GetMapping("/book_register")

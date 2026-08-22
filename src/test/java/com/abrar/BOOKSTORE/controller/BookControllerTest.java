@@ -305,10 +305,30 @@ class BookControllerTest {
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(1))
+                                .andExpect(MockMvcResultMatchers.model().size(3))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("allGenres"))
+                                .andExpect(MockMvcResultMatchers.model().attributeExists("exampleJson"))
+                                .andExpect(MockMvcResultMatchers.model().attribute("activeTab", "single"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookRegister"))
                                 .andExpect(MockMvcResultMatchers.forwardedUrl("bookRegister"));
+        }
+
+        /**
+         * Method under test: {@link BookController#BookRegister(String, Model)}
+         * ?tab=bulk is how the old standalone Bulk Import page's links/bookmarks
+         * land on the right tab of the now-merged page - see
+         * BookImportController#importForm().
+         */
+        @Test
+        void testBookRegisterWithBulkTabParam() throws Exception {
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/book_register")
+                                .param("tab", "bulk");
+                MockMvcBuilders.standaloneSetup(bookController)
+                                .build()
+                                .perform(requestBuilder)
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.model().attribute("activeTab", "bulk"))
+                                .andExpect(MockMvcResultMatchers.view().name("bookRegister"));
         }
 
         /**

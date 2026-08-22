@@ -5,16 +5,37 @@
     <div th:replace="~{fragments/layout :: navbar}"></div>
 
     <main class="page-body">
-      <div class="container my-5 p-5 form-panel" style="max-width: 640px">
-        <span class="eyebrow d-block text-center mb-2">New entry</span>
-        <h4 class="text-center">Register a Book</h4>
+      <div class="container my-5 p-5 form-panel" style="max-width: 720px">
+        <span class="eyebrow d-block text-center mb-2">Librarian tools</span>
+        <h4 class="text-center">Add Books</h4>
         <p class="text-center text-muted small mb-4">
-          Distill the book into 1&ndash;10 short takeaways &mdash; the key ideas
-          someone could read in a few minutes.
+          Register one book with its takeaways, or paste a JSON array to
+          import several at once.
         </p>
+
+        <ul class="nav nav-tabs mb-4" id="addBooksTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" th:classappend="${activeTab == 'single'} ? 'active'" id="single-tab"
+                    data-bs-toggle="tab" data-bs-target="#single-pane" type="button" role="tab"
+                    aria-controls="single-pane" th:aria-selected="${activeTab == 'single'}">
+              <i class="fa-solid fa-plus me-1"></i> Single Book
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" th:classappend="${activeTab == 'bulk'} ? 'active'" id="bulk-tab"
+                    data-bs-toggle="tab" data-bs-target="#bulk-pane" type="button" role="tab"
+                    aria-controls="bulk-pane" th:aria-selected="${activeTab == 'bulk'}">
+              <i class="fa-solid fa-file-import me-1"></i> Bulk Import
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="addBooksTabContent">
+        <div class="tab-pane fade" th:classappend="${activeTab == 'single'} ? 'show active'" id="single-pane"
+             role="tabpanel" aria-labelledby="single-tab" tabindex="0">
         <div
           class="alert alert-danger"
-          th:if="${error}"
+          th:if="${error != null and (activeTab == null or activeTab == 'single')}"
           th:text="${error}"
         ></div>
         <form
@@ -76,6 +97,11 @@
                 <span th:text="${genre.name}"></span>
               </label>
             </div>
+            <p class="text-muted small mt-2 mb-0">
+              Don't see the genre you need? Genre names typed into a
+              <a href="#bulk-pane" data-bs-toggle="tab" data-bs-target="#bulk-pane">Bulk Import</a>
+              are created automatically.
+            </p>
           </div>
 
           <hr class="my-4" />
@@ -132,6 +158,36 @@
             <button type="submit" class="btn btn-primary">Submit</button>
           </div>
         </form>
+        </div>
+
+        <div class="tab-pane fade" th:classappend="${activeTab == 'bulk'} ? 'show active'" id="bulk-pane"
+             role="tabpanel" aria-labelledby="bulk-tab" tabindex="0">
+          <p class="text-muted mb-3">Paste a JSON array of books - faster than filling out the form one at a time.</p>
+
+          <div class="alert alert-success" th:if="${message}" th:text="${message}"></div>
+          <div class="alert alert-danger" th:if="${errors == null and error != null and activeTab == 'bulk'}" th:text="${error}"></div>
+          <div class="alert alert-danger" th:if="${errors}">
+            <strong>Some rows were skipped:</strong>
+            <ul class="mb-0">
+              <li th:each="e : ${errors}" th:text="${e}"></li>
+            </ul>
+          </div>
+
+          <form th:action="@{/admin/books/import}" method="post">
+            <label for="json" class="form-label">Books (JSON array)</label>
+            <textarea id="json" name="json" class="form-control" rows="14"
+                      style="font-family: var(--font-mono); font-size: 0.85rem;"
+                      th:text="${submittedJson}"></textarea>
+            <button type="submit" class="btn btn-primary mt-3">Import</button>
+          </form>
+
+          <details class="mt-4">
+            <summary class="eyebrow" style="cursor:pointer;">Expected format</summary>
+            <pre class="form-panel p-3 mt-2" style="font-size: 0.8rem; overflow-x: auto;" th:text="${exampleJson}"></pre>
+            <p class="text-muted small">Each book needs 1&ndash;10 takeaways. Rows that fail validation are skipped and listed above - everything else still imports.</p>
+          </details>
+        </div>
+        </div>
       </div>
     </main>
 

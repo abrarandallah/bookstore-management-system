@@ -36,7 +36,10 @@ public class BookImportController {
     @Autowired
     private GenreService genreService;
 
-    private static final String EXAMPLE_JSON = """
+    // Public/static: also referenced by BookController#BookRegister, which
+    // renders the same merged "bookRegister" template (Single Book + Bulk
+    // Import are now tabs on one page rather than two separate pages).
+    static final String EXAMPLE_JSON = """
             [
               {
                 "name": "The Art of Unfinished Things",
@@ -49,16 +52,24 @@ public class BookImportController {
               }
             ]""";
 
+    // Bulk Import used to be its own page - now it's a tab on /book_register
+    // (see BookController#BookRegister). This keeps the old URL working for
+    // anyone with it bookmarked, rather than 404ing.
     @GetMapping("/import")
-    public String importForm(Model model) {
-        model.addAttribute("exampleJson", EXAMPLE_JSON);
-        return "admin/import";
+    public String importForm() {
+        return "redirect:/book_register?tab=bulk";
     }
 
     @PostMapping("/import")
     public String runImport(@RequestParam String json, Model model) {
         model.addAttribute("exampleJson", EXAMPLE_JSON);
         model.addAttribute("submittedJson", json);
+        // Both tab panes render into the same page regardless of which one
+        // is active (Bootstrap tabs just toggle visibility), so the Single
+        // Book tab's genre checkboxes need this too, or its th:each would
+        // hit a null model attribute.
+        model.addAttribute("allGenres", genreService.findAll());
+        model.addAttribute("activeTab", "bulk");
 
         List<BookImportRequest> requests;
         try {
@@ -67,12 +78,12 @@ public class BookImportController {
             });
         } catch (Exception ex) {
             model.addAttribute("error", "Couldn't parse that as JSON: " + ex.getMessage());
-            return "admin/import";
+            return "bookRegister";
         }
 
         if (requests.isEmpty()) {
             model.addAttribute("error", "That list was empty - nothing to import.");
-            return "admin/import";
+            return "bookRegister";
         }
 
         int imported = 0;
@@ -118,6 +129,6 @@ public class BookImportController {
         if (!errors.isEmpty()) {
             model.addAttribute("errors", errors);
         }
-        return "admin/import";
+        return "bookRegister";
     }
 }
