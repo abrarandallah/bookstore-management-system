@@ -15,8 +15,6 @@ public interface GenreRepository extends JpaRepository<Genre, Integer> {
 
     Optional<Genre> findByNameIgnoreCase(String name);
 
-    boolean existsByNameIgnoreCase(String name);
-
     // Genre doesn't hold a reference back to its books (see Genre's class
     // comment), so the count is queried from the Book side of the
     // relationship instead of an object-graph traversal. Genres with zero

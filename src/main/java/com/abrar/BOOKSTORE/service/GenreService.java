@@ -28,37 +28,17 @@ public class GenreService {
     }
 
     /**
-     * @throws IllegalArgumentException if the name is blank or already
-     *                                  taken (case-insensitive) - lets
-     *                                  the controller show a friendly
-     *                                  error rather than a raw
-     *                                  constraint-violation stack trace.
-     */
-    public Genre create(String name) {
-        String trimmed = name == null ? "" : name.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Genre name is required.");
-        }
-        if (genreRepository.existsByNameIgnoreCase(trimmed)) {
-            throw new IllegalArgumentException("A genre named \"" + trimmed + "\" already exists.");
-        }
-        return genreRepository.save(new Genre(trimmed));
-    }
-
-    /**
      * Reuses an existing genre by name (case-insensitive) if one exists,
      * or creates it. Used by bulk import, where the same genre name is
      * likely to show up across many rows and shouldn't produce a
-     * duplicate each time.
+     * duplicate each time. Also the only way a brand-new genre gets
+     * created now - see BookImportController and the note on the Add
+     * Books page's genre picker.
      */
     public Genre findOrCreateByName(String name) {
         String trimmed = name == null ? "" : name.trim();
         return genreRepository.findByNameIgnoreCase(trimmed)
                 .orElseGet(() -> genreRepository.save(new Genre(trimmed)));
-    }
-
-    public void deleteById(int id) {
-        genreRepository.deleteById(id);
     }
 
     /**
