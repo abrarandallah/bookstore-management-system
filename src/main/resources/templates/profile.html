@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: pageHead('Profile')}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
@@ -33,14 +33,27 @@
                 </form>
             </div>
 
-            <div class="form-panel p-4 mt-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div>
-                    <span class="eyebrow d-block mb-1">Security</span>
-                    <p class="mb-0 text-muted small">Keep your account safe with a strong, unique password.</p>
+            <div class="row g-3 mt-1">
+                <div class="col-sm-6">
+                    <a href="/my_books" class="profile-stat-card text-decoration-none">
+                        <span class="profile-stat-card-icon"><i class="fa-solid fa-bookmark"></i></span>
+                        <span>
+                            <span class="profile-stat-card-number" th:text="${myBooksCount}">0</span>
+                            <span class="profile-stat-card-label d-block">My Books</span>
+                        </span>
+                        <span class="profile-stat-card-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+                    </a>
                 </div>
-                <a href="/change-password" class="btn btn-primary">
-                    <i class="fa-solid fa-key me-1"></i> Change Password
-                </a>
+                <div class="col-sm-6">
+                    <a href="/reading-history" class="profile-stat-card text-decoration-none">
+                        <span class="profile-stat-card-icon"><i class="fa-solid fa-book-open-reader"></i></span>
+                        <span>
+                            <span class="profile-stat-card-number" th:text="${finishedBooksCount}">0</span>
+                            <span class="profile-stat-card-label d-block">Books Finished</span>
+                        </span>
+                        <span class="profile-stat-card-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+                    </a>
+                </div>
             </div>
 
             <div class="form-panel p-4 mt-3">
@@ -62,27 +75,9 @@
                 </div>
             </div>
 
-            <div class="form-panel p-4 mt-3">
-                <span class="eyebrow d-block mb-3">Quick links</span>
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="/available_books" class="btn btn-secondary btn-sm">Browse Books</a>
-                    <a href="/my_books" class="btn btn-secondary btn-sm">My Books</a>
-                    <a href="/reading-history" class="btn btn-secondary btn-sm">Reading History</a>
-                    <a href="/book_register" class="btn btn-secondary btn-sm"
-                       sec:authorize="hasRole('LIBRARIAN')">Register a Book</a>
-                    <a href="/admin/users" class="btn btn-secondary btn-sm"
-                       sec:authorize="hasRole('LIBRARIAN')">Manage Users</a>
-                </div>
-            </div>
-
-            <div class="form-panel p-4 mt-3 d-flex justify-content-between align-items-center flex-wrap gap-3"
-                 style="border-color: var(--burgundy);">
-                <div>
-                    <span class="eyebrow d-block mb-1" style="color: var(--burgundy);">Danger zone</span>
-                    <p class="mb-0 text-muted small">Permanently delete your account and everything tied to it.</p>
-                </div>
-                <a href="/delete-account" class="btn btn-outline-danger">
-                    <i class="fa-solid fa-trash me-1"></i> Delete Account
+            <div class="text-center mt-3">
+                <a href="/settings" class="text-muted small">
+                    <i class="fa-solid fa-gear me-1"></i> Account settings, password, and more
                 </a>
             </div>
         </div>

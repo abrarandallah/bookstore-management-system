@@ -6,6 +6,7 @@ import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.service.AccountService;
 import com.abrar.BOOKSTORE.service.AchievementService;
 import com.abrar.BOOKSTORE.service.FileStorageService;
+import com.abrar.BOOKSTORE.service.MyBookListService;
 import com.abrar.BOOKSTORE.service.ReadingProgressService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -48,6 +49,9 @@ public class AuthPageController {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private MyBookListService myBookListService;
 
     @GetMapping("/login")
     public String loginPage() {
@@ -113,6 +117,7 @@ public class AuthPageController {
         model.addAttribute("user", user);
         model.addAttribute("achievements", achievementService.getEarnedAchievements(user));
         model.addAttribute("finishedBooksCount", readingProgressService.countFinished(user));
+        model.addAttribute("myBooksCount", myBookListService.getMyBooks(user).size());
         return "profile";
     }
 

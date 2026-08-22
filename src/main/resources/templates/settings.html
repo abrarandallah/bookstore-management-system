@@ -12,6 +12,29 @@
             <h4 class="mb-4">Settings</h4>
 
             <div class="form-panel p-4 mb-3">
+                <h6 class="mb-3">Account &amp; Security</h6>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+                    <div>
+                        <p class="mb-0">Password</p>
+                        <p class="mb-0 text-muted small">Keep your account safe with a strong, unique password.</p>
+                    </div>
+                    <a href="/change-password" class="btn btn-secondary btn-sm">
+                        <i class="fa-solid fa-key me-1"></i> Change Password
+                    </a>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <p class="mb-0" style="color: var(--burgundy);">Delete account</p>
+                        <p class="mb-0 text-muted small">Permanently delete your account and everything tied to it.</p>
+                    </div>
+                    <a href="/delete-account" class="btn btn-outline-danger btn-sm">
+                        <i class="fa-solid fa-trash me-1"></i> Delete Account
+                    </a>
+                </div>
+            </div>
+
+            <div class="form-panel p-4 mb-3">
                 <h6 class="mb-3">Appearance</h6>
                 <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Theme">
                     <button type="button" class="btn btn-secondary theme-option" data-theme-value="light" onclick="setTheme('light')">
