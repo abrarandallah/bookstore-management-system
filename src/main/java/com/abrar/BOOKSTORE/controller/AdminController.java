@@ -78,15 +78,8 @@ public class AdminController {
         // here, but the user still couldn't log in with the new password -
         // blocked by the separate "please verify your email" check instead.
         boolean wasUnverified = !target.isVerified();
-        System.out.println("[DEBUG resetPassword] id=" + id + " loaded target.isVerified()=" + target.isVerified()
-                + " wasUnverified=" + wasUnverified);
         target.setVerified(true);
-        System.out.println("[DEBUG resetPassword] after setVerified(true), target.isVerified()=" + target.isVerified());
-        User saved = userRepository.save(target);
-        System.out.println("[DEBUG resetPassword] after save(), saved.isVerified()=" + saved.isVerified());
-        User reloaded = userRepository.findById(id).orElse(null);
-        System.out.println("[DEBUG resetPassword] fresh reload from DB, verified="
-                + (reloaded != null ? reloaded.isVerified() : "user not found"));
+        userRepository.save(target);
         String message = "Password updated for " + target.getUsernameOrEmail() + ".";
         if (wasUnverified) {
             message += " Their account was also unverified, so it's now verified too - otherwise they still "
