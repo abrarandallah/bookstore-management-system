@@ -71,8 +71,28 @@ public class AdminController {
             return "admin/users";
         }
         target.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(target);
-        model.addAttribute("message", "Password updated for " + target.getUsernameOrEmail() + ".");
+        // A librarian manually resetting someone's password is already
+        // vouching for their identity out-of-band. Without this, an
+        // account that was still sitting unverified (e.g. they never
+        // clicked the email link) would look like the reset succeeded
+        // here, but the user still couldn't log in with the new password -
+        // blocked by the separate "please verify your email" check instead.
+        boolean wasUnverified = !target.isVerified();
+        System.out.println("[DEBUG resetPassword] id=" + id + " loaded target.isVerified()=" + target.isVerified()
+                + " wasUnverified=" + wasUnverified);
+        target.setVerified(true);
+        System.out.println("[DEBUG resetPassword] after setVerified(true), target.isVerified()=" + target.isVerified());
+        User saved = userRepository.save(target);
+        System.out.println("[DEBUG resetPassword] after save(), saved.isVerified()=" + saved.isVerified());
+        User reloaded = userRepository.findById(id).orElse(null);
+        System.out.println("[DEBUG resetPassword] fresh reload from DB, verified="
+                + (reloaded != null ? reloaded.isVerified() : "user not found"));
+        String message = "Password updated for " + target.getUsernameOrEmail() + ".";
+        if (wasUnverified) {
+            message += " Their account was also unverified, so it's now verified too - otherwise they still "
+                    + "wouldn't have been able to log in with the new password.";
+        }
+        model.addAttribute("message", message);
         model.addAttribute("users", userRepository.findAll());
         return "admin/users";
     }
