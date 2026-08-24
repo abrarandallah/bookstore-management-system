@@ -72,6 +72,16 @@ public class BookController {
         return "about";
     }
 
+    @GetMapping("/privacy")
+    public String privacy() {
+        return "privacy";
+    }
+
+    @GetMapping("/terms")
+    public String terms() {
+        return "terms";
+    }
+
     @GetMapping("/book_register")
     @PreAuthorize("hasRole('LIBRARIAN')")
     public String BookRegister(@RequestParam(required = false, defaultValue = "single") String tab, Model model) {
