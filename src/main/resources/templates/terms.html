@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: pageHead('Terms of Service')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="page-body">
+<div class="container my-5" style="max-width: 720px;">
+    <span class="eyebrow">Legal</span>
+    <h1 class="mb-4">Terms of Service</h1>
+
+    <div class="alert alert-secondary small mb-4">
+        A reasonable generic starting point, not a substitute for real legal advice -
+        whoever operates this instance should have it reviewed before relying on it for a
+        real deployment with real users.
+    </div>
+
+    <h6 class="mt-4">The basics</h6>
+    <p>
+        By creating an account or using this site, you agree to these terms. If you don't
+        agree, please don't use it.
+    </p>
+
+    <h6 class="mt-4">Your account</h6>
+    <p>
+        You're responsible for keeping your password secure and for what happens under your
+        account. Create one account per person - don't share credentials or impersonate
+        someone else.
+    </p>
+
+    <h6 class="mt-4">Reviews and content you post</h6>
+    <p>
+        You're responsible for what you post in reviews. Keep it honest and civil - no
+        harassment, spam, or content that isn't yours to post. We may remove content or
+        suspend accounts that don't meet this bar.
+    </p>
+
+    <h6 class="mt-4">The book takeaways themselves</h6>
+    <p>
+        Book takeaways on this site are summaries written for this platform - not excerpts
+        or reproductions of the original books' text.
+    </p>
+
+    <h6 class="mt-4">No warranty</h6>
+    <p>
+        This site is provided as-is. We don't guarantee it will always be available, bug-free,
+        or that any particular book or feature will remain on the site indefinitely.
+    </p>
+
+    <h6 class="mt-4">Changes</h6>
+    <p>
+        These terms may be updated from time to time. Continued use of the site after a
+        change means you accept the updated terms.
+    </p>
+
+    <h6 class="mt-4">Contact</h6>
+    <p class="text-muted small">
+        Questions about these terms? Reach out to whoever's running this instance.
+    </p>
+</div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
