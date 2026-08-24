@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: pageHead('Privacy Policy')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="page-body">
+<div class="container my-5" style="max-width: 720px;">
+    <span class="eyebrow">Legal</span>
+    <h1 class="mb-4">Privacy Policy</h1>
+
+    <div class="alert alert-secondary small mb-4">
+        This is a plain-language description of what this specific app actually does with
+        your data - not a law firm's template. It isn't legal advice, and whoever operates
+        this instance should have it reviewed before relying on it for a real deployment
+        with real users.
+    </div>
+
+    <h6 class="mt-4">What we collect</h6>
+    <ul>
+        <li>Account info: username, email address, and a hashed (never plaintext) password</li>
+        <li>An avatar image, if you choose to upload one</li>
+        <li>Your reading activity: which books you've bookmarked, your reading progress and
+            finished-book history, and any reviews or ratings you post</li>
+        <li>Basic technical data needed to keep the site working: your session cookie, and
+            your IP address is used briefly to rate-limit repeated login attempts</li>
+    </ul>
+
+    <h6 class="mt-4">What we don't do</h6>
+    <ul>
+        <li>No advertising, and no selling or sharing your data with advertisers</li>
+        <li>No third-party analytics or tracking scripts</li>
+        <li>No sharing your data with anyone outside what's needed to run the app itself
+            (e.g. an email provider, solely to send you verification and password-reset
+            emails)</li>
+    </ul>
+
+    <h6 class="mt-4">Cookies</h6>
+    <p>
+        Just one: a session cookie that keeps you logged in. It's required for the site to
+        function and isn't used for tracking or advertising.
+    </p>
+
+    <h6 class="mt-4">Your data, your control</h6>
+    <p>
+        You can change your password or delete your account entirely, at any time, from
+        <a href="/settings">Settings</a> - deleting your account removes your reviews,
+        reading history, and bookmarked books along with it.
+    </p>
+
+    <h6 class="mt-4">Contact</h6>
+    <p class="text-muted small">
+        Questions about this policy? Reach out to whoever's running this instance.
+    </p>
+</div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
