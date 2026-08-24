@@ -3,20 +3,25 @@ package com.abrar.BOOKSTORE.controller;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.service.AccountService;
+import com.abrar.BOOKSTORE.service.PagedResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('LIBRARIAN')")
 public class AdminController {
+
+    private static final int PAGE_SIZE = 20;
 
     @Autowired
     private UserRepository userRepository;
@@ -26,9 +31,19 @@ public class AdminController {
     private AccountService accountService;
 
     @GetMapping("/users")
-    public String listUsers(Model model) {
-        List<User> users = userRepository.findAll();
-        model.addAttribute("users", users);
+    public String listUsers(@RequestParam(required = false, defaultValue = "1") int page, Model model) {
+        int pageIndex = Math.max(page, 1) - 1;
+        Page<User> result = userRepository.findAll(
+                PageRequest.of(pageIndex, PAGE_SIZE, Sort.by("usernameOrEmail").ascending()));
+        model.addAttribute("users", result.getContent());
+        model.addAttribute("pagination",
+                new PagedResult<>(result.getContent(), Math.max(page, 1), PAGE_SIZE, result.getTotalElements()));
+        // The stat cards need whole-system counts, not just this page's -
+        // see admin/users.html, which used to derive them straight from
+        // the (now-paginated) users list.
+        model.addAttribute("totalUsers", userRepository.count());
+        model.addAttribute("librarianCount", userRepository.countByRole("ROLE_LIBRARIAN"));
+        model.addAttribute("readerCount", userRepository.countByRole("ROLE_USER"));
         return "admin/users";
     }
 
@@ -36,11 +51,10 @@ public class AdminController {
 
     @PostMapping("/users/{id}/role")
     public String changeRole(@PathVariable long id, @RequestParam String role,
-            Authentication authentication, Model model) {
+            Authentication authentication, RedirectAttributes redirectAttributes) {
         if (!VALID_ROLES.contains(role)) {
-            model.addAttribute("error", "Invalid role.");
-            model.addAttribute("users", userRepository.findAll());
-            return "admin/users";
+            redirectAttributes.addFlashAttribute("error", "Invalid role.");
+            return "redirect:/admin/users";
         }
         User target = userRepository.findById(id).orElse(null);
         if (target == null) {
@@ -50,9 +64,8 @@ public class AdminController {
                 && !"ROLE_LIBRARIAN".equals(role)
                 && userRepository.countByRole("ROLE_LIBRARIAN") <= 1;
         if (demotingLastLibrarian) {
-            model.addAttribute("error", "Can't remove the last librarian account.");
-            model.addAttribute("users", userRepository.findAll());
-            return "admin/users";
+            redirectAttributes.addFlashAttribute("error", "Can't remove the last librarian account.");
+            return "redirect:/admin/users";
         }
         target.setRole(role);
         userRepository.save(target);
@@ -60,15 +73,15 @@ public class AdminController {
     }
 
     @PostMapping("/users/{id}/reset-password")
-    public String resetPassword(@PathVariable long id, @RequestParam String newPassword, Model model) {
+    public String resetPassword(@PathVariable long id, @RequestParam String newPassword,
+            RedirectAttributes redirectAttributes) {
         User target = userRepository.findById(id).orElse(null);
         if (target == null) {
             return "redirect:/admin/users";
         }
         if (newPassword == null || newPassword.length() < 8) {
-            model.addAttribute("error", "Password must be at least 8 characters.");
-            model.addAttribute("users", userRepository.findAll());
-            return "admin/users";
+            redirectAttributes.addFlashAttribute("error", "Password must be at least 8 characters.");
+            return "redirect:/admin/users";
         }
         target.setPassword(passwordEncoder.encode(newPassword));
         // A librarian manually resetting someone's password is already
@@ -85,9 +98,8 @@ public class AdminController {
             message += " Their account was also unverified, so it's now verified too - otherwise they still "
                     + "wouldn't have been able to log in with the new password.";
         }
-        model.addAttribute("message", message);
-        model.addAttribute("users", userRepository.findAll());
-        return "admin/users";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users";
     }
 
     // Deleting your own account through this admin route is blocked -
@@ -96,27 +108,25 @@ public class AdminController {
     // delete. Allowing it here too would let an admin remove themselves
     // with a single click and no such confirmation.
     @PostMapping("/users/{id}/delete")
-    public String deleteUser(@PathVariable long id, Authentication authentication, Model model) {
+    public String deleteUser(@PathVariable long id, Authentication authentication,
+            RedirectAttributes redirectAttributes) {
         User target = userRepository.findById(id).orElse(null);
         if (target == null) {
             return "redirect:/admin/users";
         }
         User currentUser = userRepository.findByUsernameOrEmail(authentication.getName()).orElse(null);
         if (currentUser != null && currentUser.getId() == target.getId()) {
-            model.addAttribute("error",
+            redirectAttributes.addFlashAttribute("error",
                     "You can't delete your own account here - use Delete Account in Settings instead.");
-            model.addAttribute("users", userRepository.findAll());
-            return "admin/users";
+            return "redirect:/admin/users";
         }
         try {
             accountService.deleteAccount(target);
         } catch (IllegalStateException ex) {
-            model.addAttribute("error", ex.getMessage());
-            model.addAttribute("users", userRepository.findAll());
-            return "admin/users";
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/admin/users";
         }
-        model.addAttribute("message", "Deleted " + target.getUsernameOrEmail() + ".");
-        model.addAttribute("users", userRepository.findAll());
-        return "admin/users";
+        redirectAttributes.addFlashAttribute("message", "Deleted " + target.getUsernameOrEmail() + ".");
+        return "redirect:/admin/users";
     }
 }
