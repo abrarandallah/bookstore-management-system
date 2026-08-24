@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Run tests
+        # No database service here on purpose - every test in this suite
+        # runs against Mockito mocks or a @WebMvcTest slice, not a real
+        # MySQL connection (see the code review's Testcontainers note for
+        # the gap this doesn't cover: nothing here currently exercises
+        # MySQL-specific behavior like collation or constraint semantics).
+        run: ./mvnw --batch-mode --no-transfer-progress test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          retention-days: 7
