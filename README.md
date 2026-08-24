@@ -95,6 +95,25 @@ manually).
   can log in at all. The verification link is valid for 24 hours; a new one
   can be requested from `/resend-verification`.
 
+## Deployment / HTTPS
+
+This app doesn't terminate TLS or force an HTTPS redirect itself - it
+expects a reverse proxy (nginx, Caddy, a cloud load balancer, etc.) in
+front of it handling both, and forwarding plain HTTP to `server.port`
+(8081) with `X-Forwarded-Proto`/`X-Forwarded-For` headers set correctly.
+`server.forward-headers-strategy=framework` (set in
+`application.properties`) tells Spring to trust and act on those headers -
+this is what makes the session cookie's `Secure` flag turn on correctly in
+production, and is only safe to rely on because the assumption is that
+nothing untrusted can reach the app directly and spoof them. If you deploy
+this without a proxy in front (e.g. exposing port 8081 straight to the
+internet), that assumption breaks and you'd need to reconsider this
+setting and add your own TLS termination.
+
+For local development (`docker compose up` or `./mvnw spring-boot:run`,
+both accessed directly over plain HTTP), none of this matters - there's no
+proxy in the loop and the app behaves the same either way.
+
 ## Tests
 
 ```

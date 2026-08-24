@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /$
+Allow: /about
+Allow: /privacy
+Allow: /terms
+Allow: /available_books
+Allow: /available_books/*/read
+Allow: /available_books/*/share
+Allow: /genres
+Allow: /login
+Allow: /register
+
+# Everything else needs an account or is a form action/API route, not a
+# page worth indexing - see SecurityConfig for what's actually public vs
+# behind login; this list is deliberately narrower than that, since
+# "reachable without a session" and "worth a search engine crawling it"
+# aren't the same thing (e.g. /forgot-password, /api/auth/**).
+Disallow: /admin/
+Disallow: /my_books
+Disallow: /reading-history
+Disallow: /profile
+Disallow: /settings
+Disallow: /book_register
+Disallow: /api/
+Disallow: /available_books/results
+Disallow: /available_books/*/progress
+Disallow: /available_books/*/finish
+Disallow: /available_books/*/review
