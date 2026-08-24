@@ -19,19 +19,19 @@
     <div class="row g-3 mb-4">
         <div class="col-sm-4">
             <div class="card text-center py-3">
-                <div class="fs-3 fw-bold" th:text="${#lists.size(users)}">0</div>
+                <div class="fs-3 fw-bold" th:text="${totalUsers}">0</div>
                 <div class="text-muted small">Total users</div>
             </div>
         </div>
         <div class="col-sm-4">
             <div class="card text-center py-3">
-                <div class="fs-3 fw-bold" th:text="${#lists.size(users.?[role == 'ROLE_LIBRARIAN'])}">0</div>
+                <div class="fs-3 fw-bold" th:text="${librarianCount}">0</div>
                 <div class="text-muted small">Librarians</div>
             </div>
         </div>
         <div class="col-sm-4">
             <div class="card text-center py-3">
-                <div class="fs-3 fw-bold" th:text="${#lists.size(users.?[role == 'ROLE_USER'])}">0</div>
+                <div class="fs-3 fw-bold" th:text="${readerCount}">0</div>
                 <div class="text-muted small">Readers</div>
             </div>
         </div>
@@ -94,6 +94,34 @@
         </table>
         </div>
     </div>
+
+    <nav class="pagination-controls mt-4" th:if="${pagination != null and pagination.totalPages > 1}"
+         aria-label="User list pages">
+        <a th:if="${pagination.hasPrevious}" class="page-link"
+           th:href="@{/admin/users(page=${pagination.page - 1})}"
+           th:attr="data-page=${pagination.page - 1}" aria-label="Previous page">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        <span th:unless="${pagination.hasPrevious}" class="page-link disabled" aria-hidden="true">
+            <i class="fa-solid fa-chevron-left"></i>
+        </span>
+
+        <th:block th:each="p : ${#numbers.sequence(1, pagination.totalPages)}">
+            <span th:if="${p == pagination.page}" class="page-link active" th:text="${p}"></span>
+            <a th:unless="${p == pagination.page}" class="page-link"
+               th:href="@{/admin/users(page=${p})}"
+               th:attr="data-page=${p}" th:text="${p}"></a>
+        </th:block>
+
+        <a th:if="${pagination.hasNext}" class="page-link"
+           th:href="@{/admin/users(page=${pagination.page + 1})}"
+           th:attr="data-page=${pagination.page + 1}" aria-label="Next page">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+        <span th:unless="${pagination.hasNext}" class="page-link disabled" aria-hidden="true">
+            <i class="fa-solid fa-chevron-right"></i>
+        </span>
+    </nav>
 </div>
 </main>
 
