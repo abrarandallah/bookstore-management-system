@@ -135,6 +135,11 @@ public class SecurityConfig {
                                 // Container/orchestrator healthchecks (see docker-compose.yml)
                                 // hit this directly, with no session or bearer token.
                                 "/actuator/health",
+                                // Search-engine crawlers hit these anonymously too - see
+                                // SitemapController.
+                                "/robots.txt", "/sitemap.xml",
+                                // Legal pages - same reasoning as /about.
+                                "/privacy", "/terms",
                                 // Browsing and reading are open to everyone - only the
                                 // personal actions tied to an account (saving reading
                                 // progress, marking finished, "My Books", reviews, reading
