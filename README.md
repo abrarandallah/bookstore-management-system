@@ -19,8 +19,6 @@ Boot 3.1.2, Java 17, Thymeleaf, MySQL, and Spring Security 6.
 - Librarian role: add/edit/delete books, manage genres, bulk import
 - Admin panel (`/admin/users`) to change user roles, reset a user's password,
   or delete a user
-- Separate JWT-based JSON API under `/api/auth/**` (signup/login) for
-  non-browser clients, alongside normal session/cookie login for the website
 
 ## Requirements
 
@@ -36,8 +34,8 @@ Boot 3.1.2, Java 17, Thymeleaf, MySQL, and Spring Security 6.
 2. `docker compose up --build`
 3. Open `http://localhost:8081`.
 
-That's it - MySQL, the app, uploaded files, and the JWT signing key all
-persist in Docker volumes across restarts (`docker compose down` keeps them;
+That's it - MySQL, the app, and uploaded files all persist in Docker
+volumes across restarts (`docker compose down` keeps them;
 `docker compose down -v` wipes everything for a clean slate).
 
 ## Running locally without Docker
@@ -59,24 +57,23 @@ librarian, since regular signup always creates a `ROLE_USER` account.
 
 ## Configuration (environment variables)
 
-| Variable             | Default                             | Purpose                                                                                                                                                                                                                                              |
-| -------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DB_HOST`            | `localhost`                         | MySQL host (docker-compose sets this to `mysql` automatically)                                                                                                                                                                                       |
-| `DB_PORT`            | `3306`                              | MySQL port                                                                                                                                                                                                                                           |
-| `DB_NAME`            | `book`                              | MySQL database name                                                                                                                                                                                                                                  |
-| `DB_USERNAME`        | `abrar`                             | MySQL username                                                                                                                                                                                                                                       |
-| `DB_PASSWORD`        | `abrar`                             | MySQL password                                                                                                                                                                                                                                       |
-| `JWT_SECRET`         | auto-generated                      | Signing key for JWT API tokens. If not set, one is generated on first run and saved to `~/.bookstore-jwt-secret`, then reused on subsequent runs. Only set this yourself if you need a fixed value (e.g. multiple app instances sharing one secret). |
-| `UPLOAD_DIR`         | `uploads` (relative to working dir) | Where uploaded book covers and avatars are stored                                                                                                                                                                                                    |
-| `LIBRARIAN_USERNAME` | `librarian`                         | Username for the auto-created librarian account                                                                                                                                                                                                      |
-| `LIBRARIAN_EMAIL`    | `librarian@bookstore.local`         | Email for the auto-created librarian account                                                                                                                                                                                                         |
-| `LIBRARIAN_PASSWORD` | `change-this-password`              | Password for the auto-created librarian account - change this in any real deployment                                                                                                                                                                 |
-| `APP_BASE_URL`       | `http://localhost:8081`             | Used to build links in verification/password-reset emails                                                                                                                                                                                            |
-| `MAIL_HOST`          | `smtp.gmail.com`                    | SMTP host                                                                                                                                                                                                                                            |
-| `MAIL_PORT`          | `587`                               | SMTP port                                                                                                                                                                                                                                            |
-| `MAIL_USERNAME`      | _(empty)_                           | SMTP username                                                                                                                                                                                                                                        |
-| `MAIL_PASSWORD`      | _(empty)_                           | SMTP password                                                                                                                                                                                                                                        |
-| `MAIL_SSL_ENABLE`    | `false`                             | Set to `true` and `MAIL_PORT=465` if your network blocks STARTTLS on 587                                                                                                                                                                             |
+| Variable             | Default                             | Purpose                                                                              |
+| -------------------- | ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `DB_HOST`            | `localhost`                         | MySQL host (docker-compose sets this to `mysql` automatically)                       |
+| `DB_PORT`            | `3306`                              | MySQL port                                                                           |
+| `DB_NAME`            | `book`                              | MySQL database name                                                                  |
+| `DB_USERNAME`        | `abrar`                             | MySQL username                                                                       |
+| `DB_PASSWORD`        | `abrar`                             | MySQL password                                                                       |
+| `UPLOAD_DIR`         | `uploads` (relative to working dir) | Where uploaded book covers and avatars are stored                                    |
+| `LIBRARIAN_USERNAME` | `librarian`                         | Username for the auto-created librarian account                                      |
+| `LIBRARIAN_EMAIL`    | `librarian@bookstore.local`         | Email for the auto-created librarian account                                         |
+| `LIBRARIAN_PASSWORD` | `change-this-password`              | Password for the auto-created librarian account - change this in any real deployment |
+| `APP_BASE_URL`       | `http://localhost:8081`             | Used to build links in verification/password-reset emails                            |
+| `MAIL_HOST`          | `smtp.gmail.com`                    | SMTP host                                                                            |
+| `MAIL_PORT`          | `587`                               | SMTP port                                                                            |
+| `MAIL_USERNAME`      | _(empty)_                           | SMTP username                                                                        |
+| `MAIL_PASSWORD`      | _(empty)_                           | SMTP password                                                                        |
+| `MAIL_SSL_ENABLE`    | `false`                             | Set to `true` and `MAIL_PORT=465` if your network blocks STARTTLS on 587             |
 
 Without real mail credentials, verification and password-reset emails won't
 actually be delivered, but the tokens are still created and logged - see
@@ -87,13 +84,11 @@ manually).
 ## Auth model
 
 - The website (`/`, `/login`, `/register`, book pages, etc.) uses standard
-  session/cookie login via Spring Security's form login.
-- `/api/auth/**` is a separate JWT-based API: `POST /api/auth/signup` and
-  `POST /api/auth/login` return a bearer token for use on subsequent
-  `/api/**` requests.
-- New accounts (from either signup path) must verify their email before they
-  can log in at all. The verification link is valid for 24 hours; a new one
-  can be requested from `/resend-verification`.
+  session/cookie login via Spring Security's form login. There's no separate
+  API - every page is server-rendered Thymeleaf.
+- New accounts must verify their email before they can log in at all. The
+  verification link is valid for 24 hours; a new one can be requested from
+  `/resend-verification`.
 
 ## Deployment / HTTPS
 
