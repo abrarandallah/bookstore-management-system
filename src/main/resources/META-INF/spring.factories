@@ -1,2 +1,0 @@
-org.springframework.boot.env.EnvironmentPostProcessor=\
-com.abrar.BOOKSTORE.config.JwtSecretEnvironmentPostProcessor
