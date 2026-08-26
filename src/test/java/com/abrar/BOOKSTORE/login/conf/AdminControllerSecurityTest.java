@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.abrar.BOOKSTORE.Login.conf.SecurityConfig;
-import com.abrar.BOOKSTORE.Login.jwt.JwtTokenProvider;
 import com.abrar.BOOKSTORE.Login.user.CustomUserDetailsService;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserPrincipal;
@@ -72,9 +71,6 @@ class AdminControllerSecurityTest {
         // the context to start.
         @MockBean
         private CustomUserDetailsService customUserDetailsService;
-
-        @MockBean
-        private JwtTokenProvider jwtTokenProvider;
 
         @MockBean
         private com.abrar.BOOKSTORE.Login.auth.RateLimiter rateLimiter;
@@ -167,7 +163,7 @@ class AdminControllerSecurityTest {
                                 .with(asUser("librarian", "ROLE_LIBRARIAN"))
                                 .with(csrf());
 
-                mockMvc.perform(request).andExpect(status().isOk());
+                mockMvc.perform(request).andExpect(status().is3xxRedirection());
 
                 org.mockito.ArgumentCaptor<User> saved = org.mockito.ArgumentCaptor.forClass(User.class);
                 org.mockito.Mockito.verify(userRepository).save(saved.capture());
@@ -185,7 +181,7 @@ class AdminControllerSecurityTest {
                                 .with(asUser("librarian", "ROLE_LIBRARIAN"))
                                 .with(csrf());
 
-                mockMvc.perform(request).andExpect(status().isOk());
+                mockMvc.perform(request).andExpect(status().is3xxRedirection());
 
                 org.mockito.ArgumentCaptor<User> saved = org.mockito.ArgumentCaptor.forClass(User.class);
                 org.mockito.Mockito.verify(userRepository).save(saved.capture());
