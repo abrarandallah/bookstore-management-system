@@ -21,10 +21,10 @@ public class UserPrincipal implements UserDetails {
     private String avatarUrl;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
-    // Defaults true so the existing 6-arg constructor (used directly by
-    // JwtTokenProviderTest) keeps behaving as before; UserPrincipal.create()
-    // below is the only real caller and always sets this explicitly from
-    // User.isVerified().
+    // Defaults true so the 6-arg constructor (used directly by tests that
+    // build a principal by hand, e.g. AdminControllerSecurityTest) keeps
+    // behaving as before; UserPrincipal.create() below is the only real
+    // caller and always sets this explicitly from User.isVerified().
     private boolean verified = true;
 
     public UserPrincipal(Long id, String usernameOrEmail, String email, String avatarUrl, String password,
@@ -109,9 +109,6 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        // Gates both session (formLogin) and JWT (/api/auth/login) login,
-        // since both go through the same DaoAuthenticationProvider fed by
-        // CustomUserDetailsService.loadUserByUsername() -> this class.
         return verified;
     }
 
