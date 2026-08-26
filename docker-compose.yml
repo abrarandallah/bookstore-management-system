@@ -59,13 +59,7 @@ services:
       # Uploaded covers/avatars survive `docker compose down` without needing
       # to rebuild the image or lose data.
       - uploads-data:/app/uploads
-      # The JWT signing key normally lives at ~/.bookstore-jwt-secret on
-      # whatever host runs the app - inside a container that's a throwaway
-      # filesystem, so without this volume every `docker compose up` would
-      # generate a new key and invalidate every previously issued JWT.
-      - jwt-secret:/root
 
 volumes:
   mysql-data:
   uploads-data:
-  jwt-secret:
