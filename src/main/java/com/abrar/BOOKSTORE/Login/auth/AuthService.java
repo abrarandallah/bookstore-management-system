@@ -42,7 +42,7 @@ public class AuthService {
         // (no new user, no verification email) and notifies the *existing*
         // account's inbox instead - the only place someone who actually
         // owns that address will see it. Either way the caller (see
-        // AuthController/AuthPageController) shows the same generic
+        // AuthPageController) shows the same generic
         // "check your email" success message.
         userRepository.findByEmail(signupRequest.getEmail()).ifPresentOrElse(
                 existing -> emailService.sendAccountAlreadyExistsEmail(existing.getEmail()),
