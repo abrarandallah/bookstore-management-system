@@ -15,6 +15,7 @@ import com.abrar.BOOKSTORE.Login.user.UserPrincipal;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.controller.AdminController;
 import com.abrar.BOOKSTORE.service.AccountService;
+import com.abrar.BOOKSTORE.service.GenreService;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,6 +66,9 @@ class AdminControllerSecurityTest {
 
         @MockBean
         private AccountService accountService;
+
+        @MockBean
+        private GenreService genreService;
 
         // Pulled in transitively by SecurityConfig - never actually exercised
         // for these GET-only/no-token requests, but must exist as beans for
@@ -186,5 +190,33 @@ class AdminControllerSecurityTest {
                 org.mockito.ArgumentCaptor<User> saved = org.mockito.ArgumentCaptor.forClass(User.class);
                 org.mockito.Mockito.verify(userRepository).save(saved.capture());
                 org.junit.jupiter.api.Assertions.assertTrue(saved.getValue().isVerified());
+        }
+
+        // Same shape as the changeRole pair above, for the new genre-rename
+        // route - AdminController's class-level @PreAuthorize covers every
+        // method in the class, but that's worth actually proving for each
+        // mutating endpoint added to it, not just assumed from the one above.
+        @Test
+        void testRenameGenreRejectsARegularUserEvenWithAValidCsrfToken() throws Exception {
+                MockHttpServletRequestBuilder request = post("/admin/genres/1/rename")
+                                .param("name", "Science Fiction")
+                                .with(asUser("reader", "ROLE_USER"))
+                                .with(csrf());
+
+                mockMvc.perform(request)
+                                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void testRenameGenreAllowsALibrarianWithAValidCsrfToken() throws Exception {
+                MockHttpServletRequestBuilder request = post("/admin/genres/1/rename")
+                                .param("name", "Science Fiction")
+                                .with(asUser("librarian", "ROLE_LIBRARIAN"))
+                                .with(csrf());
+
+                mockMvc.perform(request)
+                                .andExpect(status().is3xxRedirection());
+
+                org.mockito.Mockito.verify(genreService).rename(1, "Science Fiction");
         }
 }
