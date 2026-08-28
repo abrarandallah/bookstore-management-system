@@ -3,6 +3,7 @@ package com.abrar.BOOKSTORE.controller;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.service.AccountService;
+import com.abrar.BOOKSTORE.service.GenreService;
 import com.abrar.BOOKSTORE.service.PagedResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,8 @@ public class AdminController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private GenreService genreService;
 
     @GetMapping("/users")
     public String listUsers(@RequestParam(required = false, defaultValue = "1") int page, Model model) {
@@ -128,5 +131,35 @@ public class AdminController {
         }
         redirectAttributes.addFlashAttribute("message", "Deleted " + target.getUsernameOrEmail() + ".");
         return "redirect:/admin/users";
+    }
+
+    // These two live here rather than on GenreController because that
+    // controller's one existing route (the public genre browse page) needs
+    // to stay open to every logged-in user - the librarian-only controls
+    // for these actions are rendered right on that same page (genres.html),
+    // just wrapped in sec:authorize, rather than a separate /admin/genres
+    // page. Redirecting back to /genres (not /admin/...) reflects that.
+    @PostMapping("/genres/{id}/rename")
+    public String renameGenre(@PathVariable int id, @RequestParam String name,
+            RedirectAttributes redirectAttributes) {
+        try {
+            genreService.rename(id, name);
+            redirectAttributes.addFlashAttribute("message", "Renamed to \"" + name.trim() + "\".");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/genres";
+    }
+
+    @PostMapping("/genres/{id}/merge")
+    public String mergeGenre(@PathVariable int id, @RequestParam int targetId,
+            RedirectAttributes redirectAttributes) {
+        try {
+            genreService.merge(id, targetId);
+            redirectAttributes.addFlashAttribute("message", "Merged and removed the duplicate genre.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/genres";
     }
 }
