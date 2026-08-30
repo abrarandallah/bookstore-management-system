@@ -1673,11 +1673,17 @@ select,
   justify-content: center;
   z-index: 1080;
   opacity: 0;
+  /* Only clickable while actually visible - this also means that if
+     removal ever somehow failed (see confirm-modal.js's close()), a
+     leftover invisible overlay couldn't silently block every click on
+     the page the way one used to be suspected of doing. */
+  pointer-events: none;
   transition: opacity 0.18s ease;
 }
 
 .confirm-overlay.is-visible {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .confirm-card {
