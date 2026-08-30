@@ -40,6 +40,16 @@
             void overlay.offsetWidth;
             overlay.classList.add('is-visible');
 
+            // The dialog opens centered on screen, not under the cursor -
+            // someone re-clicking the same spot that opened it (because it
+            // didn't visually register as "done something" fast enough)
+            // lands on this backdrop, not the dialog's own buttons. Without
+            // this grace period that reads as an immediate cancel, which
+            // looks exactly like "the button does nothing" from the
+            // outside: the confirm dialog opens and closes faster than it's
+            // consciously seen, no request ever goes out, repeat.
+            const backdropArmedAt = Date.now() + 300;
+
             let removed = false;
             function removeOverlay() {
                 if (removed) return;
@@ -71,7 +81,7 @@
             overlay.querySelector('.confirm-ok').addEventListener('click', () => close(true));
             overlay.querySelector('.confirm-cancel').addEventListener('click', () => close(false));
             overlay.addEventListener('click', (event) => {
-                if (event.target === overlay) {
+                if (event.target === overlay && Date.now() >= backdropArmedAt) {
                     close(false);
                 }
             });
