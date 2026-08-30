@@ -3,6 +3,9 @@ package com.abrar.BOOKSTORE.repository;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.entity.MyBookList;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +23,16 @@ public interface MyBookRepository extends JpaRepository<MyBookList, Long> {
 
     boolean existsByBookIdAndUser(int bookId, User user);
 
+    // Bulk deletes - see the comment on ReviewRepository's equivalents for
+    // why these use @Modifying + an explicit query instead of a plain
+    // deleteByX method.
+    @Modifying
     @Transactional
-    void deleteByUser(User user);
+    @Query("DELETE FROM MyBookList m WHERE m.user = :user")
+    void deleteByUser(@Param("user") User user);
 
+    @Modifying
     @Transactional
-    void deleteByBookId(int bookId);
+    @Query("DELETE FROM MyBookList m WHERE m.bookId = :bookId")
+    void deleteByBookId(@Param("bookId") int bookId);
 }
