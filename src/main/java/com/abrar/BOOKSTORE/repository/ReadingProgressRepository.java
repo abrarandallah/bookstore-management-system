@@ -4,6 +4,9 @@ import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.ReadingProgress;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -22,9 +25,16 @@ public interface ReadingProgressRepository extends JpaRepository<ReadingProgress
     // row just by guessing/crafting an id.
     Optional<ReadingProgress> findByIdAndUser(Long id, User user);
 
+    // Bulk deletes - see the comment on ReviewRepository's equivalents for
+    // why these use @Modifying + an explicit query instead of a plain
+    // deleteByX method.
+    @Modifying
     @Transactional
-    void deleteByUser(User user);
+    @Query("DELETE FROM ReadingProgress p WHERE p.user = :user")
+    void deleteByUser(@Param("user") User user);
 
+    @Modifying
     @Transactional
-    void deleteByBook(Book book);
+    @Query("DELETE FROM ReadingProgress p WHERE p.book = :book")
+    void deleteByBook(@Param("book") Book book);
 }
