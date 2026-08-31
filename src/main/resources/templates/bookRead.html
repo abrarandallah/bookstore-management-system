@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/layout :: pageHead(${book.name})}"></head>
+<head th:replace="~{fragments/layout :: pageHead(${localizedBook.name})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
@@ -10,8 +10,8 @@
         <img th:if="${book.coverImageUrl}" th:src="@{${book.coverImageUrl}}" alt="Cover"
              style="width:64px;height:auto;border-radius:4px;box-shadow:var(--shadow-card);">
         <div>
-            <span class="eyebrow d-block" th:text="${book.author}">Author</span>
-            <h3 class="mb-0" th:text="${book.name}">Book title</h3>
+            <span class="eyebrow d-block" th:text="${localizedBook.author}">Author</span>
+            <h3 class="mb-0" th:text="${localizedBook.name}">Book title</h3>
             <span class="rating-badge mt-1" th:if="${ratingSummary.count > 0}">
                 <i class="fa-solid fa-star"></i>
                 <span th:text="${#numbers.formatDecimal(ratingSummary.average, 1, 1)}">4.3</span>
@@ -46,8 +46,8 @@
 
         <div th:each="page, iter : ${book.takeaways}" class="reader-page" th:data-index="${iter.index}"
              th:style="${iter.index == resumePage} ? 'display:block' : ''">
-            <h4 th:text="${page.heading}">Heading</h4>
-            <p th:text="${page.content}" style="white-space: pre-line;">Content</p>
+            <h4 th:text="${localizedPages.get(page.id).heading}">Heading</h4>
+            <p th:text="${localizedPages.get(page.id).content}" style="white-space: pre-line;">Content</p>
         </div>
 
         <div class="d-flex justify-content-between mt-4">
