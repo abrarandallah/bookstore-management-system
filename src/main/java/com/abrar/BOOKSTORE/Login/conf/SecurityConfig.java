@@ -124,6 +124,10 @@ public class SecurityConfig {
                                 // The share page is meant to be opened by anyone the link is sent
                                 // to, logged in or not - that's the whole point of a share link.
                                 "/available_books/*/share",
+                                // Language picker (first-visit popup + Settings) - a display
+                                // preference, not tied to an account, so guests need it too.
+                                // See LanguageController.
+                                "/language", "/language/dismiss",
                                 "/css/**", "/js/**", "/images/**", "/img/**", "/uploads/**")
                         .permitAll()
                         .anyRequest().authenticated())
