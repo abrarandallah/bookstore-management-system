@@ -1735,3 +1735,38 @@ select,
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ---- language popup ---------------------------------------------------
+   Reuses .confirm-overlay/.confirm-card (see above) for the backdrop and
+   card shell, so this doesn't look like a foreign component - just its
+   own content and a few extra rules for the language button list and the
+   close button a plain confirm dialog doesn't need. */
+
+.language-popup-card {
+  position: relative;
+  max-width: 340px;
+}
+
+.language-popup-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--ink);
+  opacity: 0.55;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.language-popup-close:hover {
+  color: var(--ink);
+}
+
+.language-popup-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
