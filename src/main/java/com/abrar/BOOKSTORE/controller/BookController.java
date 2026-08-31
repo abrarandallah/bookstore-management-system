@@ -11,6 +11,7 @@ import com.abrar.BOOKSTORE.entity.ReadingProgress;
 import com.abrar.BOOKSTORE.exception.ResourceNotFoundException;
 import com.abrar.BOOKSTORE.service.AchievementService;
 import com.abrar.BOOKSTORE.service.BookService;
+import com.abrar.BOOKSTORE.service.BookTranslationService;
 import com.abrar.BOOKSTORE.service.BookValidator;
 import com.abrar.BOOKSTORE.service.FileStorageService;
 import com.abrar.BOOKSTORE.service.GenreService;
@@ -18,6 +19,7 @@ import com.abrar.BOOKSTORE.service.MyBookListService;
 import com.abrar.BOOKSTORE.service.PagedResult;
 import com.abrar.BOOKSTORE.service.ReadingProgressService;
 import com.abrar.BOOKSTORE.service.ReviewService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.LocaleResolver;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -56,6 +60,10 @@ public class BookController {
     private ReadingProgressService readingProgressService;
     @Autowired
     private AchievementService achievementService;
+    @Autowired
+    private BookTranslationService bookTranslationService;
+    @Autowired
+    private LocaleResolver localeResolver;
 
     private User currentUser(Principal principal) {
         return userRepository.findByUsernameOrEmail(principal.getName())
@@ -247,9 +255,18 @@ public class BookController {
     }
 
     @GetMapping("/available_books/{id}/read")
-    public String readBook(@PathVariable("id") int id, Model model, Principal principal) {
+    public String readBook(@PathVariable("id") int id, Model model, Principal principal, HttpServletRequest request) {
         Book b = service.getBookById(id);
         model.addAttribute("book", b);
+        // Translated title/author/takeaways for whichever language the
+        // visitor has chosen (see AppLocaleResolver) - each falls back to
+        // the book's own English fields wherever a translation doesn't
+        // exist yet, so a partially-translated book still renders
+        // correctly instead of needing to be all-or-nothing.
+        Locale locale = localeResolver.resolveLocale(request);
+        model.addAttribute("localizedBook", bookTranslationService.localizeBook(b, locale.getLanguage()));
+        model.addAttribute("localizedPages",
+                bookTranslationService.localizePages(b.getTakeaways(), locale.getLanguage()));
         model.addAttribute("reviews", reviewService.getReviewsForBook(id));
         model.addAttribute("ratingSummary", reviewService.summaryForBook(id));
         // Reading progress and "your review" only make sense for a logged-in
