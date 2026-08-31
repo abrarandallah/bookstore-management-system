@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div class="form-panel p-4">
+            <div class="form-panel p-4 mb-3">
                 <h6 class="mb-3">Reading</h6>
                 <label class="form-label">Takeaway text size</label>
                 <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Reader font size">
@@ -60,7 +60,27 @@
                 <p class="text-muted small mt-2 mb-0">Affects the takeaway text in the book reader.</p>
             </div>
 
-            <p class="text-muted small mt-3">Language support is on the roadmap - for now the site is English-only.</p>
+            <!--/* Its own panel, not folded into Appearance - a language choice is
+                   made once and rarely revisited (unlike theme, toggled often), so
+                   it doesn't need to live in the navbar either. See the first-visit
+                   popup (fragments/layout.html) for where most people will actually
+                   pick a language the first time - this is here for changing your
+                   mind later. */-->
+            <div class="form-panel p-4">
+                <h6 class="mb-3">Language</h6>
+                <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Language">
+                    <a th:href="@{/language(lang='en',redirect='/settings')}"
+                       th:classappend="${#locale.language == 'en'} ? 'btn-primary' : 'btn-secondary'"
+                       class="btn">English</a>
+                    <a th:href="@{/language(lang='fr',redirect='/settings')}"
+                       th:classappend="${#locale.language == 'fr'} ? 'btn-primary' : 'btn-secondary'"
+                       class="btn">Français</a>
+                    <a th:href="@{/language(lang='ar',redirect='/settings')}"
+                       th:classappend="${#locale.language == 'ar'} ? 'btn-primary' : 'btn-secondary'"
+                       class="btn">العربية</a>
+                </div>
+                <p class="text-muted small mt-2 mb-0">Translated book content is still being added - untranslated books and takeaways show in English.</p>
+            </div>
         </div>
     </div>
 </div>
