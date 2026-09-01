@@ -18,12 +18,14 @@ import com.abrar.BOOKSTORE.service.PagedResult;
 import com.abrar.BOOKSTORE.service.RatingSummary;
 import com.abrar.BOOKSTORE.service.ReadingProgressService;
 import com.abrar.BOOKSTORE.service.AchievementService;
+import com.abrar.BOOKSTORE.service.BookTranslationService;
 import com.abrar.BOOKSTORE.service.ReviewService;
 import com.abrar.BOOKSTORE.service.BookValidator;
 
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -38,6 +40,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.LocaleResolver;
 
 @ContextConfiguration(classes = { BookController.class, BookValidator.class })
 @ExtendWith(SpringExtension.class)
@@ -68,6 +71,12 @@ class BookControllerTest {
 
         @MockBean
         private AchievementService achievementService;
+
+        @MockBean
+        private BookTranslationService bookTranslationService;
+
+        @MockBean
+        private LocaleResolver localeResolver;
 
         private static final Principal READER_PRINCIPAL = () -> "reader";
 
@@ -474,6 +483,43 @@ class BookControllerTest {
                                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Deep Work"))
                                 .andExpect(MockMvcResultMatchers.jsonPath("$.takeaways[0].heading")
                                                 .value("Focus is a skill"));
+        }
+
+        /**
+         * Method under test:
+         * {@link BookController#readBook(int, Model, Principal, jakarta.servlet.http.HttpServletRequest)}
+         * The reader page should use BookTranslationService's output for the
+         * title/author/takeaway text, not the raw Book/BookPage fields
+         * directly - see BookTranslationService for the English-fallback
+         * logic this is delegating to.
+         */
+        @Test
+        void testReadBookAddsLocalizedContentToModel() throws Exception {
+                Book book = new Book(5, "Dune", "Frank Herbert");
+                BookPage takeaway = new BookPage(1, "The Desert Planet", "Arrakis is...");
+                takeaway.setId(50L);
+                takeaway.setBook(book);
+                book.setTakeaways(new ArrayList<>(List.of(takeaway)));
+                when(bookService.getBookById(5)).thenReturn(book);
+                when(reviewService.getReviewsForBook(5)).thenReturn(new ArrayList<>());
+                when(reviewService.summaryForBook(5)).thenReturn(new RatingSummary(0.0, 0));
+                when(localeResolver.resolveLocale(Mockito.any())).thenReturn(Locale.forLanguageTag("ar"));
+                BookTranslationService.LocalizedBook localizedBook = new BookTranslationService.LocalizedBook(
+                                "‎كثيب", "فرانك هربرت");
+                when(bookTranslationService.localizeBook(book, "ar")).thenReturn(localizedBook);
+                when(bookTranslationService.localizePages(book.getTakeaways(), "ar")).thenReturn(
+                                java.util.Map.of(50L, new BookTranslationService.LocalizedPage(
+                                                "الكوكب الصحراوي", "أراكيس هو...")));
+
+                MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/available_books/{id}/read",
+                                5);
+                MockMvcBuilders.standaloneSetup(bookController)
+                                .build()
+                                .perform(requestBuilder)
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.view().name("bookRead"))
+                                .andExpect(MockMvcResultMatchers.model().attribute("localizedBook", localizedBook))
+                                .andExpect(MockMvcResultMatchers.model().attributeExists("localizedPages"));
         }
 
         /**
