@@ -58,7 +58,8 @@
                page's model by LanguagePopupModelAdvice) - a visitor who's
                already chosen or dismissed-this-session never gets this
                markup sent to them at all. */-->
-        <div th:if="${showLanguagePopup}" id="language-popup-overlay" class="confirm-overlay">
+        
+            <!-- DEBUG showLanguagePopup = [[${showLanguagePopup}]] -->   
             <div class="confirm-card is-gentle language-popup-card" role="dialog" aria-modal="true"
                  aria-label="Choose your language">
                 <button type="button" class="language-popup-close" aria-label="Close">
