@@ -1771,3 +1771,26 @@ select,
   flex-direction: column;
   gap: 0.5rem;
 }
+
+/* ---- Arabic typography overrides ------------------------------------------
+   Fraunces/Inter/Courier Prime (the site's whole type system) have no
+   Arabic glyphs, so without this, Arabic text silently falls back to
+   whatever generic font the visitor's OS happens to supply - visually
+   inconsistent with the rest of the site. Letter-spacing makes this worse
+   than a cosmetic mismatch: Arabic letters need to physically join to
+   their neighbors to be legible, and tracking inserted between them
+   breaks that joining (worst case is .eyebrow below, which combines a
+   monospace font with 0.18em tracking - actively broken for Arabic, not
+   just off-brand). text-transform: uppercase is simply meaningless for a
+   script with no case. Scoped to html[lang="ar"] (set by
+   HtmlLangDirFilter) so English/French typography is untouched. */
+html[lang="ar"] {
+  --font-display: "Cairo", "Segoe UI", sans-serif;
+  --font-body: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html[lang="ar"] * {
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
