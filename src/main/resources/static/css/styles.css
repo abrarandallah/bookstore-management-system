@@ -1763,6 +1763,7 @@ select,
 
 .language-popup-close:hover {
   color: var(--ink);
+  opacity: 1;
 }
 
 .language-popup-options {
