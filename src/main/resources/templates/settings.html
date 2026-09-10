@@ -71,13 +71,16 @@
                 <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Language">
                     <a th:href="@{/language(lang='en',redirect='/settings')}"
                        th:classappend="${#locale.language == 'en'} ? 'btn-primary' : 'btn-secondary'"
-                       class="btn">English</a>
+                       th:attr="aria-current=${#locale.language == 'en'} ? 'true' : null"
+                       lang="en" class="btn">English</a>
                     <a th:href="@{/language(lang='fr',redirect='/settings')}"
                        th:classappend="${#locale.language == 'fr'} ? 'btn-primary' : 'btn-secondary'"
-                       class="btn">Français</a>
+                       th:attr="aria-current=${#locale.language == 'fr'} ? 'true' : null"
+                       lang="fr" class="btn">Français</a>
                     <a th:href="@{/language(lang='ar',redirect='/settings')}"
                        th:classappend="${#locale.language == 'ar'} ? 'btn-primary' : 'btn-secondary'"
-                       class="btn">العربية</a>
+                       th:attr="aria-current=${#locale.language == 'ar'} ? 'true' : null"
+                       lang="ar" dir="rtl" class="btn">العربية</a>
                 </div>
                 <p class="text-muted small mt-2 mb-0">Translated book content is still being added - untranslated books and takeaways show in English.</p>
             </div>
