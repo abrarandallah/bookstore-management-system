@@ -23,20 +23,14 @@ public class LanguagePopupModelAdvice {
     @ModelAttribute("showLanguagePopup")
     public boolean showLanguagePopup(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        System.out.println("[LANG-DEBUG] cookies=" + (cookies == null ? "null" :
-                java.util.Arrays.stream(cookies).map(c -> c.getName() + "=" + c.getValue())
-                        .collect(java.util.stream.Collectors.joining(","))));
         if (cookies == null) {
-            System.out.println("[LANG-DEBUG] -> true (no cookies at all)");
             return true;
         }
         for (Cookie cookie : cookies) {
             if (AppLocaleResolver.COOKIE_NAME.equals(cookie.getName())) {
-                System.out.println("[LANG-DEBUG] -> false (found lang cookie)");
                 return false;
             }
         }
-        System.out.println("[LANG-DEBUG] -> true (no lang cookie among the ones present)");
         return true;
     }
 }
