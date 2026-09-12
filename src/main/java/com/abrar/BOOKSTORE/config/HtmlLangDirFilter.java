@@ -41,6 +41,13 @@ public class HtmlLangDirFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        // TEMP DIAGNOSTIC: bypass rewriting entirely to test whether this
+        // filter itself is causing content to go missing.
+        chain.doFilter(request, response);
+    }
+
+    private void originalLogic(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
         ContentCachingResponseWrapper wrapper = new ContentCachingResponseWrapper(response);
         chain.doFilter(request, wrapper);
 
