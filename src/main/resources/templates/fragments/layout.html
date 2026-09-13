@@ -34,6 +34,7 @@
     </th:block>
 
     <th:block th:fragment="scripts">
+        <p>DEBUG_TOP_OF_BLOCK</p>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
                 integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
         <script th:src="@{/js/toast.js}"></script>
@@ -46,6 +47,8 @@
                 localStorage.setItem('bookstore-theme', next);
             }
         </script>
+
+        <p>DEBUG_BEFORE_COMMENT</p>
 
         <!--/* First-visit language popup. Lives here (in the "scripts"
                fragment, despite not being a script) rather than as its own
