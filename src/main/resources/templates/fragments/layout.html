@@ -62,23 +62,8 @@
                page's model by LanguagePopupModelAdvice) - a visitor who's
                already chosen or dismissed-this-session never gets this
                markup sent to them at all. */-->
-        <div th:if="${showLanguagePopup}" id="language-popup-overlay" class="confirm-overlay">
-            <div class="confirm-card is-gentle language-popup-card" role="dialog" aria-modal="true"
-                aria-label="Choose your language">
-                <button type="button" class="language-popup-close" aria-label="Close">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-                <div class="confirm-icon"><i class="fa-solid fa-globe"></i></div>
-                <p class="mb-1">Choose your language</p>
-                <p class="text-muted small mb-3" dir="rtl" lang="ar">اختر لغتك &middot; Choisissez votre langue</p>
-                <div class="language-popup-options">
-                    <a class="btn btn-secondary" lang="en" th:href="@{/language(lang='en',redirect=${#httpServletRequest.requestURI})}">English</a>
-                    <a class="btn btn-secondary" lang="fr" th:href="@{/language(lang='fr',redirect=${#httpServletRequest.requestURI})}">Français</a>
-                    <a class="btn btn-secondary" lang="ar" dir="rtl" th:href="@{/language(lang='ar',redirect=${#httpServletRequest.requestURI})}">العربية</a>
-                </div>
-                <p class="text-muted small mt-3 mb-0">You can always change this later in Settings.</p>
-            </div>
-        </div>
+        <div th:if="${showLanguagePopup}" id="language-popup-overlay">BARE_POPUP_TEST</div>
+        <!-- DEBUG_AFTER_DIV -->
         <script th:if="${showLanguagePopup}" th:src="@{/js/language-popup.js}"></script>
     </th:block>
 
