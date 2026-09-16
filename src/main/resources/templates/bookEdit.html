@@ -1,40 +1,41 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: pageHead('Edit Book')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{bookEdit.edit.book})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main class="page-body">
 <div class="container my-5 p-5 form-panel" style="max-width: 640px;">
-    <span class="eyebrow d-block text-center mb-2">Editing</span>
-    <h4 class="text-center">Edit Book</h4>
+    <span th:text="#{bookEdit.editing}" class="eyebrow d-block text-center mb-2">Editing</span>
+    <h4 th:text="#{bookEdit.edit.book}" class="text-center">Edit Book</h4>
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
     <form th:action="@{/save}" method="post" th:object="${book}" enctype="multipart/form-data">
         <input type="hidden" name="id" th:value="${book.id}">
         <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
+            <label th:text="#{bookEdit.name}" for="name" class="form-label">Name</label>
             <input type="text" id="name" class="form-control" name="name" th:value="${book.name}">
         </div>
 
         <div class="mb-3">
-            <label for="author" class="form-label">Author</label>
+            <label th:text="#{bookEdit.author}" for="author" class="form-label">Author</label>
             <input type="text" id="author" class="form-control" name="author" th:value="${book.author}">
         </div>
 
         <div class="mb-4">
-            <label for="cover" class="form-label">Cover image</label>
+            <label th:text="#{bookEdit.cover.image}" for="cover" class="form-label">Cover image</label>
             <div th:if="${book.coverImageUrl}" class="mb-2">
-                <img th:src="@{${book.coverImageUrl}}" alt="Current cover" style="height:90px;border-radius:4px;box-shadow:var(--shadow-card);">
+                <img th:src="@{${book.coverImageUrl}}" alt="Current cover" th:alt="#{bookEdit.current.cover}" style="height:90px;border-radius:4px;box-shadow:var(--shadow-card);">
             </div>
             <input type="file" id="cover" class="form-control" name="cover" accept="image/png,image/jpeg,image/webp,image/gif">
-            <div class="form-text">Leave empty to keep the current cover.</div>
+            <div th:text="#{bookEdit.leave.empty.to.keep.the}" class="form-text">Leave empty to keep the current cover.</div>
             <input type="hidden" name="existingCoverImageUrl" th:value="${book.coverImageUrl}">
         </div>
 
         <hr class="my-4">
 
         <div class="mb-4" th:if="${!#lists.isEmpty(allGenres)}">
-            <span class="eyebrow d-block mb-2">Genres</span>
+            <span th:text="#{bookEdit.genres}" class="eyebrow d-block mb-2">Genres</span>
             <div class="genre-picker">
                 <label class="genre-chip-toggle" th:each="genre : ${allGenres}">
                     <input type="checkbox" name="genreIds" th:value="${genre.id}"
@@ -48,8 +49,8 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <span class="eyebrow d-block">Key takeaways</span>
-                <span class="text-muted small">1&ndash;10 short pages, each with a heading and the idea itself.</span>
+                <span th:text="#{bookEdit.key.takeaways}" class="eyebrow d-block">Key takeaways</span>
+                <span th:text="#{bookEdit.1.ndash.10.short.pages}" class="text-muted small">1&ndash;10 short pages, each with a heading and the idea itself.</span>
             </div>
             <button type="button" class="btn btn-outline-brass btn-sm" onclick="addTakeaway()">
                 <i class="fa-solid fa-plus me-1"></i> Add another
@@ -59,18 +60,18 @@
         <div id="takeaways-container">
             <div class="takeaway-row mb-3 p-3" th:each="page, iter : ${book.takeaways}">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="eyebrow">Takeaway</span>
-                    <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="removeTakeaway(this)">Remove</button>
+                    <span th:text="#{bookEdit.takeaway}" class="eyebrow">Takeaway</span>
+                    <button th:text="#{bookEdit.remove}" type="button" class="btn btn-sm btn-link text-danger p-0" onclick="removeTakeaway(this)">Remove</button>
                 </div>
                 <input type="text" class="form-control mb-2" data-field="heading"
-                       th:name="|takeaways[${iter.index}].heading|" th:value="${page.heading}" placeholder="Heading">
+                       th:name="|takeaways[${iter.index}].heading|" th:value="${page.heading}" placeholder="Heading" th:placeholder="#{bookEdit.heading}">
                 <textarea class="form-control" data-field="content" rows="3"
-                          th:name="|takeaways[${iter.index}].content|" th:text="${page.content}" placeholder="What's the key idea?"></textarea>
+                          th:name="|takeaways[${iter.index}].content|" th:text="${page.content}" placeholder="What's the key idea?" th:placeholder="#{bookEdit.what.s.the.key.idea}"></textarea>
             </div>
         </div>
 
         <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button th:text="#{bookEdit.submit}" type="submit" class="btn btn-primary">Submit</button>
         </div>
     </form>
 </div>

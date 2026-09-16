@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -20,7 +21,7 @@
 <div class="container my-5" style="max-width: 560px;">
 
     <div class="text-center mb-4">
-        <img th:if="${book.coverImageUrl}" th:src="@{${book.coverImageUrl}}" alt="Cover"
+        <img th:if="${book.coverImageUrl}" th:src="@{${book.coverImageUrl}}" alt="Cover" th:alt="#{bookShare.cover}"
              style="width:120px;height:auto;border-radius:6px;box-shadow:var(--shadow-card);">
         <span class="eyebrow d-block mt-3" th:text="${book.author}">Author</span>
         <h2 class="mb-2" th:text="${book.name}">Book title</h2>
@@ -36,7 +37,7 @@
             <span class="text-muted">(<span th:text="${ratingSummary.count}"></span>
                 <span th:text="${ratingSummary.count == 1 ? 'review' : 'reviews'}"></span>)</span>
         </span>
-        <span class="rating-badge text-muted" th:unless="${ratingSummary.count > 0}">No reviews yet</span>
+        <span th:text="#{bookShare.no.reviews.yet}" class="rating-badge text-muted" th:unless="${ratingSummary.count > 0}">No reviews yet</span>
 
         <span class="takeaway-tag d-block mt-2" th:if="${!#lists.isEmpty(book.takeaways)}">
             <i class="fa-solid fa-list-check"></i>
@@ -48,7 +49,7 @@
            just enough that someone deciding whether to sign up can see
            what they'd actually get. */-->
     <div class="form-panel p-4 p-md-5 mb-4" th:if="${teaser != null}">
-        <span class="eyebrow d-block mb-2">A first look</span>
+        <span th:text="#{bookShare.a.first.look}" class="eyebrow d-block mb-2">A first look</span>
         <h4 th:text="${teaser.heading}">Heading</h4>
         <p style="white-space: pre-line;" th:text="${teaser.content}">Content</p>
         <p class="text-muted small mb-0" th:if="${#lists.size(book.takeaways) > 1}">
@@ -58,9 +59,9 @@
     </div>
 
     <div class="empty-state mb-4" th:if="${teaser == null}">
-        <span class="eyebrow">Nothing here yet</span>
-        <h3>No takeaways yet</h3>
-        <p>This book hasn't been summarized yet.</p>
+        <span th:text="#{bookShare.nothing.here.yet}" class="eyebrow">Nothing here yet</span>
+        <h3 th:text="#{bookShare.no.takeaways.yet}">No takeaways yet</h3>
+        <p th:text="#{bookShare.this.book.hasn.t.been}">This book hasn't been summarized yet.</p>
     </div>
 
     <div class="text-center">
@@ -76,7 +77,7 @@
             Sign in to read the full book <i class="fa-solid fa-arrow-right ms-1"></i>
         </a>
         <p class="text-muted small mt-3 mb-0" sec:authorize="isAnonymous()">
-            New here? <a th:href="@{/register}">Create a free account</a> - it only takes a minute.
+            New here? <a th:text="#{bookShare.create.a.free.account}" th:href="@{/register}">Create a free account</a> - it only takes a minute.
         </p>
 
         <button type="button" class="btn btn-link mt-2" id="share-copy-btn" onclick="copyShareLink()">

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -71,19 +72,19 @@
                markup sent to them at all. */-->
         <div th:if="${showLanguagePopup}" id="language-popup-overlay" class="confirm-overlay">
             <div class="confirm-card is-gentle language-popup-card" role="dialog" aria-modal="true"
-                aria-label="Choose your language">
-                <button type="button" class="language-popup-close" aria-label="Close">
+                aria-label="Choose your language" th:aria-label="#{fragments_layout.choose.your.language}">
+                <button type="button" class="language-popup-close" aria-label="Close" th:aria-label="#{fragments_layout.close}">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
                 <div class="confirm-icon"><i class="fa-solid fa-globe"></i></div>
-                <p class="mb-1">Choose your language</p>
-                <p class="text-muted small mb-3" dir="rtl" lang="ar">اختر لغتك &middot; Choisissez votre langue</p>
+                <p th:text="#{fragments_layout.choose.your.language}" class="mb-1">Choose your language</p>
+                <p th:text="#{fragments_layout.middot.choisissez.votre.langue}" class="text-muted small mb-3" dir="rtl" lang="ar">اختر لغتك &middot; Choisissez votre langue</p>
                 <div class="language-popup-options">
-                    <a class="btn btn-secondary" lang="en" th:href="@{/language(lang='en',redirect=${#httpServletRequest != null ? #httpServletRequest.requestURI : '/'})}">English</a>
-                    <a class="btn btn-secondary" lang="fr" th:href="@{/language(lang='fr',redirect=${#httpServletRequest != null ? #httpServletRequest.requestURI : '/'})}">Français</a>
+                    <a th:text="#{fragments_layout.english}" class="btn btn-secondary" lang="en" th:href="@{/language(lang='en',redirect=${#httpServletRequest != null ? #httpServletRequest.requestURI : '/'})}">English</a>
+                    <a th:text="#{fragments_layout.fran.ais}" class="btn btn-secondary" lang="fr" th:href="@{/language(lang='fr',redirect=${#httpServletRequest != null ? #httpServletRequest.requestURI : '/'})}">Français</a>
                     <a class="btn btn-secondary" lang="ar" dir="rtl" th:href="@{/language(lang='ar',redirect=${#httpServletRequest != null ? #httpServletRequest.requestURI : '/'})}">العربية</a>
                 </div>
-                <p class="text-muted small mt-3 mb-0">You can always change this later in Settings.</p>
+                <p th:text="#{fragments_layout.you.can.always.change.this}" class="text-muted small mt-3 mb-0">You can always change this later in Settings.</p>
             </div>
         </div>
         <script th:if="${showLanguagePopup}" th:src="@{/js/language-popup.js}"></script>
@@ -137,29 +138,29 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
                 <i class="fa-solid fa-feather-pointed brand-mark"></i>
-                <span>BookStore</span>
+                <span th:text="#{fragments_layout.bookstore}">BookStore</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+                    aria-expanded="false" aria-label="Toggle navigation" th:aria-label="#{fragments_layout.toggle.navigation}">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a th:text="#{fragments_layout.home}" class="nav-link" href="/">Home</a></li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/available_books">Available Books</a>
+                        <a th:text="#{fragments_layout.available.books}" class="nav-link" href="/available_books">Available Books</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/genres">Genres</a>
+                        <a th:text="#{fragments_layout.genres}" class="nav-link" href="/genres">Genres</a>
                     </li>
                     <!--/* Librarian-only, kept as two plain links rather than a dropdown -
                            just two items isn't worth the extra click to reveal. */-->
                     <li class="nav-item" sec:authorize="hasRole('LIBRARIAN')">
-                        <a class="nav-link" href="/book_register">Add Books</a>
+                        <a th:text="#{fragments_layout.add.books}" class="nav-link" href="/book_register">Add Books</a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('LIBRARIAN')">
-                        <a class="nav-link" href="/admin/users">Manage Users</a>
+                        <a th:text="#{fragments_layout.manage.users}" class="nav-link" href="/admin/users">Manage Users</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav mb-2 mb-lg-0 align-items-lg-center">
@@ -167,7 +168,7 @@
                            previously duplicated (once here for anonymous, once inside
                            the account dropdown for logged-in users). */-->
                     <li class="nav-item">
-                        <button type="button" class="nav-link theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light theme">
+                        <button type="button" class="nav-link theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light theme" th:title="#{fragments_layout.toggle.dark.light.theme}">
                             <span class="theme-icon-stack">
                                 <i class="fa-solid fa-sun theme-icon-light"></i>
                                 <i class="fa-solid fa-moon theme-icon-dark"></i>
@@ -175,10 +176,10 @@
                         </button>
                     </li>
                     <li class="nav-item" sec:authorize="isAnonymous()">
-                        <a class="nav-link" href="/login">Login</a>
+                        <a th:text="#{fragments_layout.login}" class="nav-link" href="/login">Login</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAnonymous()">
-                        <a class="nav-link" href="/register">Register</a>
+                        <a th:text="#{fragments_layout.register}" class="nav-link" href="/register">Register</a>
                     </li>
                     <!--/* The one account menu, for both mobile and desktop - Profile,
                            Settings, and Logout live here, behind the avatar. My Books
@@ -189,7 +190,7 @@
                            data-bs-toggle="dropdown" aria-expanded="false">
                             <img th:if="${#authentication.principal.avatarUrl}"
                                  th:src="@{${#authentication.principal.avatarUrl}}"
-                                 alt="Avatar" class="user-menu-avatar">
+                                 alt="Avatar" th:alt="#{fragments_layout.avatar}" class="user-menu-avatar">
                             <span th:unless="${#authentication.principal.avatarUrl}"
                                   class="user-menu-avatar user-menu-avatar-fallback"
                                   th:text="${#strings.toUpperCase(#strings.substring(#authentication.principal.username,0,1))}">U</span>
@@ -225,20 +226,20 @@
         <div class="container d-flex flex-wrap justify-content-between gap-3">
             <div>
                 <i class="fa-solid fa-feather-pointed brand-mark"></i>
-                <strong>BookStore</strong> — every book has a spine, every spine tells you something.
+                <strong th:text="#{fragments_layout.bookstore}">BookStore</strong> — every book has a spine, every spine tells you something.
             </div>
             <div>
-                <a href="/">Home</a>
+                <a th:text="#{fragments_layout.home}" href="/">Home</a>
                 <span class="mx-2">·</span>
-                <a href="/available_books">Available Books</a>
+                <a th:text="#{fragments_layout.available.books}" href="/available_books">Available Books</a>
                 <span class="mx-2">·</span>
-                <a href="/genres">Genres</a>
+                <a th:text="#{fragments_layout.genres}" href="/genres">Genres</a>
                 <span class="mx-2">·</span>
-                <a href="/about">About</a>
+                <a th:text="#{fragments_layout.about}" href="/about">About</a>
                 <span class="mx-2">·</span>
-                <a href="/privacy">Privacy</a>
+                <a th:text="#{fragments_layout.privacy}" href="/privacy">Privacy</a>
                 <span class="mx-2">·</span>
-                <a href="/terms">Terms</a>
+                <a th:text="#{fragments_layout.terms}" href="/terms">Terms</a>
             </div>
         </div>
     </footer>

@@ -1,14 +1,15 @@
+
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragments/layout :: pageHead('Register a Book')}"></head>
+  <head th:replace="~{fragments/layout :: pageHead(#{bookRegister.register.a.book})}"></head>
   <body>
     <div th:replace="~{fragments/layout :: navbar}"></div>
 
     <main class="page-body">
       <div class="container my-5 p-5 form-panel" style="max-width: 720px">
-        <span class="eyebrow d-block text-center mb-2">Librarian tools</span>
-        <h4 class="text-center">Add Books</h4>
-        <p class="text-center text-muted small mb-4">
+        <span th:text="#{bookRegister.librarian.tools}" class="eyebrow d-block text-center mb-2">Librarian tools</span>
+        <h4 th:text="#{bookRegister.add.books}" class="text-center">Add Books</h4>
+        <p th:text="#{bookRegister.register.one.book.with.its}" class="text-center text-muted small mb-4">
           Register one book with its takeaways, or paste a JSON array to
           import several at once.
         </p>
@@ -45,7 +46,7 @@
           enctype="multipart/form-data"
         >
           <div class="mb-3">
-            <label for="name" class="form-label">Book Name</label>
+            <label th:text="#{bookRegister.book.name}" for="name" class="form-label">Book Name</label>
             <input
               type="text"
               id="name"
@@ -56,7 +57,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="author" class="form-label">The Author</label>
+            <label th:text="#{bookRegister.the.author}" for="author" class="form-label">The Author</label>
             <input
               type="text"
               id="author"
@@ -68,7 +69,7 @@
           <div class="mb-4">
             <label for="cover" class="form-label"
               >Cover image
-              <span class="text-muted fw-normal">(optional)</span></label
+              <span th:text="#{bookRegister.optional}" class="text-muted fw-normal">(optional)</span></label
             >
             <input
               type="file"
@@ -85,7 +86,7 @@
           </div>
 
           <div class="mb-4" th:if="${!#lists.isEmpty(allGenres)}">
-            <span class="eyebrow d-block mb-2">Genres</span>
+            <span th:text="#{bookRegister.genres}" class="eyebrow d-block mb-2">Genres</span>
             <div class="genre-picker">
               <label class="genre-chip-toggle" th:each="genre : ${allGenres}">
                 <input
@@ -99,7 +100,7 @@
             </div>
             <p class="text-muted small mt-2 mb-0">
               Don't see the genre you need? Genre names typed into a
-              <a href="#bulk-pane" data-bs-toggle="tab" data-bs-target="#bulk-pane">Bulk Import</a>
+              <a th:text="#{bookRegister.bulk.import}" href="#bulk-pane" data-bs-toggle="tab" data-bs-target="#bulk-pane">Bulk Import</a>
               are created automatically.
             </p>
           </div>
@@ -108,8 +109,8 @@
 
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-              <span class="eyebrow d-block">Key takeaways</span>
-              <span class="text-muted small"
+              <span th:text="#{bookRegister.key.takeaways}" class="eyebrow d-block">Key takeaways</span>
+              <span th:text="#{bookRegister.1.ndash.10.short.pages}" class="text-muted small"
                 >1&ndash;10 short pages, each with a heading and the idea
                 itself.</span
               >
@@ -128,8 +129,8 @@
               <div
                 class="d-flex justify-content-between align-items-center mb-2"
               >
-                <span class="eyebrow">Takeaway</span>
-                <button
+                <span th:text="#{bookRegister.takeaway}" class="eyebrow">Takeaway</span>
+                <button th:text="#{bookRegister.remove}"
                   type="button"
                   class="btn btn-sm btn-link text-danger p-0"
                   onclick="removeTakeaway(this)"
@@ -142,49 +143,49 @@
                 class="form-control mb-2"
                 data-field="heading"
                 name="takeaways[0].heading"
-                placeholder="Heading, e.g. 'Start before you're ready'"
+                placeholder="Heading, e.g. 'Start before you're ready'" th:placeholder="#{bookRegister.heading.e.g.start.before}"
               />
               <textarea
                 class="form-control"
                 data-field="content"
                 name="takeaways[0].content"
                 rows="3"
-                placeholder="What's the key idea, in a few sentences?"
+                placeholder="What's the key idea, in a few sentences?" th:placeholder="#{bookRegister.what.s.the.key.idea}"
               ></textarea>
             </div>
           </div>
 
           <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button th:text="#{bookRegister.submit}" type="submit" class="btn btn-primary">Submit</button>
           </div>
         </form>
         </div>
 
         <div class="tab-pane fade" th:classappend="${activeTab == 'bulk'} ? 'show active'" id="bulk-pane"
              role="tabpanel" aria-labelledby="bulk-tab" tabindex="0">
-          <p class="text-muted mb-3">Paste a JSON array of books - faster than filling out the form one at a time.</p>
+          <p th:text="#{bookRegister.paste.a.json.array.of}" class="text-muted mb-3">Paste a JSON array of books - faster than filling out the form one at a time.</p>
 
           <div class="alert alert-success" th:if="${message}" th:text="${message}"></div>
           <div class="alert alert-danger" th:if="${errors == null and error != null and activeTab == 'bulk'}" th:text="${error}"></div>
           <div class="alert alert-danger" th:if="${errors}">
-            <strong>Some rows were skipped:</strong>
+            <strong th:text="#{bookRegister.some.rows.were.skipped}">Some rows were skipped:</strong>
             <ul class="mb-0">
               <li th:each="e : ${errors}" th:text="${e}"></li>
             </ul>
           </div>
 
           <form th:action="@{/admin/books/import}" method="post">
-            <label for="json" class="form-label">Books (JSON array)</label>
+            <label th:text="#{bookRegister.books.json.array}" for="json" class="form-label">Books (JSON array)</label>
             <textarea id="json" name="json" class="form-control" rows="14"
                       style="font-family: var(--font-mono); font-size: 0.85rem;"
                       th:text="${submittedJson}"></textarea>
-            <button type="submit" class="btn btn-primary mt-3">Import</button>
+            <button th:text="#{bookRegister.import}" type="submit" class="btn btn-primary mt-3">Import</button>
           </form>
 
           <details class="mt-4">
-            <summary class="eyebrow" style="cursor:pointer;">Expected format</summary>
+            <summary th:text="#{bookRegister.expected.format}" class="eyebrow" style="cursor:pointer;">Expected format</summary>
             <pre class="form-panel p-3 mt-2" style="font-size: 0.8rem; overflow-x: auto;" th:text="${exampleJson}"></pre>
-            <p class="text-muted small">Each book needs 1&ndash;10 takeaways. Rows that fail validation are skipped and listed above - everything else still imports.</p>
+            <p th:text="#{bookRegister.each.book.needs.1.ndash}" class="text-muted small">Each book needs 1&ndash;10 takeaways. Rows that fail validation are skipped and listed above - everything else still imports.</p>
           </details>
         </div>
         </div>

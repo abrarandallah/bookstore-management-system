@@ -1,16 +1,17 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: pageHead('Verification Link Invalid')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{verifyEmailInvalid.verification.link.invalid})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main class="page-body">
 <div class="container mt-5 mb-5 text-center">
     <div class="empty-state" style="max-width: 480px; margin: 0 auto;">
-        <span class="eyebrow">Link expired</span>
-        <h3>Verification link invalid</h3>
+        <span th:text="#{verifyEmailInvalid.link.expired}" class="eyebrow">Link expired</span>
+        <h3 th:text="#{verifyEmailInvalid.verification.link.invalid.1}">Verification link invalid</h3>
         <p th:text="${error}"></p>
-        <a class="btn btn-primary" href="/resend-verification">Request a new link</a>
+        <a th:text="#{verifyEmailInvalid.request.a.new.link}" class="btn btn-primary" href="/resend-verification">Request a new link</a>
     </div>
 </div>
 </main>

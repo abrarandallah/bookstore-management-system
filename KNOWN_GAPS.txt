@@ -1,0 +1,29 @@
+KNOWN GAPS - read this before spot-checking
+
+These are deliberate, not bugs I missed:
+
+1. Four strings inside the "Add a takeaway" JavaScript (in
+   fragments/layout.html, inside the <script> block) were left
+   untranslated on purpose: "Takeaway", "Remove", the "Heading"
+   placeholder, and the "What's the key idea?" placeholder. These are
+   built as plain JavaScript strings when a new takeaway row is added
+   to a form in the browser, not rendered by Thymeleaf, so the #{key}
+   mechanism doesn't reach them. This only affects the small
+   "add takeaway" authoring form, not anything a reader sees. Left as
+   a known gap given the time budget - can be revisited later if
+   wanted (would need a small separate fix, e.g. Thymeleaf rendering
+   the translated strings into hidden elements the JavaScript reads
+   from).
+
+2. One key, fragments_layout.middot.choisissez.votre.langue, is
+   deliberately excluded from auto-translation (see
+   translate_ui_messages.py's EXCLUDE_FROM_TRANSLATION). Its English
+   value is "اختر لغتك &middot; Choisissez votre langue" - it already
+   intentionally mixes Arabic and French, shown in the language-picker
+   popup itself to preview both scripts to someone who currently only
+   reads the English UI. Running it through LibreTranslate would have
+   produced nonsense. It's copied through unchanged into every
+   language's file instead.
+
+Everything else (327 total UI strings across all 28 templates) went
+through the normal extraction + translation pipeline.

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: pageHead(${localizedBook.name})}"></head>
@@ -7,7 +8,7 @@
 <main class="page-body">
 <div class="container my-5" style="max-width: 640px;">
     <div class="d-flex align-items-center gap-3 mb-4">
-        <img th:if="${book.coverImageUrl}" th:src="@{${book.coverImageUrl}}" alt="Cover"
+        <img th:if="${book.coverImageUrl}" th:src="@{${book.coverImageUrl}}" alt="Cover" th:alt="#{bookRead.cover}"
              style="width:64px;height:auto;border-radius:4px;box-shadow:var(--shadow-card);">
         <div>
             <span class="eyebrow d-block" th:text="${localizedBook.author}">Author</span>
@@ -17,18 +18,18 @@
                 <span th:text="${#numbers.formatDecimal(ratingSummary.average, 1, 1)}">4.3</span>
                 <span class="text-muted">(<span th:text="${ratingSummary.count}"></span> <span th:text="${ratingSummary.count == 1 ? 'review' : 'reviews'}"></span>)</span>
             </span>
-            <span class="rating-badge mt-1 text-muted" th:unless="${ratingSummary.count > 0}">No reviews yet</span>
+            <span th:text="#{bookRead.no.reviews.yet}" class="rating-badge mt-1 text-muted" th:unless="${ratingSummary.count > 0}">No reviews yet</span>
         </div>
-        <a th:href="@{/available_books/{id}/share(id=${book.id})}" class="icon-link ms-auto" title="Share this book"
+        <a th:href="@{/available_books/{id}/share(id=${book.id})}" class="icon-link ms-auto" title="Share this book" th:title="#{bookRead.share.this.book}"
            target="_blank" rel="noopener">
             <i class="fa-solid fa-share-nodes"></i>
         </a>
     </div>
 
     <div th:if="${#lists.isEmpty(book.takeaways)}" class="empty-state">
-        <span class="eyebrow">Nothing here yet</span>
-        <h3>No takeaways yet</h3>
-        <p>This book hasn't been summarized yet.</p>
+        <span th:text="#{bookRead.nothing.here.yet}" class="eyebrow">Nothing here yet</span>
+        <h3 th:text="#{bookRead.no.takeaways.yet}">No takeaways yet</h3>
+        <p th:text="#{bookRead.this.book.hasn.t.been}">This book hasn't been summarized yet.</p>
     </div>
 
     <div th:unless="${#lists.isEmpty(book.takeaways)}" class="reader-panel form-panel p-4 p-md-5">
@@ -70,22 +71,22 @@
             <div class="star-rating mb-3">
                 <input type="radio" id="star5" name="rating" value="5" required
                        th:checked="${ownReview != null and ownReview.rating == 5}">
-                <label for="star5" title="5 stars"><i class="fa-solid fa-star"></i></label>
+                <label for="star5" title="5 stars" th:title="#{bookRead.5.stars}"><i class="fa-solid fa-star"></i></label>
                 <input type="radio" id="star4" name="rating" value="4" required
                        th:checked="${ownReview != null and ownReview.rating == 4}">
-                <label for="star4" title="4 stars"><i class="fa-solid fa-star"></i></label>
+                <label for="star4" title="4 stars" th:title="#{bookRead.4.stars}"><i class="fa-solid fa-star"></i></label>
                 <input type="radio" id="star3" name="rating" value="3" required
                        th:checked="${ownReview != null and ownReview.rating == 3}">
-                <label for="star3" title="3 stars"><i class="fa-solid fa-star"></i></label>
+                <label for="star3" title="3 stars" th:title="#{bookRead.3.stars}"><i class="fa-solid fa-star"></i></label>
                 <input type="radio" id="star2" name="rating" value="2" required
                        th:checked="${ownReview != null and ownReview.rating == 2}">
-                <label for="star2" title="2 stars"><i class="fa-solid fa-star"></i></label>
+                <label for="star2" title="2 stars" th:title="#{bookRead.2.stars}"><i class="fa-solid fa-star"></i></label>
                 <input type="radio" id="star1" name="rating" value="1" required
                        th:checked="${ownReview != null and ownReview.rating == 1}">
-                <label for="star1" title="1 star"><i class="fa-solid fa-star"></i></label>
+                <label for="star1" title="1 star" th:title="#{bookRead.1.star}"><i class="fa-solid fa-star"></i></label>
             </div>
             <textarea name="comment" class="form-control mb-3" rows="3" maxlength="2000"
-                      placeholder="What did you think? (optional)"
+                      placeholder="What did you think? (optional)" th:placeholder="#{bookRead.what.did.you.think.optional}"
                       th:text="${ownReview != null ? ownReview.comment : ''}"></textarea>
             <button type="submit" class="btn btn-primary btn-sm"
                     th:text="${ownReview != null ? 'Update review' : 'Submit review'}"></button>
@@ -94,18 +95,18 @@
               th:action="@{/available_books/{bookId}/review/{reviewId}/delete(bookId=${book.id}, reviewId=${ownReview.id})}"
               method="post" class="d-inline mt-2"
               onsubmit="return appConfirm(event, 'Delete your review?');">
-            <button type="submit" class="btn btn-link btn-sm text-danger p-0">Delete my review</button>
+            <button th:text="#{bookRead.delete.my.review}" type="submit" class="btn btn-link btn-sm text-danger p-0">Delete my review</button>
         </form>
     </div>
     <div class="form-panel p-4 mt-4 text-center" sec:authorize="isAnonymous()">
-        <span class="eyebrow d-block mb-2">Rate this book</span>
-        <p class="mb-3 text-muted">Log in to rate and review this book, and to pick up your reading progress next time.</p>
-        <a th:href="@{/login}" class="btn btn-primary btn-sm">Log in</a>
-        <a th:href="@{/register}" class="btn btn-outline-brass btn-sm">Create an account</a>
+        <span th:text="#{bookRead.rate.this.book}" class="eyebrow d-block mb-2">Rate this book</span>
+        <p th:text="#{bookRead.log.in.to.rate.and}" class="mb-3 text-muted">Log in to rate and review this book, and to pick up your reading progress next time.</p>
+        <a th:text="#{bookRead.log.in}" th:href="@{/login}" class="btn btn-primary btn-sm">Log in</a>
+        <a th:text="#{bookRead.create.an.account}" th:href="@{/register}" class="btn btn-outline-brass btn-sm">Create an account</a>
     </div>
 
     <div class="mt-4" th:unless="${#lists.isEmpty(reviews)}">
-        <span class="eyebrow d-block mb-3">Reader reviews</span>
+        <span th:text="#{bookRead.reader.reviews}" class="eyebrow d-block mb-3">Reader reviews</span>
         <div class="review-card mb-3" th:each="r : ${reviews}">
             <div class="d-flex justify-content-between align-items-start">
                 <div>

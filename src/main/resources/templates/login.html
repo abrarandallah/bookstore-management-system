@@ -1,6 +1,7 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: pageHead('Login')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{login.login})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
@@ -9,43 +10,43 @@
     <div class="row justify-content-center">
         <div class="col-md-5">
             <div class="auth-card p-4">
-                <h4>Welcome back</h4>
-                <div class="alert alert-success" th:if="${param.registered != null}">
+                <h4 th:text="#{login.welcome.back}">Welcome back</h4>
+                <div th:text="#{login.account.created.successfully.check.your}" class="alert alert-success" th:if="${param.registered != null}">
                     Account created successfully. Check your email for a verification link before logging in.
                 </div>
-                <div class="alert alert-success" th:if="${param.reset != null}">
+                <div th:text="#{login.your.password.has.been.reset}" class="alert alert-success" th:if="${param.reset != null}">
                     Your password has been reset. Please log in.
                 </div>
-                <div class="alert alert-success" th:if="${param.accountDeleted != null}">
+                <div th:text="#{login.your.account.has.been.deleted}" class="alert alert-success" th:if="${param.accountDeleted != null}">
                     Your account has been deleted.
                 </div>
-                <div class="alert alert-success" th:if="${param.verified != null}">
+                <div th:text="#{login.your.email.has.been.verified}" class="alert alert-success" th:if="${param.verified != null}">
                     Your email has been verified. Please log in.
                 </div>
-                <div class="alert alert-danger" th:if="${param.error != null}">
+                <div th:text="#{login.invalid.username.email.or.password}" class="alert alert-danger" th:if="${param.error != null}">
                     Invalid username/email or password.
                 </div>
                 <div class="alert alert-danger" th:if="${param.unverified != null}">
-                    Please verify your email before logging in. <a href="/resend-verification">Resend verification email</a>
+                    Please verify your email before logging in. <a th:text="#{login.resend.verification.email}" href="/resend-verification">Resend verification email</a>
                 </div>
-                <div class="alert alert-danger" th:if="${param.rateLimited != null}">
+                <div th:text="#{login.too.many.login.attempts.please}" class="alert alert-danger" th:if="${param.rateLimited != null}">
                     Too many login attempts. Please try again in a few minutes.
                 </div>
                 <form th:action="@{/login}" method="post">
                     <div class="mb-3">
-                        <label for="usernameOrEmail" class="form-label">Username or Email</label>
-                        <input type="text" class="form-control" id="usernameOrEmail" name="usernameOrEmail" placeholder="Enter your username or email" required>
+                        <label th:text="#{login.username.or.email}" for="usernameOrEmail" class="form-label">Username or Email</label>
+                        <input type="text" class="form-control" id="usernameOrEmail" name="usernameOrEmail" placeholder="Enter your username or email" th:placeholder="#{login.enter.your.username.or.email}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                        <label th:text="#{login.password}" for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" th:placeholder="#{login.enter.your.password}" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    <button th:text="#{login.login}" type="submit" class="btn btn-primary w-100">Login</button>
                     <div class="text-center mt-3">
-                        <a href="/forgot-password">Forgot password?</a>
+                        <a th:text="#{login.forgot.password}" href="/forgot-password">Forgot password?</a>
                     </div>
                     <div class="text-center mt-2">
-                        <a href="/register">Don't have an account yet? Create one here</a>
+                        <a th:text="#{login.don.t.have.an.account}" href="/register">Don't have an account yet? Create one here</a>
                     </div>
                 </form>
             </div>

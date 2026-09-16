@@ -1,6 +1,7 @@
+
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/layout :: pageHead('Home')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{home.home})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
@@ -9,26 +10,26 @@
     <div class="container hero-section">
         <div class="row align-items-center g-5">
             <div class="col-lg-6 hero-copy">
-                <span class="eyebrow">Big ideas, small time commitment</span>
-                <h1>Welcome to BookStore</h1>
-                <p>
+                <span th:text="#{home.big.ideas.small.time.commitment}" class="eyebrow">Big ideas, small time commitment</span>
+                <h1 th:text="#{home.welcome.to.bookstore}">Welcome to BookStore</h1>
+                <p th:text="#{home.every.book.here.is.distilled}">
                     Every book here is distilled into 1&ndash;10 short takeaways &mdash; the ideas worth keeping,
                     without the hundreds of pages around them. Good for a first taste of a book, or for
                     when you just don't have the time to read the whole thing.
                 </p>
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="/available_books" class="btn btn-primary">Browse Books</a>
-                    <a href="/login" class="btn btn-outline-brass" sec:authorize="isAnonymous()">Login</a>
-                    <a href="/register" class="btn btn-outline-brass" sec:authorize="isAnonymous()">Create an account</a>
+                    <a th:text="#{home.browse.books}" href="/available_books" class="btn btn-primary">Browse Books</a>
+                    <a th:text="#{home.login}" href="/login" class="btn btn-outline-brass" sec:authorize="isAnonymous()">Login</a>
+                    <a th:text="#{home.create.an.account}" href="/register" class="btn btn-outline-brass" sec:authorize="isAnonymous()">Create an account</a>
                     <a href="/random_book" class="btn btn-outline-brass">
                         <i class="fa-solid fa-dice me-1"></i> Surprise Me
                     </a>
-                    <a href="/about" class="btn btn-outline-brass">How it works</a>
+                    <a th:text="#{home.how.it.works}" href="/about" class="btn btn-outline-brass">How it works</a>
                 </div>
             </div>
             <div class="col-lg-6 text-center">
                 <div class="hero-figure">
-                    <img src="/img/bg.jpg" alt="A library section" class="book-cover"/>
+                    <img src="/img/bg.jpg" alt="A library section" th:alt="#{home.a.library.section}" class="book-cover"/>
                 </div>
             </div>
         </div>
@@ -36,34 +37,34 @@
 
     <!-- About teaser -->
     <div class="container my-5" id="how-it-works" style="max-width: 720px;">
-        <span class="eyebrow">How it works</span>
-        <h2 class="mb-3">About BookStore</h2>
-        <p>
+        <span th:text="#{home.how.it.works}" class="eyebrow">How it works</span>
+        <h2 th:text="#{home.about.bookstore}" class="mb-3">About BookStore</h2>
+        <p th:text="#{home.most.books.have.a.handful}">
             Most books have a handful of ideas worth remembering, wrapped in pages of story and
             repetition. BookStore distills each one into a few short takeaways you can read in
             minutes, not hours.
         </p>
-        <a href="/about" class="btn btn-outline-brass btn-sm">Learn more</a>
+        <a th:text="#{home.learn.more}" href="/about" class="btn btn-outline-brass btn-sm">Learn more</a>
     </div>
 
     <!-- Community Section -->
     <div class="container my-5">
-        <span class="eyebrow">Readers</span>
-        <h2 class="mb-4">Made for readers</h2>
+        <span th:text="#{home.readers}" class="eyebrow">Readers</span>
+        <h2 th:text="#{home.made.for.readers}" class="mb-4">Made for readers</h2>
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="hero-figure">
-                    <img src="/img/readers1.jpeg" alt="Reader in armchair" class="book-cover"/>
+                    <img src="/img/readers1.jpeg" alt="Reader in armchair" th:alt="#{home.reader.in.armchair}" class="book-cover"/>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="hero-figure">
-                    <img src="/img/readers2.jpeg" alt="Reader by window" class="book-cover"/>
+                    <img src="/img/readers2.jpeg" alt="Reader by window" th:alt="#{home.reader.by.window}" class="book-cover"/>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="hero-figure">
-                    <img src="/img/readers3.jpeg" alt="Children reading together" class="book-cover"/>
+                    <img src="/img/readers3.jpeg" alt="Children reading together" th:alt="#{home.children.reading.together}" class="book-cover"/>
                 </div>
             </div>
         </div>
@@ -71,10 +72,10 @@
 
     <!-- Closing Section -->
     <div class="container my-5 text-center">
-        <span class="eyebrow">Take a break</span>
-        <h2 class="mb-4">Read anywhere</h2>
+        <span th:text="#{home.take.a.break}" class="eyebrow">Take a break</span>
+        <h2 th:text="#{home.read.anywhere}" class="mb-4">Read anywhere</h2>
         <div class="hero-figure">
-            <img src="/img/nature.jpeg" alt="Reading outdoors under a tree" class="book-cover"/>
+            <img src="/img/nature.jpeg" alt="Reading outdoors under a tree" th:alt="#{home.reading.outdoors.under.a.tree}" class="book-cover"/>
         </div>
     </div>
 </main>

@@ -1,6 +1,7 @@
+
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/layout :: pageHead('Available Books')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{bookList.available.books})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
@@ -8,8 +9,8 @@
     <div class="container my-5">
         <div class="section-heading">
             <div>
-                <span class="eyebrow">The shelf</span>
-                <h2>Available Books</h2>
+                <span th:text="#{bookList.the.shelf}" class="eyebrow">The shelf</span>
+                <h2 th:text="#{bookList.available.books}">Available Books</h2>
             </div>
             <a th:href="@{/book_register}" class="btn btn-outline-brass" sec:authorize="hasRole('LIBRARIAN')">
                 <i class="fa-solid fa-plus me-1"></i> Register a book
@@ -20,27 +21,27 @@
             <div class="search-field">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="search" name="q" id="search-input" class="search-input"
-                       placeholder="Search by title or author&hellip;" th:value="${q}" autocomplete="off">
+                       placeholder="Search by title or author&hellip;" th:placeholder="#{bookList.search.by.title.or.author}" th:value="${q}" autocomplete="off">
             </div>
             <div class="search-divider"></div>
             <select name="genre" id="search-genre" class="search-sort" th:if="${!#lists.isEmpty(genres)}">
-                <option value="" th:selected="${selectedGenre == null}">All genres</option>
+                <option th:text="#{bookList.all.genres}" value="" th:selected="${selectedGenre == null}">All genres</option>
                 <option th:each="g : ${genres}" th:value="${g.id}" th:text="${g.name}"
                         th:selected="${selectedGenre != null and selectedGenre == g.id}"></option>
             </select>
             <div class="search-divider"></div>
             <select name="sort" id="search-sort" class="search-sort">
-                <option value="name_asc" th:selected="${sort == 'name_asc' or sort == null}">Title A&ndash;Z</option>
-                <option value="author_asc" th:selected="${sort == 'author_asc'}">Author A&ndash;Z</option>
-                <option value="newest" th:selected="${sort == 'newest'}">Newest first</option>
-                <option value="read_time_asc" th:selected="${sort == 'read_time_asc'}">Shortest read</option>
-                <option value="read_time_desc" th:selected="${sort == 'read_time_desc'}">Longest read</option>
+                <option th:text="#{bookList.title.a.ndash.z}" value="name_asc" th:selected="${sort == 'name_asc' or sort == null}">Title A&ndash;Z</option>
+                <option th:text="#{bookList.author.a.ndash.z}" value="author_asc" th:selected="${sort == 'author_asc'}">Author A&ndash;Z</option>
+                <option th:text="#{bookList.newest.first}" value="newest" th:selected="${sort == 'newest'}">Newest first</option>
+                <option th:text="#{bookList.shortest.read}" value="read_time_asc" th:selected="${sort == 'read_time_asc'}">Shortest read</option>
+                <option th:text="#{bookList.longest.read}" value="read_time_desc" th:selected="${sort == 'read_time_desc'}">Longest read</option>
             </select>
             <button type="submit" class="btn btn-secondary search-submit">
-                <span class="search-submit-text">Search</span>
+                <span th:text="#{bookList.search}" class="search-submit-text">Search</span>
                 <i class="fa-solid fa-circle-notch fa-spin search-submit-spinner" aria-hidden="true"></i>
             </button>
-            <a th:href="@{/available_books(sort=${sort}, genre=${selectedGenre})}"
+            <a th:text="#{bookList.clear}" th:href="@{/available_books(sort=${sort}, genre=${selectedGenre})}"
                th:classappend="${q == null or #strings.isEmpty(q)} ? 'd-none' : ''"
                id="search-clear" class="btn btn-link">Clear</a>
         </form>
@@ -48,27 +49,27 @@
         <div id="book-results">
             <th:block th:fragment="resultsFragment">
                 <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q)) and selectedGenre == null}" class="empty-state">
-                    <span class="eyebrow">Nothing here yet</span>
-                    <h3>The shelf is empty</h3>
-                    <p>No books have been registered for the store yet.</p>
+                    <span th:text="#{bookList.nothing.here.yet}" class="eyebrow">Nothing here yet</span>
+                    <h3 th:text="#{bookList.the.shelf.is.empty}">The shelf is empty</h3>
+                    <p th:text="#{bookList.no.books.have.been.registered}">No books have been registered for the store yet.</p>
                 </div>
 
                 <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q)) and selectedGenre != null}" class="empty-state">
-                    <span class="eyebrow">No matches</span>
-                    <h3>No books in this genre yet</h3>
-                    <p>Try a different genre, or clear the filter to see everything.</p>
+                    <span th:text="#{bookList.no.matches}" class="eyebrow">No matches</span>
+                    <h3 th:text="#{bookList.no.books.in.this.genre}">No books in this genre yet</h3>
+                    <p th:text="#{bookList.try.a.different.genre.or}">Try a different genre, or clear the filter to see everything.</p>
                 </div>
 
                 <div th:if="${#lists.isEmpty(book) and q != null and !#strings.isEmpty(q)}" class="empty-state">
-                    <span class="eyebrow">No matches</span>
+                    <span th:text="#{bookList.no.matches}" class="eyebrow">No matches</span>
                     <h3>Nothing matches "<span th:text="${q}"></span>"</h3>
-                    <p>Try a different title or author.</p>
+                    <p th:text="#{bookList.try.a.different.title.or}">Try a different title or author.</p>
                 </div>
 
                 <div class="book-grid" th:unless="${#lists.isEmpty(book)}">
                     <div class="book-card" th:each="b : ${book}"
                          th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(b.name.hashCode()) % 360} + ', 42%, 34%)'">
-                        <img th:if="${b.coverImageUrl}" th:src="@{${b.coverImageUrl}}" alt="Cover" class="book-cover mb-2">
+                        <img th:if="${b.coverImageUrl}" th:src="@{${b.coverImageUrl}}" alt="Cover" th:alt="#{bookList.cover}" class="book-cover mb-2">
                         <div class="book-author" th:text="${b.author}">Author</div>
                         <div class="book-title" th:text="${b.name}">Book title</div>
                         <div class="d-flex align-items-center gap-1 flex-wrap mb-1" th:if="${!#sets.isEmpty(b.genres)}">
@@ -82,29 +83,29 @@
                         <div class="d-flex align-items-center gap-2 flex-wrap">
                             <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
                                 <i class="fa-solid fa-list-check"></i>
-                                <span th:text="${#lists.size(b.takeaways)} + ' takeaways · ' + ${b.estimatedReadMinutes} + ' min read'"></span>
+                                <span th:text="${#lists.size(b.takeaways)} + ' takeaways Â· ' + ${b.estimatedReadMinutes} + ' min read'"></span>
                             </span>
                         </div>
                         <div class="book-actions">
-                            <a th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
+                            <a th:text="#{bookList.read}" th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
                             <form th:action="@{/mylist/{id}(id=${b.id})}" method="post" class="d-inline ajax-bookmark-form">
-                                <button type="submit" class="btn btn-link p-0 icon-link" style="border:none;background:none;" title="Add to My Books">
+                                <button type="submit" class="btn btn-link p-0 icon-link" style="border:none;background:none;" title="Add to My Books" th:title="#{bookList.add.to.my.books}">
                                     <i class="fa-solid fa-bookmark"></i>
                                 </button>
                             </form>
-                            <a th:href="@{/available_books/{id}/share(id=${b.id})}" class="icon-link" title="Share this book"
+                            <a th:href="@{/available_books/{id}/share(id=${b.id})}" class="icon-link" title="Share this book" th:title="#{bookList.share.this.book}"
                                target="_blank" rel="noopener">
                                 <i class="fa-solid fa-share-nodes"></i>
                             </a>
                             <a th:href="@{/editBook/{id}(id=${b.id})}" sec:authorize="hasRole('LIBRARIAN')" class="icon-link"
-                               title="Edit book" aria-label="Edit book">
+                               title="Edit book" th:title="#{bookList.edit.book}" aria-label="Edit book" th:aria-label="#{bookList.edit.book}">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
                             <form th:action="@{/deleteBook/{id}(id=${b.id})}" method="post" class="d-inline"
                                   sec:authorize="hasRole('LIBRARIAN')"
                                   onsubmit="return appConfirm(event, 'Delete this book? This cannot be undone.');">
                                 <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;"
-                                        title="Delete book" aria-label="Delete book">
+                                        title="Delete book" th:title="#{bookList.delete.book}" aria-label="Delete book" th:aria-label="#{bookList.delete.book}">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
@@ -113,10 +114,10 @@
                 </div>
 
                 <nav class="pagination-controls mt-4" th:if="${pagination != null and pagination.totalPages > 1}"
-                     aria-label="Book list pages">
+                     aria-label="Book list pages" th:aria-label="#{bookList.book.list.pages}">
                     <a th:if="${pagination.hasPrevious}" class="page-link"
                        th:href="@{/available_books(q=${q}, sort=${sort}, genre=${selectedGenre}, page=${pagination.page - 1})}"
-                       th:attr="data-page=${pagination.page - 1}" aria-label="Previous page">
+                       th:attr="data-page=${pagination.page - 1}" aria-label="Previous page" th:aria-label="#{bookList.previous.page}">
                         <i class="fa-solid fa-chevron-left"></i>
                     </a>
                     <span th:unless="${pagination.hasPrevious}" class="page-link disabled" aria-hidden="true">
@@ -132,7 +133,7 @@
 
                     <a th:if="${pagination.hasNext}" class="page-link"
                        th:href="@{/available_books(q=${q}, sort=${sort}, genre=${selectedGenre}, page=${pagination.page + 1})}"
-                       th:attr="data-page=${pagination.page + 1}" aria-label="Next page">
+                       th:attr="data-page=${pagination.page + 1}" aria-label="Next page" th:aria-label="#{bookList.next.page}">
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                     <span th:unless="${pagination.hasNext}" class="page-link disabled" aria-hidden="true">

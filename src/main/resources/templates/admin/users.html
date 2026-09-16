@@ -1,6 +1,7 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/layout :: pageHead('Manage Users')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{admin_users.manage.users})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
@@ -8,8 +9,8 @@
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="mb-1">Manage Users</h4>
-            <p class="text-muted mb-0">Promote readers to librarian, or reset anyone's password.</p>
+            <h4 th:text="#{admin_users.manage.users}" class="mb-1">Manage Users</h4>
+            <p th:text="#{admin_users.promote.readers.to.librarian.or}" class="text-muted mb-0">Promote readers to librarian, or reset anyone's password.</p>
         </div>
     </div>
 
@@ -20,19 +21,19 @@
         <div class="col-sm-4">
             <div class="card text-center py-3">
                 <div class="fs-3 fw-bold" th:text="${totalUsers}">0</div>
-                <div class="text-muted small">Total users</div>
+                <div th:text="#{admin_users.total.users}" class="text-muted small">Total users</div>
             </div>
         </div>
         <div class="col-sm-4">
             <div class="card text-center py-3">
                 <div class="fs-3 fw-bold" th:text="${librarianCount}">0</div>
-                <div class="text-muted small">Librarians</div>
+                <div th:text="#{admin_users.librarians}" class="text-muted small">Librarians</div>
             </div>
         </div>
         <div class="col-sm-4">
             <div class="card text-center py-3">
                 <div class="fs-3 fw-bold" th:text="${readerCount}">0</div>
-                <div class="text-muted small">Readers</div>
+                <div th:text="#{admin_users.readers}" class="text-muted small">Readers</div>
             </div>
         </div>
     </div>
@@ -42,12 +43,12 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
             <tr>
-                <th>User</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Change Role</th>
-                <th>Reset Password</th>
-                <th>Delete</th>
+                <th th:text="#{admin_users.user}">User</th>
+                <th th:text="#{admin_users.email}">Email</th>
+                <th th:text="#{admin_users.role}">Role</th>
+                <th th:text="#{admin_users.change.role}">Change Role</th>
+                <th th:text="#{admin_users.reset.password}">Reset Password</th>
+                <th th:text="#{admin_users.delete}">Delete</th>
             </tr>
             </thead>
             <tbody>
@@ -68,26 +69,26 @@
                 <td>
                     <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" class="d-flex gap-2">
                         <select name="role" class="form-select form-select-sm" style="width: auto;">
-                            <option value="ROLE_USER" th:selected="${u.role == 'ROLE_USER'}">Reader</option>
-                            <option value="ROLE_LIBRARIAN" th:selected="${u.role == 'ROLE_LIBRARIAN'}">Librarian</option>
+                            <option th:text="#{admin_users.reader}" value="ROLE_USER" th:selected="${u.role == 'ROLE_USER'}">Reader</option>
+                            <option th:text="#{admin_users.librarian}" value="ROLE_LIBRARIAN" th:selected="${u.role == 'ROLE_LIBRARIAN'}">Librarian</option>
                         </select>
-                        <button type="submit" class="btn btn-sm btn-outline-secondary">Save</button>
+                        <button th:text="#{admin_users.save}" type="submit" class="btn btn-sm btn-outline-secondary">Save</button>
                     </form>
                 </td>
                 <td>
                     <form th:action="@{/admin/users/{id}/reset-password(id=${u.id})}" method="post" class="d-flex gap-2">
                         <input type="password" name="newPassword" class="form-control form-control-sm"
-                               placeholder="New password" minlength="8" required style="width: 160px;">
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Reset</button>
+                               placeholder="New password" th:placeholder="#{admin_users.new.password}" minlength="8" required style="width: 160px;">
+                        <button th:text="#{admin_users.reset}" type="submit" class="btn btn-sm btn-outline-danger">Reset</button>
                     </form>
                 </td>
                 <td>
                     <form th:if="${u.usernameOrEmail != #authentication.name}"
                           th:action="@{/admin/users/{id}/delete(id=${u.id})}" method="post"
                           onsubmit="return appConfirm(event, 'Permanently delete this user and everything tied to their account? This cannot be undone.');">
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        <button th:text="#{admin_users.delete}" type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                     </form>
-                    <span th:unless="${u.usernameOrEmail != #authentication.name}" class="text-muted small">That's you</span>
+                    <span th:text="#{admin_users.that.s.you}" th:unless="${u.usernameOrEmail != #authentication.name}" class="text-muted small">That's you</span>
                 </td>
             </tr>
             </tbody>
@@ -96,10 +97,10 @@
     </div>
 
     <nav class="pagination-controls mt-4" th:if="${pagination != null and pagination.totalPages > 1}"
-         aria-label="User list pages">
+         aria-label="User list pages" th:aria-label="#{admin_users.user.list.pages}">
         <a th:if="${pagination.hasPrevious}" class="page-link"
            th:href="@{/admin/users(page=${pagination.page - 1})}"
-           th:attr="data-page=${pagination.page - 1}" aria-label="Previous page">
+           th:attr="data-page=${pagination.page - 1}" aria-label="Previous page" th:aria-label="#{admin_users.previous.page}">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
         <span th:unless="${pagination.hasPrevious}" class="page-link disabled" aria-hidden="true">
@@ -115,7 +116,7 @@
 
         <a th:if="${pagination.hasNext}" class="page-link"
            th:href="@{/admin/users(page=${pagination.page + 1})}"
-           th:attr="data-page=${pagination.page + 1}" aria-label="Next page">
+           th:attr="data-page=${pagination.page + 1}" aria-label="Next page" th:aria-label="#{admin_users.next.page}">
             <i class="fa-solid fa-chevron-right"></i>
         </a>
         <span th:unless="${pagination.hasNext}" class="page-link disabled" aria-hidden="true">

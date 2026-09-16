@@ -1,6 +1,7 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: pageHead('Register')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{register.register})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
@@ -9,26 +10,26 @@
     <div class="row justify-content-center">
         <div class="col-md-5">
             <div class="auth-card p-4">
-                <h4>Create an account</h4>
+                <h4 th:text="#{register.create.an.account}">Create an account</h4>
                 <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
                 <form th:action="@{/register}" th:object="${signupRequest}" method="post">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
+                        <label th:text="#{register.username}" for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="username" name="username"
-                               th:value="${signupRequest?.username}" placeholder="Enter your username" required>
+                               th:value="${signupRequest?.username}" placeholder="Enter your username" th:placeholder="#{register.enter.your.username}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
+                        <label th:text="#{register.email}" for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email"
-                               th:value="${signupRequest?.email}" placeholder="Enter your email" required>
+                               th:value="${signupRequest?.email}" placeholder="Enter your email" th:placeholder="#{register.enter.your.email}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" minlength="8" placeholder="Enter your password" required>
+                        <label th:text="#{register.password}" for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" minlength="8" placeholder="Enter your password" th:placeholder="#{register.enter.your.password}" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                    <button th:text="#{register.register}" type="submit" class="btn btn-primary w-100">Register</button>
                     <div class="text-center mt-3">
-                        <a href="/login">Already have an account? Log in</a>
+                        <a th:text="#{register.already.have.an.account.log}" href="/login">Already have an account? Log in</a>
                     </div>
                 </form>
             </div>

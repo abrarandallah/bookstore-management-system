@@ -1,16 +1,17 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/layout :: pageHead('Genres')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{genres.genres})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main class="page-body">
 <div class="container my-5">
-    <span class="eyebrow d-block mb-2">Browse</span>
-    <h4 class="mb-1">Genres</h4>
-    <p class="text-muted mb-4">Pick a genre to see the books shelved under it.</p>
+    <span th:text="#{genres.browse}" class="eyebrow d-block mb-2">Browse</span>
+    <h4 th:text="#{genres.genres}" class="mb-1">Genres</h4>
+    <p th:text="#{genres.pick.a.genre.to.see}" class="text-muted mb-4">Pick a genre to see the books shelved under it.</p>
 
-    <div th:if="${#maps.isEmpty(genreCounts)}" class="text-muted">No genres yet.</div>
+    <div th:text="#{genres.no.genres.yet}" th:if="${#maps.isEmpty(genreCounts)}" class="text-muted">No genres yet.</div>
 
     <div class="row g-3" th:unless="${#maps.isEmpty(genreCounts)}">
         <div class="col-sm-6 col-md-4 col-lg-3" th:each="entry : ${genreCounts}">
@@ -26,8 +27,8 @@
 
     <div class="card mt-5" sec:authorize="hasRole('LIBRARIAN')" th:unless="${#maps.isEmpty(genreCounts)}">
         <div class="card-header">
-            <span class="fw-semibold">Manage Genres</span>
-            <span class="text-muted small d-block d-sm-inline ms-sm-2">Fix a typo, or merge a duplicate into an existing genre.</span>
+            <span th:text="#{genres.manage.genres}" class="fw-semibold">Manage Genres</span>
+            <span th:text="#{genres.fix.a.typo.or.merge}" class="text-muted small d-block d-sm-inline ms-sm-2">Fix a typo, or merge a duplicate into an existing genre.</span>
         </div>
         <div class="alert alert-danger m-3 mb-0" th:if="${error}" th:text="${error}"></div>
         <div class="alert alert-success m-3 mb-0" th:if="${message}" th:text="${message}"></div>
@@ -35,10 +36,10 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
             <tr>
-                <th>Genre</th>
-                <th>Books</th>
-                <th>Rename</th>
-                <th>Merge into</th>
+                <th th:text="#{genres.genre}">Genre</th>
+                <th th:text="#{genres.books}">Books</th>
+                <th th:text="#{genres.rename}">Rename</th>
+                <th th:text="#{genres.merge.into}">Merge into</th>
             </tr>
             </thead>
             <tbody>
@@ -49,7 +50,7 @@
                     <form th:action="@{/admin/genres/{id}/rename(id=${entry.key.id})}" method="post" class="d-flex gap-2">
                         <input type="text" name="name" class="form-control form-control-sm"
                                th:value="${entry.key.name}" required style="width: 160px;">
-                        <button type="submit" class="btn btn-sm btn-outline-secondary">Save</button>
+                        <button th:text="#{genres.save}" type="submit" class="btn btn-sm btn-outline-secondary">Save</button>
                     </form>
                 </td>
                 <td>
@@ -62,9 +63,9 @@
                                         th:value="${target.key.id}" th:text="${target.key.name}"></option>
                             </th:block>
                         </select>
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Merge</button>
+                        <button th:text="#{genres.merge}" type="submit" class="btn btn-sm btn-outline-danger">Merge</button>
                     </form>
-                    <span th:unless="${#maps.size(genreCounts) > 1}" class="text-muted small">Only genre</span>
+                    <span th:text="#{genres.only.genre}" th:unless="${#maps.size(genreCounts) > 1}" class="text-muted small">Only genre</span>
                 </td>
             </tr>
             </tbody>

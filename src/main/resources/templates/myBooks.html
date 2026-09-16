@@ -1,6 +1,7 @@
+
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: pageHead('My Books')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{myBooks.my.books})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
@@ -8,8 +9,8 @@
     <div class="container my-5">
         <div class="section-heading">
             <div>
-                <span class="eyebrow">Your collection</span>
-                <h2>My Books</h2>
+                <span th:text="#{myBooks.your.collection}" class="eyebrow">Your collection</span>
+                <h2 th:text="#{myBooks.my.books}">My Books</h2>
             </div>
             <a th:href="@{/available_books}" class="btn btn-outline-brass">
                 <i class="fa-solid fa-magnifying-glass me-1"></i> Browse more books
@@ -17,16 +18,16 @@
         </div>
 
         <div th:if="${#lists.isEmpty(book)}" class="empty-state">
-            <span class="eyebrow">Nothing here yet</span>
-            <h3>Your shelf is bare</h3>
-            <p>You haven't added any books to your collection yet.</p>
-            <a th:href="@{/available_books}" class="btn btn-primary">Browse available books</a>
+            <span th:text="#{myBooks.nothing.here.yet}" class="eyebrow">Nothing here yet</span>
+            <h3 th:text="#{myBooks.your.shelf.is.bare}">Your shelf is bare</h3>
+            <p th:text="#{myBooks.you.haven.t.added.any}">You haven't added any books to your collection yet.</p>
+            <a th:text="#{myBooks.browse.available.books}" th:href="@{/available_books}" class="btn btn-primary">Browse available books</a>
         </div>
 
         <div class="book-grid" th:unless="${#lists.isEmpty(book)}">
             <div class="book-card" th:each="b : ${book}"
                  th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(b.name.hashCode()) % 360} + ', 42%, 34%)'">
-                <img th:if="${b.coverImageUrl}" th:src="@{${b.coverImageUrl}}" alt="Cover" class="book-cover mb-2">
+                <img th:if="${b.coverImageUrl}" th:src="@{${b.coverImageUrl}}" alt="Cover" th:alt="#{myBooks.cover}" class="book-cover mb-2">
                 <div class="book-author" th:text="${b.author}">Author</div>
                 <div class="book-title" th:text="${b.name}">Book title</div>
                 <div class="d-flex align-items-center gap-1 flex-wrap mb-1" th:if="${!#sets.isEmpty(b.genres)}">
@@ -40,7 +41,7 @@
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
                         <i class="fa-solid fa-list-check"></i>
-                        <span th:text="${#lists.size(b.takeaways)} + ' takeaways · ' + ${b.estimatedReadMinutes} + ' min read'"></span>
+                        <span th:text="${#lists.size(b.takeaways)} + ' takeaways Â· ' + ${b.estimatedReadMinutes} + ' min read'"></span>
                     </span>
                 </div>
                 <div class="mt-2" th:if="${progressByBook.get(b.id) != null}">
@@ -54,11 +55,11 @@
                     </span>
                 </div>
                 <div class="book-actions">
-                    <a th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
+                    <a th:text="#{myBooks.read}" th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
                     <form th:action="@{/deleteMyBook/{id}(id=${myBookListIdByBookId.get(b.id)})}" method="post"
                           class="d-inline" onsubmit="return appConfirm(event, 'Remove this book from your list?', {gentle: true, confirmLabel: 'Remove'});">
-                        <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;" title="Remove from My Books">
-                            <i class="fa-solid fa-trash"></i> <span class="small">Remove</span>
+                        <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;" title="Remove from My Books" th:title="#{myBooks.remove.from.my.books}">
+                            <i class="fa-solid fa-trash"></i> <span th:text="#{myBooks.remove}" class="small">Remove</span>
                         </button>
                     </form>
                 </div>

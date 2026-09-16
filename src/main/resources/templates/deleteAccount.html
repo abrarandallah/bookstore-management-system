@@ -1,6 +1,7 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: pageHead('Delete Account')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{deleteAccount.delete.account})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
@@ -9,8 +10,8 @@
     <div class="row justify-content-center">
         <div class="col-md-5">
             <div class="auth-card p-4">
-                <h4 class="text-danger">Delete Account</h4>
-                <p class="text-muted small">
+                <h4 th:text="#{deleteAccount.delete.account}" class="text-danger">Delete Account</h4>
+                <p th:text="#{deleteAccount.this.permanently.deletes.your.account}" class="text-muted small">
                     This permanently deletes your account, your "My Books" list, and any
                     reviews you've written. Books themselves aren't affected. This can't
                     be undone.
@@ -19,7 +20,7 @@
                 <form th:action="@{/delete-account}" method="post"
                       onsubmit="return appConfirm(event, 'This will permanently delete your account and everything tied to it. This cannot be undone. Continue?');">
                     <div class="mb-3">
-                        <label for="currentPassword" class="form-label">Confirm your password</label>
+                        <label th:text="#{deleteAccount.confirm.your.password}" for="currentPassword" class="form-label">Confirm your password</label>
                         <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
                     </div>
                     <button type="submit" class="btn btn-danger w-100">
@@ -29,7 +30,7 @@
             </div>
 
             <div class="text-center mt-3">
-                <a th:href="@{/profile}">Cancel and go back</a>
+                <a th:text="#{deleteAccount.cancel.and.go.back}" th:href="@{/profile}">Cancel and go back</a>
             </div>
         </div>
     </div>

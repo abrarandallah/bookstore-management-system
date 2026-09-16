@@ -1,6 +1,7 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: pageHead('Settings')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{settings.settings})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
@@ -8,15 +9,15 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-7">
-            <span class="eyebrow d-block mb-2">Preferences</span>
-            <h4 class="mb-4">Settings</h4>
+            <span th:text="#{settings.preferences}" class="eyebrow d-block mb-2">Preferences</span>
+            <h4 th:text="#{settings.settings}" class="mb-4">Settings</h4>
 
             <div class="form-panel p-4 mb-3">
-                <h6 class="mb-3">Account &amp; Security</h6>
+                <h6 th:text="#{settings.account.amp.security}" class="mb-3">Account &amp; Security</h6>
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
                     <div>
-                        <p class="mb-0">Password</p>
-                        <p class="mb-0 text-muted small">Keep your account safe with a strong, unique password.</p>
+                        <p th:text="#{settings.password}" class="mb-0">Password</p>
+                        <p th:text="#{settings.keep.your.account.safe.with}" class="mb-0 text-muted small">Keep your account safe with a strong, unique password.</p>
                     </div>
                     <a href="/change-password" class="btn btn-secondary btn-sm">
                         <i class="fa-solid fa-key me-1"></i> Change Password
@@ -25,8 +26,8 @@
                 <hr>
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
-                        <p class="mb-0" style="color: var(--burgundy);">Delete account</p>
-                        <p class="mb-0 text-muted small">Permanently delete your account and everything tied to it.</p>
+                        <p th:text="#{settings.delete.account}" class="mb-0" style="color: var(--burgundy);">Delete account</p>
+                        <p th:text="#{settings.permanently.delete.your.account.and}" class="mb-0 text-muted small">Permanently delete your account and everything tied to it.</p>
                     </div>
                     <a href="/delete-account" class="btn btn-outline-danger btn-sm">
                         <i class="fa-solid fa-trash me-1"></i> Delete Account
@@ -35,8 +36,8 @@
             </div>
 
             <div class="form-panel p-4 mb-3">
-                <h6 class="mb-3">Appearance</h6>
-                <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Theme">
+                <h6 th:text="#{settings.appearance}" class="mb-3">Appearance</h6>
+                <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Theme" th:aria-label="#{settings.theme}">
                     <button type="button" class="btn btn-secondary theme-option" data-theme-value="light" onclick="setTheme('light')">
                         <i class="fa-solid fa-sun me-1"></i> Light
                     </button>
@@ -50,14 +51,14 @@
             </div>
 
             <div class="form-panel p-4 mb-3">
-                <h6 class="mb-3">Reading</h6>
-                <label class="form-label">Takeaway text size</label>
-                <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Reader font size">
-                    <button type="button" class="btn btn-secondary font-size-option" data-size-value="small" onclick="setReaderFontSize('small')">Small</button>
-                    <button type="button" class="btn btn-secondary font-size-option" data-size-value="medium" onclick="setReaderFontSize('medium')">Medium</button>
-                    <button type="button" class="btn btn-secondary font-size-option" data-size-value="large" onclick="setReaderFontSize('large')">Large</button>
+                <h6 th:text="#{settings.reading}" class="mb-3">Reading</h6>
+                <label th:text="#{settings.takeaway.text.size}" class="form-label">Takeaway text size</label>
+                <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Reader font size" th:aria-label="#{settings.reader.font.size}">
+                    <button th:text="#{settings.small}" type="button" class="btn btn-secondary font-size-option" data-size-value="small" onclick="setReaderFontSize('small')">Small</button>
+                    <button th:text="#{settings.medium}" type="button" class="btn btn-secondary font-size-option" data-size-value="medium" onclick="setReaderFontSize('medium')">Medium</button>
+                    <button th:text="#{settings.large}" type="button" class="btn btn-secondary font-size-option" data-size-value="large" onclick="setReaderFontSize('large')">Large</button>
                 </div>
-                <p class="text-muted small mt-2 mb-0">Affects the takeaway text in the book reader.</p>
+                <p th:text="#{settings.affects.the.takeaway.text.in}" class="text-muted small mt-2 mb-0">Affects the takeaway text in the book reader.</p>
             </div>
 
             <!--/* Its own panel, not folded into Appearance - a language choice is
@@ -67,13 +68,13 @@
                    pick a language the first time - this is here for changing your
                    mind later. */-->
             <div class="form-panel p-4">
-                <h6 class="mb-3">Language</h6>
-                <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Language">
-                    <a th:href="@{/language(lang='en',redirect='/settings')}"
+                <h6 th:text="#{settings.language}" class="mb-3">Language</h6>
+                <div class="d-flex gap-2 flex-wrap" role="group" aria-label="Language" th:aria-label="#{settings.language}">
+                    <a th:text="#{settings.english}" th:href="@{/language(lang='en',redirect='/settings')}"
                        th:classappend="${#locale.language == 'en'} ? 'btn-primary' : 'btn-secondary'"
                        th:attr="aria-current=${#locale.language == 'en'} ? 'true' : null"
                        lang="en" class="btn">English</a>
-                    <a th:href="@{/language(lang='fr',redirect='/settings')}"
+                    <a th:text="#{settings.fran.ais}" th:href="@{/language(lang='fr',redirect='/settings')}"
                        th:classappend="${#locale.language == 'fr'} ? 'btn-primary' : 'btn-secondary'"
                        th:attr="aria-current=${#locale.language == 'fr'} ? 'true' : null"
                        lang="fr" class="btn">Français</a>
@@ -82,7 +83,7 @@
                        th:attr="aria-current=${#locale.language == 'ar'} ? 'true' : null"
                        lang="ar" dir="rtl" class="btn">العربية</a>
                 </div>
-                <p class="text-muted small mt-2 mb-0">Translated book content is still being added - untranslated books and takeaways show in English.</p>
+                <p th:text="#{settings.translated.book.content.is.still}" class="text-muted small mt-2 mb-0">Translated book content is still being added - untranslated books and takeaways show in English.</p>
             </div>
         </div>
     </div>

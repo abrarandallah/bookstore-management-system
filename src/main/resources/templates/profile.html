@@ -1,6 +1,7 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: pageHead('Profile')}"></head>
+<head th:replace="~{fragments/layout :: pageHead(#{profile.profile})}"></head>
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
@@ -11,7 +12,7 @@
             <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
 
             <div class="auth-card text-center">
-                <img th:if="${user.avatarUrl}" th:src="@{${user.avatarUrl}}" alt="Avatar"
+                <img th:if="${user.avatarUrl}" th:src="@{${user.avatarUrl}}" alt="Avatar" th:alt="#{profile.avatar}"
                      class="rounded-circle mx-auto mb-3" style="width:88px;height:88px;object-fit:cover;box-shadow:var(--shadow-card);">
                 <div th:unless="${user.avatarUrl}"
                      class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
@@ -21,15 +22,15 @@
                 <h5 class="mb-1" th:text="${user.username}"></h5>
                 <p class="text-muted mb-2" th:text="${user.email}"></p>
                 <span class="pill-tag" th:text="${user.role == 'ROLE_LIBRARIAN'} ? 'Librarian' : 'Reader'"></span>
-                <span class="pill-tag" th:if="${finishedBooksCount >= 15}" style="margin-left: 6px;">🔥 Voracious Reader</span>
-                <span class="pill-tag" th:if="${finishedBooksCount >= 5 and finishedBooksCount < 15}" style="margin-left: 6px;">🐛 Bookworm</span>
-                <span class="pill-tag" th:if="${finishedBooksCount >= 1 and finishedBooksCount < 5}" style="margin-left: 6px;">📖 First Chapter</span>
+                <span th:text="#{profile.voracious.reader}" class="pill-tag" th:if="${finishedBooksCount >= 15}" style="margin-left: 6px;">🔥 Voracious Reader</span>
+                <span th:text="#{profile.bookworm}" class="pill-tag" th:if="${finishedBooksCount >= 5 and finishedBooksCount < 15}" style="margin-left: 6px;">🐛 Bookworm</span>
+                <span th:text="#{profile.first.chapter}" class="pill-tag" th:if="${finishedBooksCount >= 1 and finishedBooksCount < 5}" style="margin-left: 6px;">📖 First Chapter</span>
 
                 <form th:action="@{/profile/avatar}" method="post" enctype="multipart/form-data"
                       class="d-flex justify-content-center align-items-center gap-2 mt-3">
                     <input type="file" name="avatar" class="form-control form-control-sm" style="max-width: 220px;"
                            accept="image/png,image/jpeg,image/webp,image/gif" required>
-                    <button type="submit" class="btn btn-outline-brass btn-sm">Update photo</button>
+                    <button th:text="#{profile.update.photo}" type="submit" class="btn btn-outline-brass btn-sm">Update photo</button>
                 </form>
             </div>
 
@@ -39,7 +40,7 @@
                         <span class="profile-stat-card-icon"><i class="fa-solid fa-bookmark"></i></span>
                         <span>
                             <span class="profile-stat-card-number" th:text="${myBooksCount}">0</span>
-                            <span class="profile-stat-card-label d-block">My Books</span>
+                            <span th:text="#{profile.my.books}" class="profile-stat-card-label d-block">My Books</span>
                         </span>
                         <span class="profile-stat-card-arrow"><i class="fa-solid fa-arrow-right"></i></span>
                     </a>
@@ -49,7 +50,7 @@
                         <span class="profile-stat-card-icon"><i class="fa-solid fa-book-open-reader"></i></span>
                         <span>
                             <span class="profile-stat-card-number" th:text="${finishedBooksCount}">0</span>
-                            <span class="profile-stat-card-label d-block">Books Finished</span>
+                            <span th:text="#{profile.books.finished}" class="profile-stat-card-label d-block">Books Finished</span>
                         </span>
                         <span class="profile-stat-card-arrow"><i class="fa-solid fa-arrow-right"></i></span>
                     </a>
@@ -60,7 +61,7 @@
                 <span class="eyebrow d-block mb-3">Achievements <span class="text-muted" th:text="'(' + ${#lists.size(achievements)} + ')'"></span></span>
                 <p class="text-muted small" th:if="${#lists.isEmpty(achievements)}">
                     Finish a book to start unlocking achievements - see your progress on the
-                    <a href="/reading-history">Reading History</a> page.
+                    <a th:text="#{profile.reading.history}" href="/reading-history">Reading History</a> page.
                 </p>
                 <div class="d-flex flex-wrap gap-3" th:unless="${#lists.isEmpty(achievements)}">
                     <div th:each="ua : ${achievements}" class="medal medal-compact badge-pop"
