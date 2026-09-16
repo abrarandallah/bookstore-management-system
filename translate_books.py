@@ -22,7 +22,7 @@ and the libretranslate container above already up):
     docker run --rm --network bookstore-management-system_default \
         -v "${PWD}:/app" -w /app \
         python:3.12-slim \
-        sh -c "pip install -q pymysql requests && python translate_books.py"
+        sh -c "pip install -q pymysql requests && python -u translate_books.py"
 
 Environment variables:
     LIBRETRANSLATE_URL (default: http://libretranslate:5000/translate)
