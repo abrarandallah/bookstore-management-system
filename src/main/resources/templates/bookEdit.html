@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: pageHead(#{bookEdit.edit.book})}"></head>
@@ -40,7 +39,7 @@
                 <label class="genre-chip-toggle" th:each="genre : ${allGenres}">
                     <input type="checkbox" name="genreIds" th:value="${genre.id}"
                            th:checked="${selectedGenreIds != null and selectedGenreIds.contains(genre.id)}">
-                    <span th:text="${genre.name}"></span>
+                    <span th:text="${@genreLocalizer.localizeName(genre.name, #locale.language)}"></span>
                 </label>
             </div>
         </div>

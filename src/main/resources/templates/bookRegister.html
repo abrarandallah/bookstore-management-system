@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head th:replace="~{fragments/layout :: pageHead(#{bookRegister.register.a.book})}"></head>
@@ -95,7 +94,7 @@
                   th:value="${genre.id}"
                   th:checked="${selectedGenreIds != null and selectedGenreIds.contains(genre.id)}"
                 />
-                <span th:text="${genre.name}"></span>
+                <span th:text="${@genreLocalizer.localizeName(genre.name, #locale.language)}"></span>
               </label>
             </div>
             <p class="text-muted small mt-2 mb-0">

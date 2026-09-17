@@ -27,7 +27,7 @@
 
         <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap mb-2"
              th:if="${!#sets.isEmpty(book.genres)}">
-            <span class="genre-badge" th:each="g : ${book.genres}" th:text="${g.name}"></span>
+            <span class="genre-badge" th:each="g : ${book.genres}" th:text="${@genreLocalizer.localizeName(g.name, #locale.language)}"></span>
         </div>
 
         <span class="rating-badge" th:if="${ratingSummary.count > 0}">
