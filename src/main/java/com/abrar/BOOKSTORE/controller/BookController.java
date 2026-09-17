@@ -106,7 +106,8 @@ public class BookController {
     public String getAllBook(@RequestParam(required = false) String q,
             @RequestParam(required = false, defaultValue = "name_asc") String sort,
             @RequestParam(required = false) Integer genre,
-            @RequestParam(required = false, defaultValue = "1") int page, Model model) {
+            @RequestParam(required = false, defaultValue = "1") int page, Model model,
+            HttpServletRequest request) {
         PagedResult<Book> result = service.searchPaged(q, genre, sort, page, BookService.DEFAULT_PAGE_SIZE);
         model.addAttribute("book", result.getContent());
         model.addAttribute("pagination", result);
@@ -115,6 +116,8 @@ public class BookController {
         model.addAttribute("genres", genreService.findAll());
         model.addAttribute("selectedGenre", genre);
         model.addAttribute("ratingSummaries", reviewService.summariesForAllBooks());
+        model.addAttribute("localizedBooks", bookTranslationService.localizeBooks(result.getContent(),
+                localeResolver.resolveLocale(request).getLanguage()));
         return "bookList";
     }
 
@@ -128,7 +131,8 @@ public class BookController {
     public String getAllBookResultsFragment(@RequestParam(required = false) String q,
             @RequestParam(required = false, defaultValue = "name_asc") String sort,
             @RequestParam(required = false) Integer genre,
-            @RequestParam(required = false, defaultValue = "1") int page, Model model) {
+            @RequestParam(required = false, defaultValue = "1") int page, Model model,
+            HttpServletRequest request) {
         PagedResult<Book> result = service.searchPaged(q, genre, sort, page, BookService.DEFAULT_PAGE_SIZE);
         model.addAttribute("book", result.getContent());
         model.addAttribute("pagination", result);
@@ -136,6 +140,8 @@ public class BookController {
         model.addAttribute("sort", sort);
         model.addAttribute("selectedGenre", genre);
         model.addAttribute("ratingSummaries", reviewService.summariesForAllBooks());
+        model.addAttribute("localizedBooks", bookTranslationService.localizeBooks(result.getContent(),
+                localeResolver.resolveLocale(request).getLanguage()));
         return "bookList :: resultsFragment";
     }
 
@@ -207,7 +213,7 @@ public class BookController {
     // since been removed from the store are skipped rather than blowing up
     // the whole page.
     @GetMapping("/my_books")
-    public String getMyBooks(Model model, Principal principal) {
+    public String getMyBooks(Model model, Principal principal, HttpServletRequest request) {
         List<MyBookList> list = myBookService.getMyBooks(currentUser(principal));
         List<Book> books = new ArrayList<>();
         Map<Integer, Long> myBookListIdByBookId = new HashMap<>();
@@ -224,6 +230,8 @@ public class BookController {
         model.addAttribute("myBookListIdByBookId", myBookListIdByBookId);
         model.addAttribute("ratingSummaries", reviewService.summariesForAllBooks());
         model.addAttribute("progressByBook", readingProgressService.getInProgressByBook(currentUser(principal), books));
+        model.addAttribute("localizedBooks", bookTranslationService.localizeBooks(books,
+                localeResolver.resolveLocale(request).getLanguage()));
         return "myBooks";
     }
 
@@ -246,11 +254,13 @@ public class BookController {
     // the link can open without logging in - unlike /read, which is gated.
     // See SecurityConfig's permitAll list for the matching route.
     @GetMapping("/available_books/{id}/share")
-    public String shareBook(@PathVariable("id") int id, Model model) {
+    public String shareBook(@PathVariable("id") int id, Model model, HttpServletRequest request) {
         Book b = service.getBookById(id);
         model.addAttribute("book", b);
         model.addAttribute("ratingSummary", reviewService.summaryForBook(id));
         model.addAttribute("teaser", b.getTakeaways().isEmpty() ? null : b.getTakeaways().get(0));
+        model.addAttribute("localizedBook", bookTranslationService.localizeBook(b,
+                localeResolver.resolveLocale(request).getLanguage()));
         return "bookShare";
     }
 
@@ -299,7 +309,8 @@ public class BookController {
     }
 
     @PostMapping("/available_books/{id}/finish")
-    public String finishBook(@PathVariable("id") int id, Model model, Principal principal) {
+    public String finishBook(@PathVariable("id") int id, Model model, Principal principal,
+            HttpServletRequest request) {
         Book b = service.getBookById(id);
         User user = currentUser(principal);
         ReadingProgress progress = readingProgressService.getOrCreate(user, b);
@@ -308,13 +319,19 @@ public class BookController {
         model.addAttribute("book", b);
         model.addAttribute("newAchievements",
                 alreadyFinished ? List.of() : achievementService.checkBookCompletionAchievements(user, progress));
+        model.addAttribute("localizedBook", bookTranslationService.localizeBook(b,
+                localeResolver.resolveLocale(request).getLanguage()));
         return "bookFinished";
     }
 
     @GetMapping("/reading-history")
-    public String readingHistory(Model model, Principal principal) {
+    public String readingHistory(Model model, Principal principal, HttpServletRequest request) {
         User user = currentUser(principal);
-        model.addAttribute("history", readingProgressService.getHistory(user));
+        List<ReadingProgress> history = readingProgressService.getHistory(user);
+        model.addAttribute("history", history);
+        model.addAttribute("localizedBooks", bookTranslationService.localizeBooks(
+                history.stream().map(ReadingProgress::getBook).toList(),
+                localeResolver.resolveLocale(request).getLanguage()));
         return "readingHistory";
     }
 

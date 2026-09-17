@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: pageHead(#{bookFinished.finished})}"></head>
@@ -9,7 +8,7 @@
 <div class="container mt-5 mb-5 text-center">
     <div class="empty-state" style="max-width: 560px; margin: 0 auto;">
         <span th:text="#{bookFinished.nice.work}" class="eyebrow">Nice work</span>
-        <h3>You finished <span th:text="${book.name}">Book title</span>!</h3>
+        <h3>You finished <span th:text="${localizedBook.name}">Book title</span>!</h3>
         <img th:if="${book.coverImageUrl}" th:src="@{${book.coverImageUrl}}" alt="Cover" th:alt="#{bookFinished.cover}"
              style="width:96px;height:auto;border-radius:6px;box-shadow:var(--shadow-card);margin: 1rem 0;">
 

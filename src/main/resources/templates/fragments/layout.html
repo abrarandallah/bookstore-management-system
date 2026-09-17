@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -226,7 +225,8 @@
         <div class="container d-flex flex-wrap justify-content-between gap-3">
             <div>
                 <i class="fa-solid fa-feather-pointed brand-mark"></i>
-                <strong th:text="#{fragments_layout.bookstore}">BookStore</strong> — every book has a spine, every spine tells you something.
+                <strong th:text="#{fragments_layout.bookstore}">BookStore</strong>
+                <span th:text="#{fragments_layout.tagline}">— every book has a spine, every spine tells you something.</span>
             </div>
             <div>
                 <a th:text="#{fragments_layout.home}" href="/">Home</a>

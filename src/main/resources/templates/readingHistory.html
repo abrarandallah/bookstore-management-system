@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: pageHead(#{readingHistory.reading.history})}"></head>
@@ -31,8 +30,8 @@
                          style="width:48px;height:auto;border-radius:4px;">
                     <div class="flex-grow-1">
                         <a th:href="@{/available_books/{id}/read(id=${rp.book.id})}" class="fw-semibold text-decoration-none"
-                           th:text="${rp.book.name}">Book title</a>
-                        <div class="small text-muted" th:text="${rp.book.author}">Author</div>
+                           th:text="${localizedBooks.get(rp.book.id).name}">Book title</a>
+                        <div class="small text-muted" th:text="${localizedBooks.get(rp.book.id).author}">Author</div>
 
                         <div th:if="${rp.finished}" class="small mt-1">
                             <i class="fa-solid fa-circle-check" style="color: var(--brass, #b08d57);"></i>

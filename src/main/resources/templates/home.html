@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: pageHead(#{home.home})}"></head>
@@ -22,7 +21,7 @@
                     <a th:text="#{home.login}" href="/login" class="btn btn-outline-brass" sec:authorize="isAnonymous()">Login</a>
                     <a th:text="#{home.create.an.account}" href="/register" class="btn btn-outline-brass" sec:authorize="isAnonymous()">Create an account</a>
                     <a href="/random_book" class="btn btn-outline-brass">
-                        <i class="fa-solid fa-dice me-1"></i> Surprise Me
+                        <i class="fa-solid fa-dice me-1"></i> <span th:text="#{home.surprise.me}">Surprise Me</span>
                     </a>
                     <a th:text="#{home.how.it.works}" href="/about" class="btn btn-outline-brass">How it works</a>
                 </div>

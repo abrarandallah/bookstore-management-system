@@ -73,6 +73,30 @@ public class BookTranslationService {
         return result;
     }
 
+    /**
+     * Every one of {@code books}' name/author, keyed by book id, each
+     * translated into {@code language} where a translation exists and left
+     * as the original English otherwise. Used by the book list page, which
+     * shows many books at once - one query regardless of how many books are
+     * on the page, rather than one query per book.
+     */
+    public Map<Integer, LocalizedBook> localizeBooks(List<Book> books, String language) {
+        Map<Integer, LocalizedBook> result = new HashMap<>();
+        for (Book book : books) {
+            result.put(book.getId(), new LocalizedBook(book.getName(), book.getAuthor()));
+        }
+        if (SOURCE_LANGUAGE.equals(language) || books.isEmpty()) {
+            return result;
+        }
+        List<Integer> bookIds = books.stream().map(Book::getId).toList();
+        List<BookTranslation> translations = bookTranslationRepository
+                .findByBook_IdInAndLanguage(bookIds, language);
+        for (BookTranslation t : translations) {
+            result.put(t.getBook().getId(), new LocalizedBook(t.getName(), t.getAuthor()));
+        }
+        return result;
+    }
+
     public record LocalizedBook(String name, String author) {
     }
 
