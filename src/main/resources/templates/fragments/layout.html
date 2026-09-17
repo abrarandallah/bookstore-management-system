@@ -198,19 +198,19 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li>
                                 <a class="dropdown-item" href="/profile">
-                                    <i class="fa-solid fa-user"></i> Profile
+                                    <i class="fa-solid fa-user"></i> <span th:text="#{fragments_layout.profile}">Profile</span>
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item" href="/settings">
-                                    <i class="fa-solid fa-gear"></i> Settings
+                                    <i class="fa-solid fa-gear"></i> <span th:text="#{fragments_layout.settings}">Settings</span>
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form th:action="@{/logout}" method="post">
                                     <button type="submit" class="dropdown-item logout-link">
-                                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                                        <i class="fa-solid fa-right-from-bracket"></i> <span th:text="#{fragments_layout.logout}">Logout</span>
                                     </button>
                                 </form>
                             </li>
