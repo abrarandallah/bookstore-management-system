@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -79,6 +80,20 @@ class BookControllerTest {
         private LocaleResolver localeResolver;
 
         private static final Principal READER_PRINCIPAL = () -> "reader";
+
+        // Every endpoint that shows book titles/authors now resolves the
+        // visitor's language via localeResolver (see BookController's
+        // localizeBook(s) calls). Most tests don't care which language -
+        // they're testing pagination, ownership, validation, etc, not
+        // translation - so this gives every test a safe, non-null default.
+        // A test that specifically needs a different language (e.g. the
+        // Arabic reader-page test below) just calls its own when(...) on
+        // localeResolver inside the test body, which runs after this and
+        // overrides it for that one test.
+        @BeforeEach
+        void stubDefaultLocale() {
+                when(localeResolver.resolveLocale(Mockito.any())).thenReturn(Locale.ENGLISH);
+        }
 
         private void stubCurrentUser() {
                 User user = new User("reader", "reader@example.com", "hash", "ROLE_USER");
@@ -152,7 +167,7 @@ class BookControllerTest {
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(7))
+                                .andExpect(MockMvcResultMatchers.model().size(8))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("book"))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("pagination"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookList"))
@@ -175,7 +190,7 @@ class BookControllerTest {
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(6))
+                                .andExpect(MockMvcResultMatchers.model().size(7))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("book"))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("pagination"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookList :: resultsFragment"));
@@ -409,7 +424,7 @@ class BookControllerTest {
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(4))
+                                .andExpect(MockMvcResultMatchers.model().size(5))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("book"))
                                 .andExpect(MockMvcResultMatchers.view().name("myBooks"))
                                 .andExpect(MockMvcResultMatchers.forwardedUrl("myBooks"));
