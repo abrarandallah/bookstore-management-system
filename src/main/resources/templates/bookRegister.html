@@ -18,14 +18,14 @@
             <button class="nav-link" th:classappend="${activeTab == 'single'} ? 'active'" id="single-tab"
                     data-bs-toggle="tab" data-bs-target="#single-pane" type="button" role="tab"
                     aria-controls="single-pane" th:aria-selected="${activeTab == 'single'}">
-              <i class="fa-solid fa-plus me-1"></i> Single Book
+              <i class="fa-solid fa-plus me-1"></i> <span th:text="#{bookRegister.single.book}">Single Book</span>
             </button>
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" th:classappend="${activeTab == 'bulk'} ? 'active'" id="bulk-tab"
                     data-bs-toggle="tab" data-bs-target="#bulk-pane" type="button" role="tab"
                     aria-controls="bulk-pane" th:aria-selected="${activeTab == 'bulk'}">
-              <i class="fa-solid fa-file-import me-1"></i> Bulk Import
+              <i class="fa-solid fa-file-import me-1"></i> <span th:text="#{bookRegister.bulk.import}">Bulk Import</span>
             </button>
           </li>
         </ul>
@@ -67,7 +67,7 @@
           </div>
           <div class="mb-4">
             <label for="cover" class="form-label"
-              >Cover image
+              ><span th:text="#{bookRegister.cover.image}">Cover image</span>
               <span th:text="#{bookRegister.optional}" class="text-muted fw-normal">(optional)</span></label
             >
             <input
@@ -98,9 +98,9 @@
               </label>
             </div>
             <p class="text-muted small mt-2 mb-0">
-              Don't see the genre you need? Genre names typed into a
+              <span th:text="#{bookRegister.dont.see.genre.before}">Don't see the genre you need? Genre names typed into a</span>
               <a th:text="#{bookRegister.bulk.import}" href="#bulk-pane" data-bs-toggle="tab" data-bs-target="#bulk-pane">Bulk Import</a>
-              are created automatically.
+              <span th:text="#{bookRegister.dont.see.genre.after}">are created automatically.</span>
             </p>
           </div>
 
@@ -119,7 +119,7 @@
               class="btn btn-outline-brass btn-sm"
               onclick="addTakeaway()"
             >
-              <i class="fa-solid fa-plus me-1"></i> Add another
+              <i class="fa-solid fa-plus me-1"></i> <span th:text="#{bookRegister.add.another}">Add another</span>
             </button>
           </div>
 
