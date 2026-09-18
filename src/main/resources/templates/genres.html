@@ -18,7 +18,7 @@
                th:href="@{/available_books(genre=${entry.key.id})}">
                 <div class="card-body">
                     <div class="fw-semibold" th:text="${@genreLocalizer.localizeName(entry.key.name, #locale.language)}"></div>
-                    <div class="text-muted small" th:text="${entry.value} + (${entry.value == 1} ? ' book' : ' books')"></div>
+                    <div class="text-muted small" th:text="${entry.value == 1} ? #{genres.book.count.one(${entry.value})} : #{genres.book.count.other(${entry.value})}"></div>
                 </div>
             </a>
         </div>
