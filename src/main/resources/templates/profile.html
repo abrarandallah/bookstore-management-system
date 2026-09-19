@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: pageHead(#{profile.profile})}"></head>
@@ -58,27 +57,27 @@
             </div>
 
             <div class="form-panel p-4 mt-3">
-                <span class="eyebrow d-block mb-3">Achievements <span class="text-muted" th:text="'(' + ${#lists.size(achievements)} + ')'"></span></span>
+                <span class="eyebrow d-block mb-3"><span th:text="#{profile.achievements}">Achievements</span> <span class="text-muted" th:text="'(' + ${#lists.size(achievements)} + ')'"></span></span>
                 <p class="text-muted small" th:if="${#lists.isEmpty(achievements)}">
-                    Finish a book to start unlocking achievements - see your progress on the
-                    <a th:text="#{profile.reading.history}" href="/reading-history">Reading History</a> page.
+                    <span th:text="#{profile.finish.a.book.to.start}">Finish a book to start unlocking achievements - see your progress on the</span>
+                    <a th:text="#{profile.reading.history}" href="/reading-history">Reading History</a><span th:text="#{profile.page}"> page.</span>
                 </p>
                 <div class="d-flex flex-wrap gap-3" th:unless="${#lists.isEmpty(achievements)}">
                     <div th:each="ua : ${achievements}" class="medal medal-compact badge-pop"
-                         th:title="${ua.achievement.description}">
+                         th:title="${@achievementLocalizer.localizeDescription(ua.achievement.code, #locale.language, ua.achievement.description)}">
                         <div class="medal-seal">
                             <div class="medal-seal-face">
                                 <span class="medal-icon" th:text="${ua.achievement.icon}">🏆</span>
                             </div>
                         </div>
-                        <div class="medal-name" th:text="${ua.achievement.name}">Achievement</div>
+                        <div class="medal-name" th:text="${@achievementLocalizer.localizeName(ua.achievement.code, #locale.language, ua.achievement.name)}">Achievement</div>
                     </div>
                 </div>
             </div>
 
             <div class="text-center mt-3">
                 <a href="/settings" class="text-muted small">
-                    <i class="fa-solid fa-gear me-1"></i> Account settings, password, and more
+                    <i class="fa-solid fa-gear me-1"></i> <span th:text="#{profile.account.settings.password.and.more}">Account settings, password, and more</span>
                 </a>
             </div>
         </div>
