@@ -1794,3 +1794,12 @@ html[lang="ar"] * {
   letter-spacing: normal !important;
   text-transform: none !important;
 }
+
+/* Data tables (e.g. admin/users.html) don't reliably pick up right-to-left
+   column order and text alignment from the page's dir="rtl" alone in every
+   browser - this makes it explicit rather than relying on default table
+   behavior, which is inconsistent. */
+html[dir="rtl"] .table {
+  direction: rtl;
+  text-align: right;
+}
