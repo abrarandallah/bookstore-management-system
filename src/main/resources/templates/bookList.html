@@ -12,7 +12,7 @@
                 <h2 th:text="#{bookList.available.books}">Available Books</h2>
             </div>
             <a th:href="@{/book_register}" class="btn btn-outline-brass" sec:authorize="hasRole('LIBRARIAN')">
-                <i class="fa-solid fa-plus me-1"></i> Register a book
+                <i class="fa-solid fa-plus me-1"></i> <span th:text="#{bookList.register.a.book}">Register a book</span>
             </a>
         </div>
 
@@ -82,7 +82,9 @@
                         <div class="d-flex align-items-center gap-2 flex-wrap">
                             <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
                                 <i class="fa-solid fa-list-check"></i>
-                                <span th:text="${#lists.size(b.takeaways)} + ' takeaways Â· ' + ${b.estimatedReadMinutes} + ' min read'"></span>
+                                <span th:text="${#lists.size(b.takeaways) == 1}
+                                    ? #{bookList.takeaway.count.one(${#lists.size(b.takeaways)}, ${b.estimatedReadMinutes})}
+                                    : #{bookList.takeaway.count.other(${#lists.size(b.takeaways)}, ${b.estimatedReadMinutes})}"></span>
                             </span>
                         </div>
                         <div class="book-actions">
