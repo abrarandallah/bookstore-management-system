@@ -9,22 +9,22 @@
 
 SELECT 'book_translations.name' AS field, bt.id, b.name AS english, bt.name AS arabic
 FROM book b JOIN book_translations bt ON bt.book_id = b.id AND bt.language = 'ar'
-WHERE bt.name REGEXP '\?{2,}'
+WHERE bt.name REGEXP '\\?{2,}'
 
 UNION ALL
 
 SELECT 'book_translations.author', bt.id, b.author, bt.author
 FROM book b JOIN book_translations bt ON bt.book_id = b.id AND bt.language = 'ar'
-WHERE bt.author REGEXP '\?{2,}'
+WHERE bt.author REGEXP '\\?{2,}'
 
 UNION ALL
 
 SELECT 'book_page_translations.heading', pt.id, p.heading, pt.heading
 FROM book_page p JOIN book_page_translations pt ON pt.book_page_id = p.id AND pt.language = 'ar'
-WHERE pt.heading REGEXP '\?{2,}'
+WHERE pt.heading REGEXP '\\?{2,}'
 
 UNION ALL
 
 SELECT 'book_page_translations.content', pt.id, LEFT(p.content, 60), LEFT(pt.content, 60)
 FROM book_page p JOIN book_page_translations pt ON pt.book_page_id = p.id AND pt.language = 'ar'
-WHERE pt.content REGEXP '\?{2,}';
+WHERE pt.content REGEXP '\\?{2,}';
