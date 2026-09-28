@@ -76,7 +76,8 @@ def retry_field(cur, conn, label, select_sql, update_sql):
             print(f"  id {row_id}: SKIPPED (LibreTranslate failed repeatedly)")
             continue
         if still_has_latin_letters(translated):
-            print(f"  id {row_id}: retried, still not translated -> keeping old value (needs a human)")
+            preview = translated[:80] + ("..." if len(translated) > 80 else "")
+            print(f"  id {row_id}: retried, still not translated -> keeping old value (needs a human). LibreTranslate returned: {preview!r}")
             continue
         cur.execute(update_sql, (translated, row_id))
         conn.commit()
