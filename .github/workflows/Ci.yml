@@ -1,6 +1,6 @@
 name: CI
 
-on:
+on:neverm
   push:
     branches: [main]
   pull_request:
