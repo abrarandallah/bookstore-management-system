@@ -7,10 +7,10 @@ import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 
@@ -36,23 +36,21 @@ public class ReviewController {
     // one endpoint covers both "leave a review" and "edit my review".
     @PostMapping("/available_books/{id}/review")
     public String submitReview(@PathVariable("id") int id, @RequestParam int rating,
-            @RequestParam(required = false) String comment, Principal principal, Model model) {
+            @RequestParam(required = false) String comment, Principal principal,
+            RedirectAttributes redirectAttributes) {
         Book book = bookService.getBookById(id);
         User user = currentUser(principal);
         try {
             reviewService.submitReview(book, user, rating, comment);
         } catch (IllegalArgumentException ex) {
             // Only reachable via a tampered request - the star widget on
-            // the reader page only ever submits 1-5. Re-render the read
-            // page directly (rather than redirect+flash) to match how
-            // BookController.addBook() handles validation failures
-            // elsewhere in this app.
-            model.addAttribute("book", book);
-            model.addAttribute("reviews", reviewService.getReviewsForBook(id));
-            model.addAttribute("ownReview", reviewService.findOwnReview(id, user).orElse(null));
-            model.addAttribute("ratingSummary", reviewService.summaryForBook(id));
-            model.addAttribute("reviewError", ex.getMessage());
-            return "bookRead";
+            // the reader page only ever submits 1-5. Redirect back to the
+            // reader (GET) with the error flashed (a translation key) instead
+            // of re-rendering bookRead from here: that page needs many other
+            // model values (translated title and takeaways, resume position,
+            // ...) that only BookController#readBook knows how to build, and
+            // leaving any out made the page fail to render.
+            redirectAttributes.addFlashAttribute("reviewError", "review.error.rating.range");
         }
         return "redirect:/available_books/" + id + "/read";
     }
