@@ -1,6 +1,7 @@
 package com.abrar.BOOKSTORE.repository;
 
 import com.abrar.BOOKSTORE.entity.Book;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,6 +38,11 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
                         + "OR LOWER(t.author) LIKE LOWER(CONCAT('%', :term, '%'))))) "
                         + "AND g.id = :genreId")
         List<Book> searchByGenre(@Param("term") String term, @Param("genreId") Integer genreId, Sort sort);
+
+        // Books with 1..maxTakeaways takeaways, newest first - the home page's
+        // "Quick reads" shelf. Pageable only limits how many come back.
+        @Query("SELECT b FROM Book b WHERE SIZE(b.takeaways) BETWEEN 1 AND :maxTakeaways ORDER BY b.id DESC")
+        List<Book> findQuickReads(@Param("maxTakeaways") int maxTakeaways, Pageable pageable);
 
         // Every book currently tagged with a genre - used by GenreService#merge
         // to move each one onto the target genre before the source genre is

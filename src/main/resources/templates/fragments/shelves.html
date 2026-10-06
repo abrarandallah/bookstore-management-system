@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/* One horizontal "shelf" of book cards for the home page. Used from home.html as
+       fragments/shelves :: shelf(eyebrow, title, items, seeAllUrl)
+       - items: a list of HomeShelvesService.ShelfItem (an empty list hides the whole shelf)
+       - seeAllUrl: where the "See all books" button goes, or null for no button. */-->
+<section th:fragment="shelf(eyebrow, title, items, seeAllUrl)" th:if="${!#lists.isEmpty(items)}"
+         class="container my-5">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow" th:text="${eyebrow}">Eyebrow</span>
+            <h2 th:text="${title}">Shelf title</h2>
+        </div>
+        <a th:if="${seeAllUrl != null}" th:href="@{${seeAllUrl}}" class="btn btn-outline-brass btn-sm"
+           th:text="#{home.shelf.see.all}">See all books</a>
+    </div>
+    <div class="book-grid">
+        <div class="book-card" th:each="item, iter : ${items}"
+             th:style="'--card-index: ' + ${iter.index} + '; --spine-color: hsl(' + ${T(java.lang.Math).abs(item.book.name.hashCode()) % 360} + ', 42%, 34%)'">
+            <img th:if="${item.book.coverImageUrl}" th:src="@{${item.book.coverImageUrl}}" alt="Cover"
+                 th:alt="#{bookList.cover}" class="book-cover mb-2">
+            <div class="book-author" th:text="${item.author}">Author</div>
+            <div class="book-title" th:text="${item.name}">Book title</div>
+            <span class="rating-badge mb-1" th:if="${item.rating != null}">
+                <i class="fa-solid fa-star"></i>
+                <span th:text="${#numbers.formatDecimal(item.rating.average, 1, 1)}"></span>
+                <span class="text-muted">(<span th:text="${item.rating.count}"></span>)</span>
+            </span>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="takeaway-tag">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span th:text="${item.takeawayCount == 1}
+                        ? #{bookList.takeaway.count.one(${item.takeawayCount}, ${item.minutes})}
+                        : #{bookList.takeaway.count.other(${item.takeawayCount}, ${item.minutes})}"></span>
+                </span>
+            </div>
+            <div class="mt-2" th:if="${item.step > 0}">
+                <div class="reader-progress-bar">
+                    <div class="reader-progress-fill" th:style="'width:' + ${item.percent} + '%'"></div>
+                </div>
+                <span class="small text-muted"
+                      th:text="#{bookRead.takeaway.progress(${item.step}, ${item.takeawayCount})}"></span>
+            </div>
+            <div class="book-actions">
+                <a th:href="@{/available_books/{id}/read(id=${item.book.id})}" class="btn btn-secondary btn-sm"
+                   th:text="${item.step > 0} ? #{home.continue.button} : #{bookList.read}">Read</a>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

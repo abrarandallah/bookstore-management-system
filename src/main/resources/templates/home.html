@@ -34,6 +34,14 @@
         </div>
     </div>
 
+    <!-- Shelves (see HomeShelvesService - an empty shelf is simply not shown) -->
+    <div sec:authorize="isAuthenticated()">
+        <th:block th:replace="~{fragments/shelves :: shelf(#{home.continue.eyebrow}, #{home.continue.title}, ${@homeShelves.continueReading(#authentication.name, #locale.language)}, null)}"></th:block>
+    </div>
+    <th:block th:replace="~{fragments/shelves :: shelf(#{home.newest.eyebrow}, #{home.newest.title}, ${@homeShelves.newest(#locale.language)}, '/available_books?sort=newest')}"></th:block>
+    <th:block th:replace="~{fragments/shelves :: shelf(#{home.top.eyebrow}, #{home.top.title}, ${@homeShelves.topRated(#locale.language)}, '/available_books')}"></th:block>
+    <th:block th:replace="~{fragments/shelves :: shelf(#{home.quick.eyebrow}, #{home.quick.title}, ${@homeShelves.quickReads(#locale.language)}, '/available_books?sort=read_time_asc')}"></th:block>
+
     <!-- About teaser -->
     <div class="container my-5" id="how-it-works" style="max-width: 720px;">
         <span th:text="#{home.how.it.works}" class="eyebrow">How it works</span>
