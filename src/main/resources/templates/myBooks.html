@@ -40,7 +40,9 @@
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
                         <i class="fa-solid fa-list-check"></i>
-                        <span th:text="${#lists.size(b.takeaways)} + ' takeaways Â· ' + ${b.estimatedReadMinutes} + ' min read'"></span>
+                        <span th:text="${#lists.size(b.takeaways) == 1}
+                            ? #{bookList.takeaway.count.one(${#lists.size(b.takeaways)}, ${b.estimatedReadMinutes})}
+                            : #{bookList.takeaway.count.other(${#lists.size(b.takeaways)}, ${b.estimatedReadMinutes})}"></span>
                     </span>
                 </div>
                 <div class="mt-2" th:if="${progressByBook.get(b.id) != null}">
