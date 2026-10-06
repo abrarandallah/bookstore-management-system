@@ -28,9 +28,12 @@ Boot 3.1.2, Java 17, Thymeleaf, MySQL, and Spring Security 6.
 
 ## Running with Docker (recommended - no local MySQL or Maven needed)
 
-1. `cp .env.example .env` and fill in real values (at minimum, set
-   `MAIL_USERNAME`/`MAIL_PASSWORD` if you want verification/reset emails to
-   actually be delivered - everything else has a working default).
+1. Copy `.env.example` to `.env` (`copy .env.example .env` in Windows Command
+   Prompt, or `cp .env.example .env` in PowerShell/macOS/Linux) and fill in real
+   values (at minimum, set `MAIL_USERNAME`/`MAIL_PASSWORD` if you want
+   verification/reset emails to actually be delivered - everything else has a
+   working default). Before putting the site online, also change `DB_PASSWORD`
+   and `LIBRARIAN_PASSWORD` - the defaults are only meant for your own computer.
 2. `docker compose up --build`
 3. Open `http://localhost:8081`.
 
