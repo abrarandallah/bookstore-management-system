@@ -258,9 +258,17 @@ public class BookController {
         Book b = service.getBookById(id);
         model.addAttribute("book", b);
         model.addAttribute("ratingSummary", reviewService.summaryForBook(id));
-        model.addAttribute("teaser", b.getTakeaways().isEmpty() ? null : b.getTakeaways().get(0));
-        model.addAttribute("localizedBook", bookTranslationService.localizeBook(b,
-                localeResolver.resolveLocale(request).getLanguage()));
+        BookPage teaser = b.getTakeaways().isEmpty() ? null : b.getTakeaways().get(0);
+        model.addAttribute("teaser", teaser);
+        String language = localeResolver.resolveLocale(request).getLanguage();
+        model.addAttribute("localizedBook", bookTranslationService.localizeBook(b, language));
+        // The teaser text in the visitor's language, when a translation exists
+        // (bookShare.html falls back to "teaser" itself when this is null).
+        if (teaser != null) {
+            Map<Long, BookTranslationService.LocalizedPage> pages = bookTranslationService
+                    .localizePages(b.getTakeaways(), language);
+            model.addAttribute("localizedTeaser", pages == null ? null : pages.get(teaser.getId()));
+        }
         return "bookShare";
     }
 
