@@ -40,7 +40,7 @@ public class PasswordResetController {
             Model model) {
         String clientIp = request.getRemoteAddr();
         if (!rateLimiter.allow(clientIp)) {
-            model.addAttribute("error", "Too many reset attempts. Please try again in a few minutes.");
+            model.addAttribute("error", "reset.error.too.many");
             return "forgotPassword";
         }
         Optional<User> userOpt = userRepository.findByUsernameOrEmailOrEmail(usernameOrEmail);
@@ -55,8 +55,7 @@ public class PasswordResetController {
         // Same message whether or not the account exists, so this can't be used
         // to enumerate registered usernames/emails. Rate limiting above is what
         // keeps this endpoint from being abused for spam/enumeration attempts.
-        model.addAttribute("message",
-                "If an account with that username or email exists, we've sent a password reset link to it.");
+        model.addAttribute("message", "reset.sent");
         return "forgotPassword";
     }
 
@@ -64,7 +63,7 @@ public class PasswordResetController {
     public String resetPasswordForm(@RequestParam String token, Model model) {
         Optional<PasswordResetToken> tokenOpt = tokenRepository.findByToken(token);
         if (tokenOpt.isEmpty() || tokenOpt.get().isExpired()) {
-            model.addAttribute("error", "This reset link is invalid or has expired. Please request a new one.");
+            model.addAttribute("error", "reset.error.invalid.link");
             return "resetPasswordInvalid";
         }
         model.addAttribute("token", token);
@@ -76,16 +75,16 @@ public class PasswordResetController {
             @RequestParam String confirmPassword, Model model) {
         Optional<PasswordResetToken> tokenOpt = tokenRepository.findByToken(token);
         if (tokenOpt.isEmpty() || tokenOpt.get().isExpired()) {
-            model.addAttribute("error", "This reset link is invalid or has expired. Please request a new one.");
+            model.addAttribute("error", "reset.error.invalid.link");
             return "resetPasswordInvalid";
         }
         if (password == null || password.length() < 8) {
-            model.addAttribute("error", "Password must be at least 8 characters.");
+            model.addAttribute("error", "reset.error.too.short");
             model.addAttribute("token", token);
             return "resetPassword";
         }
         if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "Passwords don't match.");
+            model.addAttribute("error", "reset.error.mismatch");
             model.addAttribute("token", token);
             return "resetPassword";
         }

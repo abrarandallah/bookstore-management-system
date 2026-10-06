@@ -12,7 +12,7 @@
                 <h2 th:text="#{myBooks.my.books}">My Books</h2>
             </div>
             <a th:href="@{/available_books}" class="btn btn-outline-brass">
-                <i class="fa-solid fa-magnifying-glass me-1"></i> Browse more books
+                <i class="fa-solid fa-magnifying-glass me-1"></i> <span th:text="#{common.browse.more.books}">Browse more books</span>
             </a>
         </div>
 
@@ -48,15 +48,12 @@
                         <div class="reader-progress-fill"
                              th:style="'width:' + (((progressByBook.get(b.id).currentPage + 1) * 100) / #lists.size(b.takeaways)) + '%'"></div>
                     </div>
-                    <span class="small text-muted">
-                        Takeaway <span th:text="${progressByBook.get(b.id).currentPage + 1}"></span> of
-                        <span th:text="${#lists.size(b.takeaways)}"></span>
-                    </span>
+                    <span class="small text-muted" th:text="#{bookRead.takeaway.progress(${progressByBook.get(b.id).currentPage + 1}, ${#lists.size(b.takeaways)})}"></span>
                 </div>
                 <div class="book-actions">
                     <a th:text="#{myBooks.read}" th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
                     <form th:action="@{/deleteMyBook/{id}(id=${myBookListIdByBookId.get(b.id)})}" method="post"
-                          class="d-inline" onsubmit="return appConfirm(event, 'Remove this book from your list?', {gentle: true, confirmLabel: 'Remove'});">
+                          class="d-inline" onsubmit="return appConfirm(event);" th:data-confirm="#{confirm.remove.from.my.books}" data-confirm-gentle="true" th:data-confirm-label="#{myBooks.remove}">
                         <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;" title="Remove from My Books" th:title="#{myBooks.remove.from.my.books}">
                             <i class="fa-solid fa-trash"></i> <span th:text="#{myBooks.remove}" class="small">Remove</span>
                         </button>

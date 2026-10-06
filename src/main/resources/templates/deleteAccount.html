@@ -16,15 +16,15 @@
                     reviews you've written. Books themselves aren't affected. This can't
                     be undone.
                 </p>
-                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+                <div class="alert alert-danger" th:if="${error}" th:text="${#messages.msgOrNull(error) ?: error}"></div>
                 <form th:action="@{/delete-account}" method="post"
-                      onsubmit="return appConfirm(event, 'This will permanently delete your account and everything tied to it. This cannot be undone. Continue?');">
+                      onsubmit="return appConfirm(event);" th:data-confirm="#{confirm.delete.account}">
                     <div class="mb-3">
                         <label th:text="#{deleteAccount.confirm.your.password}" for="currentPassword" class="form-label">Confirm your password</label>
                         <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
                     </div>
                     <button type="submit" class="btn btn-danger w-100">
-                        <i class="fa-solid fa-trash me-1"></i> Permanently Delete My Account
+                        <i class="fa-solid fa-trash me-1"></i> <span th:text="#{deleteAccount.permanently.delete.my.account}">Permanently Delete My Account</span>
                     </button>
                 </form>
             </div>

@@ -27,7 +27,7 @@
                     Invalid username/email or password.
                 </div>
                 <div class="alert alert-danger" th:if="${param.unverified != null}">
-                    Please verify your email before logging in. <a th:text="#{login.resend.verification.email}" href="/resend-verification">Resend verification email</a>
+                    <span th:text="#{login.please.verify.email}">Please verify your email before logging in.</span> <a th:text="#{login.resend.verification.email}" href="/resend-verification">Resend verification email</a>
                 </div>
                 <div th:text="#{login.too.many.login.attempts.please}" class="alert alert-danger" th:if="${param.rateLimited != null}">
                     Too many login attempts. Please try again in a few minutes.

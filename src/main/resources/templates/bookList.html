@@ -61,7 +61,7 @@
 
                 <div th:if="${#lists.isEmpty(book) and q != null and !#strings.isEmpty(q)}" class="empty-state">
                     <span th:text="#{bookList.no.matches}" class="eyebrow">No matches</span>
-                    <h3>Nothing matches "<span th:text="${q}"></span>"</h3>
+                    <h3 th:text="#{bookList.nothing.matches(${q})}">Nothing matches</h3>
                     <p th:text="#{bookList.try.a.different.title.or}">Try a different title or author.</p>
                 </div>
 
@@ -104,7 +104,7 @@
                             </a>
                             <form th:action="@{/deleteBook/{id}(id=${b.id})}" method="post" class="d-inline"
                                   sec:authorize="hasRole('LIBRARIAN')"
-                                  onsubmit="return appConfirm(event, 'Delete this book? This cannot be undone.');">
+                                  onsubmit="return appConfirm(event);" th:data-confirm="#{confirm.delete.book}">
                                 <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;"
                                         title="Delete book" th:title="#{bookList.delete.book}" aria-label="Delete book" th:aria-label="#{bookList.delete.book}">
                                     <i class="fa-solid fa-trash"></i>

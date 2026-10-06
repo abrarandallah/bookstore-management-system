@@ -11,8 +11,8 @@
         <div class="col-md-5">
             <div class="auth-card p-4">
                 <h4 th:text="#{resendVerification.resend.verification.email}">Resend Verification Email</h4>
-                <div class="alert alert-info" th:if="${message}" th:text="${message}"></div>
-                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+                <div class="alert alert-info" th:if="${message}" th:text="${#messages.msgOrNull(message) ?: message}"></div>
+                <div class="alert alert-danger" th:if="${error}" th:text="${#messages.msgOrNull(error) ?: error}"></div>
                 <p th:text="#{resendVerification.enter.your.username.or.email}" class="text-muted small">Enter your username or email and we'll send you a new verification link.</p>
                 <form th:action="@{/resend-verification}" method="post">
                     <div class="mb-3">

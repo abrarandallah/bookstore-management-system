@@ -14,7 +14,11 @@
 
     // Resolves true/false depending on which button is clicked, backdrop
     // click or Escape both counting as cancel.
-    function showConfirmModal(message, { gentle = false, confirmLabel = 'Delete', cancelLabel = 'Cancel' } = {}) {
+    function showConfirmModal(message, options = {}) {
+        const i18n = window.APP_I18N || {};
+        const gentle = !!options.gentle;
+        const confirmLabel = options.confirmLabel || i18n.confirmDelete || 'Delete';
+        const cancelLabel = options.cancelLabel || i18n.confirmCancel || 'Cancel';
         clearStrayOverlays();
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
@@ -93,9 +97,19 @@
     // returns false to block the native synchronous submit; if the user
     // confirms, resubmits the same form programmatically (which does not
     // re-trigger onsubmit, so this can't loop).
+    // The message and options can be passed directly, or (preferred, since
+    // the text then comes from the translation files) read from the form's
+    // data-confirm / data-confirm-gentle / data-confirm-label attributes.
     window.appConfirm = function (event, message, options = {}) {
         event.preventDefault();
         const form = event.target;
+        if (message === undefined) {
+            message = form.dataset.confirm || '';
+            options = {
+                gentle: form.dataset.confirmGentle === 'true',
+                confirmLabel: form.dataset.confirmLabel || undefined,
+            };
+        }
         showConfirmModal(message, options).then((confirmed) => {
             if (confirmed) {
                 form.submit();

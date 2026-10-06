@@ -9,8 +9,8 @@
 <div class="container mt-5 mb-5 text-center">
     <div class="empty-state" style="max-width: 480px; margin: 0 auto;">
         <span th:text="#{error.something.went.wrong}" class="eyebrow">Something went wrong</span>
-        <h3 th:text="${status != null and status == 404} ? 'Page not found' : 'Oops'">Oops</h3>
-        <p th:text="${message} ?: ((${status != null and status == 404}) ? 'This page does not exist, or it may have moved.' : 'Something went wrong.')">Something went wrong.</p>
+        <h3 th:text="${status != null and status == 404} ? #{error.page.not.found} : #{error.oops}">Oops</h3>
+        <p th:text="${message != null and !#strings.isEmpty(message)} ? ${#messages.msgOrNull(message) ?: message} : (${status != null and status == 404} ? #{error.page.does.not.exist} : #{error.something.went.wrong})">Something went wrong.</p>
         <a th:text="#{error.back.to.home}" class="btn btn-primary" href="/">Back to Home</a>
     </div>
 </div>

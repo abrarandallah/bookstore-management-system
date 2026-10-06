@@ -36,7 +36,7 @@
         <div
           class="alert alert-danger"
           th:if="${error != null and (activeTab == null or activeTab == 'single')}"
-          th:text="${error}"
+          th:text="${#messages.msgOrNull(error) ?: error}"
         ></div>
         <form
           th:action="@{/save}"

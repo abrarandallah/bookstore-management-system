@@ -15,7 +15,7 @@
             <span class="rating-badge mt-1" th:if="${ratingSummary.count > 0}">
                 <i class="fa-solid fa-star"></i>
                 <span th:text="${#numbers.formatDecimal(ratingSummary.average, 1, 1)}">4.3</span>
-                <span class="text-muted">(<span th:text="${ratingSummary.count}"></span> <span th:text="${ratingSummary.count == 1 ? 'review' : 'reviews'}"></span>)</span>
+                <span class="text-muted">(<span th:text="${ratingSummary.count == 1} ? #{common.review.count.one(${ratingSummary.count})} : #{common.review.count.other(${ratingSummary.count})}"></span>)</span>
             </span>
             <span th:text="#{bookRead.no.reviews.yet}" class="rating-badge mt-1 text-muted" th:unless="${ratingSummary.count > 0}">No reviews yet</span>
         </div>
@@ -59,13 +59,13 @@
             </button>
         </div>
         <p class="text-center mt-2 mb-0 small" style="color: var(--ink-soft); opacity: 0.7;">
-            <i class="fa-solid fa-keyboard me-1"></i> Use the &larr; and &rarr; arrow keys to navigate too
+            <i class="fa-solid fa-keyboard me-1"></i> <span th:text="#{bookRead.keyboard.hint}">Use the &larr; and &rarr; arrow keys to navigate too</span>
         </p>
     </div>
 
     <div class="form-panel p-4 mt-4" sec:authorize="isAuthenticated()">
-        <span class="eyebrow d-block mb-3" th:text="${ownReview != null ? 'Edit your review' : 'Rate this book'}"></span>
-        <div class="alert alert-danger" th:if="${reviewError}" th:text="${reviewError}"></div>
+        <span class="eyebrow d-block mb-3" th:text="${ownReview != null} ? #{bookRead.edit.your.review} : #{bookRead.rate.this.book}">Rate this book</span>
+        <div class="alert alert-danger" th:if="${reviewError}" th:text="${#messages.msgOrNull(reviewError) ?: reviewError}"></div>
         <form th:action="@{/available_books/{id}/review(id=${book.id})}" method="post">
             <div class="star-rating mb-3">
                 <input type="radio" id="star5" name="rating" value="5" required
@@ -88,12 +88,12 @@
                       placeholder="What did you think? (optional)" th:placeholder="#{bookRead.what.did.you.think.optional}"
                       th:text="${ownReview != null ? ownReview.comment : ''}"></textarea>
             <button type="submit" class="btn btn-primary btn-sm"
-                    th:text="${ownReview != null ? 'Update review' : 'Submit review'}"></button>
+                    th:text="${ownReview != null} ? #{bookRead.update.review} : #{bookRead.submit.review}">Submit review</button>
         </form>
         <form th:if="${ownReview != null}"
               th:action="@{/available_books/{bookId}/review/{reviewId}/delete(bookId=${book.id}, reviewId=${ownReview.id})}"
               method="post" class="d-inline mt-2"
-              onsubmit="return appConfirm(event, 'Delete your review?');">
+              onsubmit="return appConfirm(event);" th:data-confirm="#{confirm.delete.review}">
             <button th:text="#{bookRead.delete.my.review}" type="submit" class="btn btn-link btn-sm text-danger p-0">Delete my review</button>
         </form>
     </div>
@@ -136,7 +136,8 @@
     const readerI18n = {
         takeawayProgress: /*[[#{bookRead.takeaway.progress}]]*/ 'Takeaway {0} of {1}',
         next: /*[[#{bookRead.next}]]*/ 'Next',
-        done: /*[[#{bookRead.done}]]*/ 'Done'
+        done: /*[[#{bookRead.done}]]*/ 'Done',
+        loginToSave: /*[[#{ui.login.to.save.progress}]]*/ 'Log in to save your progress and mark this as finished.'
     };
     // Anonymous visitors can still read every page - they just don't have
     // anywhere to persist progress/completion to, so those two server
@@ -192,7 +193,7 @@
             if (isLoggedIn) {
                 document.getElementById('finish-form').submit();
             } else {
-                window.showToast('Log in to save your progress and mark this as finished.', { icon: 'circle-info' });
+                window.showToast(readerI18n.loginToSave, { icon: 'circle-info' });
             }
             return;
         }

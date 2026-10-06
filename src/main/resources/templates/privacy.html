@@ -44,9 +44,8 @@
 
     <h6 th:text="#{privacy.your.data.your.control}" class="mt-4">Your data, your control</h6>
     <p>
-        You can change your password or delete your account entirely, at any time, from
-        <a th:text="#{privacy.settings}" href="/settings">Settings</a> - deleting your account removes your reviews,
-        reading history, and bookmarked books along with it.
+        <span th:text="#{privacy.your.data.control.before}">You can change your password or delete your account entirely, at any time, from</span>
+        <a th:text="#{privacy.settings}" href="/settings">Settings</a> <span th:text="#{privacy.your.data.control.after}">- deleting your account removes your reviews, reading history, and bookmarked books along with it.</span>
     </p>
 
     <h6 th:text="#{privacy.contact}" class="mt-4">Contact</h6>

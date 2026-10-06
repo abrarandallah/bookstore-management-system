@@ -75,10 +75,13 @@ public class AuthPageController {
             // user knows what to fix instead of just seeing "fill in all
             // fields" - the fields may well already be filled in with an
             // invalid value.
+            // The message is a translation key built from the field and the
+            // rule that failed (e.g. "signup.error.password.Size") - see
+            // messages*.properties - so it shows in the reader's language.
             String error = bindingResult.getFieldErrors().stream()
                     .findFirst()
-                    .map(fieldError -> fieldError.getDefaultMessage())
-                    .orElse("Please fill in all fields.");
+                    .map(fieldError -> "signup.error." + fieldError.getField() + "." + fieldError.getCode())
+                    .orElse("signup.error.fill.all.fields");
             model.addAttribute("error", error);
             return "register";
         }
@@ -89,7 +92,7 @@ public class AuthPageController {
             // deliberately doesn't throw for a duplicate email, to avoid
             // leaking which emails are registered. Show the error instead
             // of a 500 page.
-            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("error", "signup.error.username.taken");
             model.addAttribute("signupRequest", signupRequest);
             return "register";
         } catch (DataIntegrityViolationException ex) {
@@ -99,7 +102,7 @@ public class AuthPageController {
             // instant could both pass those checks before either finishes
             // saving. Deliberately kept generic (doesn't say which field
             // collided) for the same enumeration reason as above.
-            model.addAttribute("error", "Registration failed. Please check your details and try again.");
+            model.addAttribute("error", "signup.error.generic");
             model.addAttribute("signupRequest", signupRequest);
             return "register";
         }
@@ -154,24 +157,24 @@ public class AuthPageController {
             @RequestParam String confirmPassword, Authentication authentication, Model model) {
         User user = currentUser(authentication);
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            model.addAttribute("error", "Current password is incorrect.");
+            model.addAttribute("error", "password.error.current.incorrect");
             return "changePassword";
         }
         if (password == null || password.length() < 8) {
-            model.addAttribute("error", "New password must be at least 8 characters.");
+            model.addAttribute("error", "password.error.new.too.short");
             return "changePassword";
         }
         if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "New passwords don't match.");
+            model.addAttribute("error", "password.error.new.mismatch");
             return "changePassword";
         }
         if (passwordEncoder.matches(password, user.getPassword())) {
-            model.addAttribute("error", "New password must be different from your current password.");
+            model.addAttribute("error", "password.error.new.same");
             return "changePassword";
         }
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
-        model.addAttribute("message", "Your password has been changed.");
+        model.addAttribute("message", "password.changed");
         return "changePassword";
     }
 
@@ -189,13 +192,14 @@ public class AuthPageController {
             HttpServletRequest request, Model model) {
         User user = currentUser(authentication);
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            model.addAttribute("error", "Current password is incorrect.");
+            model.addAttribute("error", "password.error.current.incorrect");
             return "deleteAccount";
         }
         try {
             accountService.deleteAccount(user);
         } catch (IllegalStateException ex) {
-            model.addAttribute("error", ex.getMessage());
+            // Only thrown when this is the last librarian account.
+            model.addAttribute("error", "account.error.last.librarian");
             return "deleteAccount";
         }
         // The account (and the session's backing DB row) no longer exists -

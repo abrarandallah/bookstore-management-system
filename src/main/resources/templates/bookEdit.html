@@ -8,7 +8,7 @@
 <div class="container my-5 p-5 form-panel" style="max-width: 640px;">
     <span th:text="#{bookEdit.editing}" class="eyebrow d-block text-center mb-2">Editing</span>
     <h4 th:text="#{bookEdit.edit.book}" class="text-center">Edit Book</h4>
-    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${#messages.msgOrNull(error) ?: error}"></div>
     <form th:action="@{/save}" method="post" th:object="${book}" enctype="multipart/form-data">
         <input type="hidden" name="id" th:value="${book.id}">
         <div class="mb-3">

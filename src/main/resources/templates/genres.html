@@ -55,7 +55,7 @@
                 <td>
                     <form th:if="${#maps.size(genreCounts) > 1}"
                           th:action="@{/admin/genres/{id}/merge(id=${entry.key.id})}" method="post" class="d-flex gap-2"
-                          onsubmit="return appConfirm(event, 'Move every book from this genre into the one you picked, then delete this genre? This can&#39;t be undone.');">
+                          onsubmit="return appConfirm(event);" th:data-confirm="#{confirm.merge.genre}">
                         <select name="targetId" class="form-select form-select-sm" style="width: auto;">
                             <th:block th:each="target : ${genreCounts}">
                                 <option th:if="${target.key.id != entry.key.id}"

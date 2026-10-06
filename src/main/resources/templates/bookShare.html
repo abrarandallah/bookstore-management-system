@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <th:block th:insert="~{fragments/layout :: pageHead(${book.name} + ' - shared by a reader')}"></th:block>
+    <th:block th:insert="~{fragments/layout :: pageHead(#{bookShare.page.title(${localizedBook.name})})}"></th:block>
     <!--/* Open Graph tags so the link actually looks like something when it
            lands in a chat app or social feed, instead of a bare URL. Kept
            here rather than in the shared pageHead fragment since only this
            page needs them. */-->
     <meta th:if="${book.coverImageUrl}" property="og:image" th:content="@{${book.coverImageUrl}}">
-    <meta property="og:title" th:content="${book.name} + ' by ' + ${book.author}">
+    <meta property="og:title" th:content="#{bookShare.og.title(${localizedBook.name}, ${localizedBook.author})}">
     <meta property="og:description"
-          th:content="${teaser != null ? teaser.heading : (book.name + ' - a book on BookStore, summarized in ' + book.estimatedReadMinutes + ' min.')}">
+          th:content="${teaser != null} ? ${(localizedTeaser != null ? localizedTeaser : teaser).heading} : #{bookShare.og.description(${localizedBook.name}, ${book.estimatedReadMinutes})}">
     <meta property="og:type" content="book">
 </head>
 <body>
@@ -33,14 +33,13 @@
         <span class="rating-badge" th:if="${ratingSummary.count > 0}">
             <i class="fa-solid fa-star"></i>
             <span th:text="${#numbers.formatDecimal(ratingSummary.average, 1, 1)}">4.3</span>
-            <span class="text-muted">(<span th:text="${ratingSummary.count}"></span>
-                <span th:text="${ratingSummary.count == 1 ? 'review' : 'reviews'}"></span>)</span>
+            <span class="text-muted">(<span th:text="${ratingSummary.count == 1} ? #{common.review.count.one(${ratingSummary.count})} : #{common.review.count.other(${ratingSummary.count})}"></span>)</span>
         </span>
         <span th:text="#{bookShare.no.reviews.yet}" class="rating-badge text-muted" th:unless="${ratingSummary.count > 0}">No reviews yet</span>
 
         <span class="takeaway-tag d-block mt-2" th:if="${!#lists.isEmpty(book.takeaways)}">
             <i class="fa-solid fa-list-check"></i>
-            <span th:text="${#lists.size(book.takeaways)} + ' takeaways &middot; ' + ${book.estimatedReadMinutes} + ' min read'"></span>
+            <span th:text="${#lists.size(book.takeaways) == 1} ? #{bookList.takeaway.count.one(${#lists.size(book.takeaways)}, ${book.estimatedReadMinutes})} : #{bookList.takeaway.count.other(${#lists.size(book.takeaways)}, ${book.estimatedReadMinutes})}"></span>
         </span>
     </div>
 
@@ -49,11 +48,10 @@
            what they'd actually get. */-->
     <div class="form-panel p-4 p-md-5 mb-4" th:if="${teaser != null}">
         <span th:text="#{bookShare.a.first.look}" class="eyebrow d-block mb-2">A first look</span>
-        <h4 th:text="${teaser.heading}">Heading</h4>
-        <p style="white-space: pre-line;" th:text="${teaser.content}">Content</p>
+        <h4 th:text="${(localizedTeaser != null ? localizedTeaser : teaser).heading}">Heading</h4>
+        <p style="white-space: pre-line;" th:text="${(localizedTeaser != null ? localizedTeaser : teaser).content}">Content</p>
         <p class="text-muted small mb-0" th:if="${#lists.size(book.takeaways) > 1}">
-            + <span th:text="${#lists.size(book.takeaways) - 1}"></span> more
-            <span th:text="${#lists.size(book.takeaways) - 1 == 1 ? 'takeaway' : 'takeaways'}"></span> inside.
+            <span th:text="${#lists.size(book.takeaways) - 1 == 1} ? #{bookShare.more.takeaways.one(${#lists.size(book.takeaways) - 1})} : #{bookShare.more.takeaways.other(${#lists.size(book.takeaways) - 1})}"></span>
         </p>
     </div>
 
@@ -66,21 +64,21 @@
     <div class="text-center">
         <a sec:authorize="isAuthenticated()" th:href="@{/available_books/{id}/read(id=${book.id})}"
            class="btn btn-primary">
-            Read the full book <i class="fa-solid fa-arrow-right ms-1"></i>
+            <span th:text="#{bookShare.read.full.book}">Read the full book</span> <i class="fa-solid fa-arrow-right ms-1"></i>
         </a>
         <!--/* Login always lands on /available_books on success (see
                SecurityConfig's defaultSuccessUrl) - there's no redirect-back
                support yet, so this intentionally just points at /login
                rather than promising a return to this exact book. */-->
         <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn btn-primary">
-            Sign in to read the full book <i class="fa-solid fa-arrow-right ms-1"></i>
+            <span th:text="#{bookShare.sign.in.to.read}">Sign in to read the full book</span> <i class="fa-solid fa-arrow-right ms-1"></i>
         </a>
         <p class="text-muted small mt-3 mb-0" sec:authorize="isAnonymous()">
-            New here? <a th:text="#{bookShare.create.a.free.account}" th:href="@{/register}">Create a free account</a> - it only takes a minute.
+            <span th:text="#{bookShare.new.here}">New here?</span> <a th:text="#{bookShare.create.a.free.account}" th:href="@{/register}">Create a free account</a> <span th:text="#{bookShare.takes.a.minute}">- it only takes a minute.</span>
         </p>
 
         <button type="button" class="btn btn-link mt-2" id="share-copy-btn" onclick="copyShareLink()">
-            <i class="fa-solid fa-link me-1"></i> Copy this link to share
+            <i class="fa-solid fa-link me-1"></i> <span th:text="#{bookShare.copy.link}">Copy this link to share</span>
         </button>
     </div>
 
@@ -89,12 +87,14 @@
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
-<script>
+<script th:inline="javascript">
+    const linkCopiedText = /*[[#{bookShare.link.copied}]]*/ 'Link copied';
     function copyShareLink() {
         navigator.clipboard.writeText(window.location.href).then(function () {
             const btn = document.getElementById('share-copy-btn');
             const original = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Link copied';
+            btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> ';
+            btn.appendChild(document.createTextNode(linkCopiedText));
             setTimeout(function () { btn.innerHTML = original; }, 2000);
         });
     }

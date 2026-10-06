@@ -31,7 +31,7 @@ public class EmailVerificationController {
     public String verifyEmail(@RequestParam String token, Model model) {
         Optional<EmailVerificationToken> tokenOpt = tokenRepository.findByToken(token);
         if (tokenOpt.isEmpty() || tokenOpt.get().isExpired()) {
-            model.addAttribute("error", "This verification link is invalid or has expired. Please request a new one.");
+            model.addAttribute("error", "verify.error.invalid.link");
             return "verifyEmailInvalid";
         }
         EmailVerificationToken verificationToken = tokenOpt.get();
@@ -55,7 +55,7 @@ public class EmailVerificationController {
         // budget with /forgot-password (bare IP) or /login (used with a
         // "login:" prefix) - see LoginRateLimitFilter for that one.
         if (!rateLimiter.allow("verify:" + clientIp)) {
-            model.addAttribute("error", "Too many requests. Please try again in a few minutes.");
+            model.addAttribute("error", "verify.error.too.many");
             return "resendVerification";
         }
         Optional<User> userOpt = userRepository.findByUsernameOrEmailOrEmail(usernameOrEmail);
@@ -72,8 +72,7 @@ public class EmailVerificationController {
         // Same message regardless of whether the account exists or is already
         // verified, so this can't be used to enumerate accounts or their
         // verification status.
-        model.addAttribute("message",
-                "If an unverified account with that username or email exists, we've sent a new verification link to it.");
+        model.addAttribute("message", "verify.sent");
         return "resendVerification";
     }
 }

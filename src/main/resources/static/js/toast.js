@@ -44,6 +44,12 @@
         }, duration);
     };
 
+    // Translated text comes from window.APP_I18N (set by fragments/layout.html
+    // before this file loads); the English here is only a fallback.
+    function t(key, fallback) {
+        return (window.APP_I18N && window.APP_I18N[key]) || fallback;
+    }
+
     function handleBookmarkSubmit(form) {
         const button = form.querySelector('button[type="submit"]');
         if (button) {
@@ -62,13 +68,13 @@
                 // when redirect: 'manual' is used - that's success, not an
                 // error, so treat it as such rather than throwing.
                 if (response.ok || response.type === 'opaqueredirect' || response.status === 0) {
-                    window.showToast('Added to My Books', { icon: 'bookmark' });
+                    window.showToast(t('addedToMyBooks', 'Added to My Books'), { icon: 'bookmark' });
                 } else {
-                    window.showToast('Could not add that book - try again', { icon: 'triangle-exclamation', isError: true });
+                    window.showToast(t('addFailed', 'Could not add that book - try again'), { icon: 'triangle-exclamation', isError: true });
                 }
             })
             .catch(() => {
-                window.showToast('Could not add that book - try again', { icon: 'triangle-exclamation', isError: true });
+                window.showToast(t('addFailed', 'Could not add that book - try again'), { icon: 'triangle-exclamation', isError: true });
             })
             .finally(() => {
                 if (button) {

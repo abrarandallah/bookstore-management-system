@@ -29,18 +29,20 @@ public class FileStorageService {
     /**
      * @return the public path (under /uploads/) the file was saved to.
      * @throws IllegalArgumentException if the file is missing, too large, or
-     *                                  not a recognized image type.
+     *                                  not a recognized image type. The message
+     *                                  is a translation key (upload.error.*) so
+     *                                  the page can show it in the reader's language.
      */
     public String store(MultipartFile file, String subfolder) {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("No file was uploaded.");
+            throw new IllegalArgumentException("upload.error.none");
         }
         if (file.getSize() > MAX_BYTES) {
-            throw new IllegalArgumentException("Image must be under 5MB.");
+            throw new IllegalArgumentException("upload.error.size");
         }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
-            throw new IllegalArgumentException("Only PNG, JPEG, WEBP, or GIF images are allowed.");
+            throw new IllegalArgumentException("upload.error.type");
         }
 
         try {
@@ -59,7 +61,7 @@ public class FileStorageService {
 
             return "/uploads/" + subfolder + "/" + filename;
         } catch (IOException e) {
-            throw new IllegalArgumentException("Could not save the uploaded image.", e);
+            throw new IllegalArgumentException("upload.error.save", e);
         }
     }
 }

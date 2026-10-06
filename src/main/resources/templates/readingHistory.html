@@ -12,7 +12,7 @@
                 <h2 th:text="#{readingHistory.reading.history}">Reading History</h2>
             </div>
             <a th:href="@{/available_books}" class="btn btn-outline-brass">
-                <i class="fa-solid fa-magnifying-glass me-1"></i> Browse more books
+                <i class="fa-solid fa-magnifying-glass me-1"></i> <span th:text="#{common.browse.more.books}">Browse more books</span>
             </a>
         </div>
 
@@ -35,21 +35,18 @@
 
                         <div th:if="${rp.finished}" class="small mt-1">
                             <i class="fa-solid fa-circle-check" style="color: var(--brass, #b08d57);"></i>
-                            Finished <span th:text="${#temporals.format(rp.finishedAt, 'MMM d, yyyy')}">date</span>
+                            <span th:text="#{readingHistory.finished.on(${#temporals.format(rp.finishedAt, 'MMM d, yyyy')})}">Finished date</span>
                         </div>
                         <div th:unless="${rp.finished}" class="mt-2">
                             <div class="reader-progress-bar">
                                 <div class="reader-progress-fill history-progress-fill"
                                      th:attr="data-target-width=${((rp.currentPage + 1) * 100) / #lists.size(rp.book.takeaways)} + '%'"></div>
                             </div>
-                            <span class="small text-muted">
-                                Takeaway <span th:text="${rp.currentPage + 1}"></span> of
-                                <span th:text="${#lists.size(rp.book.takeaways)}"></span>
-                            </span>
+                            <span class="small text-muted" th:text="#{bookRead.takeaway.progress(${rp.currentPage + 1}, ${#lists.size(rp.book.takeaways)})}"></span>
                         </div>
                     </div>
                     <form th:action="@{/reading-history/{id}/delete(id=${rp.id})}" method="post"
-                          onsubmit="return appConfirm(event, 'Remove this from your reading history?', {gentle: true, confirmLabel: 'Remove'});">
+                          onsubmit="return appConfirm(event);" th:data-confirm="#{confirm.remove.from.history}" data-confirm-gentle="true" th:data-confirm-label="#{myBooks.remove}">
                         <button type="submit" class="btn btn-link p-0 icon-link danger" style="border:none;background:none;"
                                 title="Remove from history" th:title="#{readingHistory.remove.from.history}" aria-label="Remove from history" th:aria-label="#{readingHistory.remove.from.history}">
                             <i class="fa-solid fa-trash"></i>

@@ -16,7 +16,8 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleAccessDenied(Model model) {
-        model.addAttribute("message", "You don't have permission to do that.");
+        // A translation key - error.html looks it up in the reader's language.
+        model.addAttribute("message", "error.forbidden");
         return "error";
     }
 
@@ -25,7 +26,9 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFound(ResourceNotFoundException ex, Model model) {
-        model.addAttribute("message", ex.getMessage());
+        // The exception text is English and meant for logs/developers; readers get
+        // a translated, generic message (translation key) instead.
+        model.addAttribute("message", "error.not.found.generic");
         return "error";
     }
 }

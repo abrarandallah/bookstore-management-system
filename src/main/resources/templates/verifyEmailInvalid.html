@@ -10,7 +10,7 @@
     <div class="empty-state" style="max-width: 480px; margin: 0 auto;">
         <span th:text="#{verifyEmailInvalid.link.expired}" class="eyebrow">Link expired</span>
         <h3 th:text="#{verifyEmailInvalid.verification.link.invalid.1}">Verification link invalid</h3>
-        <p th:text="${error}"></p>
+        <p th:text="${#messages.msgOrNull(error) ?: error}"></p>
         <a th:text="#{verifyEmailInvalid.request.a.new.link}" class="btn btn-primary" href="/resend-verification">Request a new link</a>
     </div>
 </div>
