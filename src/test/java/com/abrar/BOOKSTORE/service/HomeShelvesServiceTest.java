@@ -10,6 +10,7 @@ import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.entity.BookPage;
+import com.abrar.BOOKSTORE.entity.Genre;
 import com.abrar.BOOKSTORE.entity.ReadingProgress;
 import com.abrar.BOOKSTORE.repository.BookRepository;
 import com.abrar.BOOKSTORE.repository.ReadingProgressRepository;
@@ -17,6 +18,7 @@ import com.abrar.BOOKSTORE.service.HomeShelvesService.ShelfItem;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -145,5 +147,36 @@ class HomeShelvesServiceTest {
         assertEquals("Short Book", items.get(0).name());
         assertEquals(2, items.get(0).takeawayCount());
         assertEquals(0, items.get(0).step());
+    }
+
+    /** Same-genre books only: not the book itself, and not ones already finished. */
+    @Test
+    void testRelatedBooksSkipsTheSourceAndBooksTheReaderHasFinished() {
+        Genre business = new Genre("Business");
+        business.setId(10);
+        Book source = bookWithTakeaways(1, "Source Book", 3);
+        Book unread = bookWithTakeaways(2, "Unread Book", 3);
+        Book alreadyRead = bookWithTakeaways(3, "Already Read", 3);
+        source.setGenres(new LinkedHashSet<>(List.of(business)));
+        ReadingProgress finished = new ReadingProgress(reader, alreadyRead);
+        finished.setFinishedAt(Instant.now());
+        when(bookRepository.findById(1)).thenReturn(Optional.of(source));
+        when(bookRepository.findByGenres_Id(10)).thenReturn(List.of(source, unread, alreadyRead));
+        when(userRepository.findByUsernameOrEmail("reader")).thenReturn(Optional.of(reader));
+        when(readingProgressRepository.findByUserAndBookIn(Mockito.eq(reader), Mockito.anyList()))
+                .thenReturn(List.of(finished));
+
+        List<ShelfItem> items = homeShelvesService.relatedBooks(1, "reader", "en");
+
+        assertEquals(1, items.size());
+        assertEquals("Unread Book", items.get(0).name());
+    }
+
+    @Test
+    void testRelatedBooksIsEmptyWhenTheBookHasNoGenres() {
+        Book source = bookWithTakeaways(1, "Source Book", 3);
+        when(bookRepository.findById(1)).thenReturn(Optional.of(source));
+
+        assertTrue(homeShelvesService.relatedBooks(1, "reader", "en").isEmpty());
     }
 }

@@ -37,6 +37,9 @@
         </div>
     </div>
 </div>
+
+<!-- "You might also like" - other unread books in the same genres (see HomeShelvesService#relatedBooks) -->
+<th:block th:replace="~{fragments/shelves :: shelf(#{bookFinished.related.eyebrow}, #{bookFinished.related.title}, ${@homeShelves.relatedBooks(book.id, #authentication.name, #locale.language)}, null)}"></th:block>
 </main>
 
 <canvas id="confetti-canvas" class="confetti-canvas"></canvas>

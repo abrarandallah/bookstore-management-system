@@ -3,6 +3,7 @@ package com.abrar.BOOKSTORE.service;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.entity.Book;
+import com.abrar.BOOKSTORE.entity.Genre;
 import com.abrar.BOOKSTORE.entity.ReadingProgress;
 import com.abrar.BOOKSTORE.repository.BookRepository;
 import com.abrar.BOOKSTORE.repository.ReadingProgressRepository;
@@ -11,10 +12,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -33,6 +40,7 @@ public class HomeShelvesService {
 
     public static final int SHELF_SIZE = 6;
     public static final int CONTINUE_LIMIT = 4;
+    public static final int RELATED_LIMIT = 3;
     // 4 takeaways is about 6 minutes (see Book#getEstimatedReadMinutes).
     public static final int QUICK_READ_MAX_TAKEAWAYS = 4;
 
@@ -126,6 +134,49 @@ public class HomeShelvesService {
         List<Book> books = bookRepository
                 .findQuickReads(QUICK_READ_MAX_TAKEAWAYS, PageRequest.of(0, SHELF_SIZE));
         return items(books, language);
+    }
+
+    /**
+     * "You might also like": other books sharing at least one genre with the
+     * given book, skipping the book itself and any the reader has already
+     * finished. Books sharing the most genres come first, then the newest.
+     * Used on the page shown after finishing a book (bookFinished.html).
+     */
+    public List<ShelfItem> relatedBooks(int bookId, String username, String language) {
+        Optional<Book> source = bookRepository.findById(bookId);
+        if (source.isEmpty() || source.get().getGenres().isEmpty()) {
+            return List.of();
+        }
+        Map<Integer, Book> candidates = new LinkedHashMap<>();
+        Map<Integer, Integer> sharedGenres = new HashMap<>();
+        for (Genre genre : source.get().getGenres()) {
+            for (Book candidate : bookRepository.findByGenres_Id(genre.getId())) {
+                if (candidate.getId() == bookId || candidate.getTakeaways().isEmpty()) {
+                    continue;
+                }
+                candidates.putIfAbsent(candidate.getId(), candidate);
+                sharedGenres.merge(candidate.getId(), 1, Integer::sum);
+            }
+        }
+        if (candidates.isEmpty()) {
+            return List.of();
+        }
+        Set<Integer> alreadyFinished = new HashSet<>();
+        if (username != null) {
+            userRepository.findByUsernameOrEmail(username).ifPresent(user -> readingProgressRepository
+                    .findByUserAndBookIn(user, new ArrayList<>(candidates.values())).stream()
+                    .filter(ReadingProgress::isFinished)
+                    .forEach(p -> alreadyFinished.add(p.getBook().getId())));
+        }
+        Comparator<Book> byMostSharedGenres = Comparator
+                .<Book>comparingInt(b -> sharedGenres.get(b.getId())).reversed();
+        Comparator<Book> byNewest = Comparator.<Book>comparingInt(Book::getId).reversed();
+        List<Book> picks = candidates.values().stream()
+                .filter(b -> !alreadyFinished.contains(b.getId()))
+                .sorted(byMostSharedGenres.thenComparing(byNewest))
+                .limit(RELATED_LIMIT)
+                .toList();
+        return items(picks, language);
     }
 
     private List<ShelfItem> items(List<Book> books, String language) {
