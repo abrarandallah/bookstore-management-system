@@ -21,9 +21,9 @@
                 <h5 class="mb-1" th:text="${user.username}"></h5>
                 <p class="text-muted mb-2" th:text="${user.email}"></p>
                 <span class="pill-tag" th:text="${user.role == 'ROLE_LIBRARIAN'} ? #{profile.role.librarian} : #{profile.role.reader}"></span>
-                <span th:text="#{profile.voracious.reader}" class="pill-tag" th:if="${finishedBooksCount >= 15}" style="margin-left: 6px;">🔥 Voracious Reader</span>
-                <span th:text="#{profile.bookworm}" class="pill-tag" th:if="${finishedBooksCount >= 5 and finishedBooksCount < 15}" style="margin-left: 6px;">🐛 Bookworm</span>
-                <span th:text="#{profile.first.chapter}" class="pill-tag" th:if="${finishedBooksCount >= 1 and finishedBooksCount < 5}" style="margin-left: 6px;">📖 First Chapter</span>
+                <span th:text="#{profile.voracious.reader}" class="pill-tag" th:if="${finishedBooksCount >= 15}" style="margin-inline-start: 6px;">🔥 Voracious Reader</span>
+                <span th:text="#{profile.bookworm}" class="pill-tag" th:if="${finishedBooksCount >= 5 and finishedBooksCount < 15}" style="margin-inline-start: 6px;">🐛 Bookworm</span>
+                <span th:text="#{profile.first.chapter}" class="pill-tag" th:if="${finishedBooksCount >= 1 and finishedBooksCount < 5}" style="margin-inline-start: 6px;">📖 First Chapter</span>
 
                 <form th:action="@{/profile/avatar}" method="post" enctype="multipart/form-data"
                       class="d-flex justify-content-center align-items-center gap-2 mt-3">
