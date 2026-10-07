@@ -77,6 +77,7 @@ librarian, since regular signup always creates a `ROLE_USER` account.
 | `MAIL_USERNAME`      | _(empty)_                           | SMTP username                                                                        |
 | `MAIL_PASSWORD`      | _(empty)_                           | SMTP password                                                                        |
 | `MAIL_SSL_ENABLE`    | `false`                             | Set to `true` and `MAIL_PORT=465` if your network blocks STARTTLS on 587             |
+| `SHOW_SQL`           | `false`                             | Set to `true` to print every database query in the log while debugging               |
 
 Without real mail credentials, verification and password-reset emails won't
 actually be delivered, but the tokens are still created and logged - see
