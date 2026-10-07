@@ -6,6 +6,8 @@ import com.abrar.BOOKSTORE.service.AccountService;
 import com.abrar.BOOKSTORE.service.GenreService;
 import com.abrar.BOOKSTORE.service.PagedResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -32,6 +34,14 @@ public class AdminController {
     private AccountService accountService;
     @Autowired
     private GenreService genreService;
+    @Autowired
+    private MessageSource messageSource;
+
+    // Services throw message keys; this turns a key (or, for anything that is
+    // not a known key, the raw text) into the current language.
+    private String msg(String key, Object... args) {
+        return messageSource.getMessage(key, args, key, LocaleContextHolder.getLocale());
+    }
 
     @GetMapping("/users")
     public String listUsers(@RequestParam(required = false, defaultValue = "1") int page, Model model) {
@@ -56,7 +66,7 @@ public class AdminController {
     public String changeRole(@PathVariable long id, @RequestParam String role,
             Authentication authentication, RedirectAttributes redirectAttributes) {
         if (!VALID_ROLES.contains(role)) {
-            redirectAttributes.addFlashAttribute("error", "Invalid role.");
+            redirectAttributes.addFlashAttribute("error", msg("admin.error.invalid.role"));
             return "redirect:/admin/users";
         }
         User target = userRepository.findById(id).orElse(null);
@@ -67,7 +77,7 @@ public class AdminController {
                 && !"ROLE_LIBRARIAN".equals(role)
                 && userRepository.countByRole("ROLE_LIBRARIAN") <= 1;
         if (demotingLastLibrarian) {
-            redirectAttributes.addFlashAttribute("error", "Can't remove the last librarian account.");
+            redirectAttributes.addFlashAttribute("error", msg("admin.error.last.librarian"));
             return "redirect:/admin/users";
         }
         target.setRole(role);
@@ -83,7 +93,7 @@ public class AdminController {
             return "redirect:/admin/users";
         }
         if (newPassword == null || newPassword.length() < 8) {
-            redirectAttributes.addFlashAttribute("error", "Password must be at least 8 characters.");
+            redirectAttributes.addFlashAttribute("error", msg("admin.error.password.short"));
             return "redirect:/admin/users";
         }
         target.setPassword(passwordEncoder.encode(newPassword));
@@ -96,11 +106,9 @@ public class AdminController {
         boolean wasUnverified = !target.isVerified();
         target.setVerified(true);
         userRepository.save(target);
-        String message = "Password updated for " + target.getUsernameOrEmail() + ".";
-        if (wasUnverified) {
-            message += " Their account was also unverified, so it's now verified too - otherwise they still "
-                    + "wouldn't have been able to log in with the new password.";
-        }
+        String message = wasUnverified
+                ? msg("admin.message.password.updated.verified", target.getUsernameOrEmail())
+                : msg("admin.message.password.updated", target.getUsernameOrEmail());
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/admin/users";
     }
@@ -120,16 +128,16 @@ public class AdminController {
         User currentUser = userRepository.findByUsernameOrEmail(authentication.getName()).orElse(null);
         if (currentUser != null && currentUser.getId() == target.getId()) {
             redirectAttributes.addFlashAttribute("error",
-                    "You can't delete your own account here - use Delete Account in Settings instead.");
+                    msg("admin.error.delete.self"));
             return "redirect:/admin/users";
         }
         try {
             accountService.deleteAccount(target);
         } catch (IllegalStateException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addFlashAttribute("error", msg(ex.getMessage()));
             return "redirect:/admin/users";
         }
-        redirectAttributes.addFlashAttribute("message", "Deleted " + target.getUsernameOrEmail() + ".");
+        redirectAttributes.addFlashAttribute("message", msg("admin.message.user.deleted", target.getUsernameOrEmail()));
         return "redirect:/admin/users";
     }
 
@@ -144,9 +152,9 @@ public class AdminController {
             RedirectAttributes redirectAttributes) {
         try {
             genreService.rename(id, name);
-            redirectAttributes.addFlashAttribute("message", "Renamed to \"" + name.trim() + "\".");
+            redirectAttributes.addFlashAttribute("message", msg("genre.message.renamed", name.trim()));
         } catch (IllegalArgumentException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addFlashAttribute("error", msg(ex.getMessage(), name == null ? "" : name.trim()));
         }
         return "redirect:/genres";
     }
@@ -156,9 +164,9 @@ public class AdminController {
             RedirectAttributes redirectAttributes) {
         try {
             genreService.merge(id, targetId);
-            redirectAttributes.addFlashAttribute("message", "Merged and removed the duplicate genre.");
+            redirectAttributes.addFlashAttribute("message", msg("genre.message.merged"));
         } catch (IllegalArgumentException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addFlashAttribute("error", msg(ex.getMessage()));
         }
         return "redirect:/genres";
     }

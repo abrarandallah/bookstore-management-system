@@ -51,7 +51,7 @@ public class AccountService {
     public void deleteAccount(User user) {
         if ("ROLE_LIBRARIAN".equals(user.getRole()) && userRepository.countByRole("ROLE_LIBRARIAN") <= 1) {
             throw new IllegalStateException(
-                    "Can't delete the last librarian account - promote another user to librarian first.");
+                    "account.error.last.librarian");
         }
         passwordResetTokenRepository.deleteByUser(user);
         emailVerificationTokenRepository.deleteByUser(user);

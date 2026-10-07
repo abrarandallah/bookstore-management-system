@@ -11,6 +11,8 @@ import com.abrar.BOOKSTORE.service.GenreService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +37,12 @@ public class BookImportController {
     private BookValidator bookValidator;
     @Autowired
     private GenreService genreService;
+    @Autowired
+    private MessageSource messageSource;
+
+    private String msg(String key, Object... args) {
+        return messageSource.getMessage(key, args, key, LocaleContextHolder.getLocale());
+    }
 
     // Public/static: also referenced by BookController#BookRegister, which
     // renders the same merged "bookRegister" template (Single Book + Bulk
@@ -77,12 +85,12 @@ public class BookImportController {
             requests = mapper.readValue(json, new TypeReference<List<BookImportRequest>>() {
             });
         } catch (Exception ex) {
-            model.addAttribute("error", "Couldn't parse that as JSON: " + ex.getMessage());
+            model.addAttribute("error", msg("import.error.parse", ex.getMessage()));
             return "bookRegister";
         }
 
         if (requests.isEmpty()) {
-            model.addAttribute("error", "That list was empty - nothing to import.");
+            model.addAttribute("error", msg("import.error.empty"));
             return "bookRegister";
         }
 
@@ -115,17 +123,17 @@ public class BookImportController {
                 book.setGenres(genres);
             }
 
-            String label = (req.getName() == null || req.getName().isBlank()) ? "row " + (i + 1) : req.getName();
+            String label = (req.getName() == null || req.getName().isBlank()) ? msg("import.row.label", i + 1) : req.getName();
             String error = bookValidator.validate(book);
             if (error != null) {
-                errors.add(label + ": " + error);
+                errors.add(msg("import.error.row", label, msg(error)));
                 continue;
             }
             bookService.save(book);
             imported++;
         }
 
-        model.addAttribute("message", imported + " of " + requests.size() + " book(s) imported.");
+        model.addAttribute("message", msg("import.message.summary", imported, requests.size()));
         if (!errors.isEmpty()) {
             model.addAttribute("errors", errors);
         }

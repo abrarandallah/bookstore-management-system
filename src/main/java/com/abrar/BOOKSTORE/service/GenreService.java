@@ -57,14 +57,14 @@ public class GenreService {
     public void rename(int id, String newName) {
         String trimmed = newName == null ? "" : newName.trim();
         if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Genre name can't be empty.");
+            throw new IllegalArgumentException("genre.error.empty");
         }
         Genre genre = genreRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Genre not found."));
+                .orElseThrow(() -> new IllegalArgumentException("genre.error.not.found"));
         genreRepository.findByNameIgnoreCase(trimmed).ifPresent(existing -> {
             if (existing.getId() != id) {
                 throw new IllegalArgumentException(
-                        "\"" + trimmed + "\" already exists - merge into it instead of renaming to a duplicate.");
+                        "genre.error.exists");
             }
         });
         genre.setName(trimmed);
@@ -81,12 +81,12 @@ public class GenreService {
     @Transactional
     public void merge(int sourceId, int targetId) {
         if (sourceId == targetId) {
-            throw new IllegalArgumentException("Can't merge a genre into itself.");
+            throw new IllegalArgumentException("genre.error.merge.self");
         }
         Genre source = genreRepository.findById(sourceId)
-                .orElseThrow(() -> new IllegalArgumentException("Genre not found."));
+                .orElseThrow(() -> new IllegalArgumentException("genre.error.not.found"));
         Genre target = genreRepository.findById(targetId)
-                .orElseThrow(() -> new IllegalArgumentException("Target genre not found."));
+                .orElseThrow(() -> new IllegalArgumentException("genre.error.target.not.found"));
         // Book owns the book_genres join table, so reassigning happens
         // through each Book's genres set rather than a Genre-side field.
         // source/target were loaded above through genreRepository in this

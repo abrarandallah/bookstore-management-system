@@ -8,26 +8,26 @@ import org.springframework.stereotype.Component;
 public class BookValidator {
 
     /**
-     * @return a human-readable error message, or null if the book is valid.
+     * @return a message KEY (see messages.properties; templates translate it), or null if the book is valid.
      */
     public String validate(Book b) {
         if (b.getName() == null || b.getName().isBlank()) {
-            return "Book name is required.";
+            return "book.error.name.required";
         }
         if (b.getAuthor() == null || b.getAuthor().isBlank()) {
-            return "Author is required.";
+            return "book.error.author.required";
         }
         if (b.getTakeaways().isEmpty()) {
-            return "Add at least 1 takeaway.";
+            return "book.error.takeaways.min";
         }
         if (b.getTakeaways().size() > 10) {
-            return "You can have at most 10 takeaways.";
+            return "book.error.takeaways.max";
         }
         for (BookPage p : b.getTakeaways()) {
             boolean headingBlank = p.getHeading() == null || p.getHeading().isBlank();
             boolean contentBlank = p.getContent() == null || p.getContent().isBlank();
             if (headingBlank || contentBlank) {
-                return "Takeaway " + p.getPageNumber() + " needs both a heading and content.";
+                return "book.error.takeaway.incomplete";
             }
         }
         return null;
