@@ -17,6 +17,10 @@ Boot 3.1.2, Java 17, Thymeleaf, MySQL, and Spring Security 6.
   in-app password change, self-service account deletion
 - Login is rate-limited per IP to slow down brute-force attempts
 - Librarian role: add/edit/delete books, manage genres, bulk import
+- Home page shelves (continue reading, newest, top rated, quick reads) and
+  "You might also like" suggestions after finishing a book
+- English, Arabic (right-to-left) and French interface
+- Librarians can remove any review (moderation)
 - Admin panel (`/admin/users`) to change user roles, reset a user's password,
   or delete a user
 
@@ -28,12 +32,16 @@ Boot 3.1.2, Java 17, Thymeleaf, MySQL, and Spring Security 6.
 
 ## Running with Docker (recommended - no local MySQL or Maven needed)
 
-1. Copy `.env.example` to `.env` (`copy .env.example .env` in Windows Command
+1. **Only if you don't already have a `.env` file** (copying over an existing
+   one erases your real values), copy `.env.example` to `.env` (`copy .env.example .env` in Windows Command
    Prompt, or `cp .env.example .env` in PowerShell/macOS/Linux) and fill in real
    values (at minimum, set `MAIL_USERNAME`/`MAIL_PASSWORD` if you want
    verification/reset emails to actually be delivered - everything else has a
    working default). Before putting the site online, also change `DB_PASSWORD`
    and `LIBRARIAN_PASSWORD` - the defaults are only meant for your own computer.
+   Never put real passwords in `.env.example`: that file is committed to git.
+   With `MAIL_USERNAME` empty, no email is sent; the verification link is
+   printed in the app log instead (`docker compose logs app`).
 2. `docker compose up --build`
 3. Open `http://localhost:8081`.
 

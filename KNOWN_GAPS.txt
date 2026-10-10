@@ -9,18 +9,26 @@ These are deliberate, not bugs I missed:
    preview both scripts to someone who currently only reads the English UI.
    It's copied through unchanged into every language's file instead.
 
-2. Messages that only librarians/admins ever see are still in English:
-   the success/error banners on the Manage Users and Manage Genres pages,
-   the bulk-import results, and the book-form validation messages (see
-   AdminController, GenreService, BookImportController, BookValidator).
-   Everything a normal reader can see (sign-up, login, password, reviews,
-   reading, sharing, error pages, pop-up confirmations) is translated.
-   To translate one of these later: put the text in the three messages*
-   files under a new key, and have the Java code put that KEY on the
-   model instead of the sentence (the templates already look keys up and
-   fall back to showing plain text if it isn't a key).
+2. Admin/librarian messages (Manage Users, Manage Genres, bulk import,
+   book-form validation) ARE now translated. One exception: the text of a
+   JSON parse error in bulk import comes from the parser and stays English
+   after the translated sentence in front of it.
+   To add a new message: put the text in the three messages* files under a
+   new key, and have the Java code use that KEY (the templates look keys up
+   and fall back to showing plain text if it isn't a key).
 
 3. The machine-translated text in messages_ar.properties and
    messages_fr.properties was spot-corrected for the most visible screens
    (home, About, login, privacy, terms, settings, reader). A native
    speaker should still read through the rest before a public launch.
+
+4. The Arabic right-to-left layout was fixed by reading the CSS, not by
+   looking at it in a browser. Check the home page, reader and login page
+   in Arabic and fix anything that looks mirrored wrongly. The Arabic
+   Bootstrap stylesheet is loaded without an integrity hash.
+
+5. SECURITY: an early commit ("created .env.example") contained a real Gmail
+   app password, and the repository is public, so it stays visible in the
+   git history even though it was deleted later. Revoke it at
+   myaccount.google.com/apppasswords and use a new one in your private
+   ".env" file only. Never put real values in ".env.example".
