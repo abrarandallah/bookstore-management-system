@@ -70,6 +70,17 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
+    /**
+     * Librarian moderation: removes any reader's review (spam, abuse).
+     * Callers must already have checked the LIBRARIAN role - see
+     * ReviewController#moderateDelete.
+     */
+    public void deleteAsModerator(long id) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found with id: " + id));
+        reviewRepository.delete(review);
+    }
+
     public RatingSummary summaryForBook(int bookId) {
         Double avg = reviewRepository.averageRatingForBook(bookId);
         long count = reviewRepository.countByBookId(bookId);

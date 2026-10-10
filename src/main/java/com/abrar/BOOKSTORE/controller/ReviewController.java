@@ -6,6 +6,7 @@ import com.abrar.BOOKSTORE.entity.Book;
 import com.abrar.BOOKSTORE.service.BookService;
 import com.abrar.BOOKSTORE.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +59,15 @@ public class ReviewController {
     @PostMapping("/available_books/{bookId}/review/{reviewId}/delete")
     public String deleteReview(@PathVariable int bookId, @PathVariable long reviewId, Principal principal) {
         reviewService.deleteById(reviewId, currentUser(principal));
+        return "redirect:/available_books/" + bookId + "/read";
+    }
+
+    // Moderation: a librarian can remove any review. Separate URL from the
+    // owner-only delete above so that one keeps its strict "only your own" rule.
+    @PreAuthorize("hasRole('LIBRARIAN')")
+    @PostMapping("/available_books/{bookId}/review/{reviewId}/moderate-delete")
+    public String moderateDelete(@PathVariable int bookId, @PathVariable long reviewId) {
+        reviewService.deleteAsModerator(reviewId);
         return "redirect:/available_books/" + bookId + "/read";
     }
 }

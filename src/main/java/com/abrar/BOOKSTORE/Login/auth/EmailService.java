@@ -23,9 +23,24 @@ public class EmailService {
     @Value("${spring.mail.username:}")
     private String fromAddress;
 
+    // With no SMTP login configured (MAIL_USERNAME empty) nothing can be
+    // delivered, so print the link in the app log instead. That lets a
+    // developer finish sign-up locally by copying the link from
+    // "docker compose logs app". Returns true if the caller should stop.
+    private boolean logLinkInsteadOfSending(String toEmail, String what, String link) {
+        if (fromAddress != null && !fromAddress.isBlank()) {
+            return false;
+        }
+        log.warn("MAIL_USERNAME is not set, so no email was sent to {}. {} link: {}", toEmail, what, link);
+        return true;
+    }
+
     @Async
     public void sendVerificationEmail(String toEmail, String token) {
         String link = baseUrl + "/verify-email?token=" + token;
+        if (logLinkInsteadOfSending(toEmail, "Verification", link)) {
+            return;
+        }
         SimpleMailMessage message = new SimpleMailMessage();
         if (fromAddress != null && !fromAddress.isBlank()) {
             message.setFrom(fromAddress);
@@ -73,6 +88,9 @@ public class EmailService {
     @Async
     public void sendPasswordResetEmail(String toEmail, String token) {
         String link = baseUrl + "/reset-password?token=" + token;
+        if (logLinkInsteadOfSending(toEmail, "Password reset", link)) {
+            return;
+        }
         SimpleMailMessage message = new SimpleMailMessage();
         if (fromAddress != null && !fromAddress.isBlank()) {
             message.setFrom(fromAddress);

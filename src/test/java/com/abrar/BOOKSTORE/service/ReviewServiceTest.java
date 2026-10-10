@@ -69,6 +69,24 @@ class ReviewServiceTest {
     }
 
     @Test
+    void testDeleteAsModeratorRemovesAnyonesReview() {
+        Review review = new Review(book, owner, 2, "Spam.");
+        when(reviewRepository.findById(9L)).thenReturn(Optional.of(review));
+
+        reviewService.deleteAsModerator(9L);
+
+        verify(reviewRepository).delete(review);
+    }
+
+    @Test
+    void testDeleteAsModeratorThrowsWhenMissing() {
+        when(reviewRepository.findById(9L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> reviewService.deleteAsModerator(9L));
+        verify(reviewRepository, never()).delete(Mockito.<Review>any());
+    }
+
+    @Test
     void testSubmitReviewRejectsRatingBelowRange() {
         assertThrows(IllegalArgumentException.class,
                 () -> reviewService.submitReview(book, owner, 0, "comment"));

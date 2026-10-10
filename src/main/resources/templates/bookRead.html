@@ -117,6 +117,12 @@
                 </div>
                 <span class="text-muted small" th:text="${#temporals.format(r.createdAt, 'MMM d, yyyy')}"></span>
             </div>
+            <!--/* Librarians can remove any review (moderation). */-->
+            <form sec:authorize="hasRole('LIBRARIAN')" class="mt-2" method="post"
+                  th:action="@{/available_books/{bookId}/review/{reviewId}/moderate-delete(bookId=${book.id}, reviewId=${r.id})}"
+                  onsubmit="return appConfirm(event);" th:data-confirm="#{confirm.delete.review.moderator}">
+                <button th:text="#{bookRead.moderate.delete}" type="submit" class="btn btn-link btn-sm text-danger p-0">Remove this review</button>
+            </form>
             <p class="mb-0 mt-2" th:if="${r.comment != null}" th:text="${r.comment}" style="white-space: pre-line;"></p>
         </div>
     </div>
