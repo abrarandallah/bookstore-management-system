@@ -18,10 +18,10 @@
     <div class="book-grid">
         <div class="book-card" th:each="item, iter : ${items}"
              th:style="'--card-index: ' + ${iter.index} + '; --spine-color: hsl(' + ${T(java.lang.Math).abs(item.book.name.hashCode()) % 360} + ', 42%, 34%)'">
-            <img th:if="${item.book.coverImageUrl}" th:src="@{${item.book.coverImageUrl}}" alt="Cover"
+            <img th:if="${item.book.coverImageUrl}" loading="lazy" decoding="async" th:src="@{${item.book.coverImageUrl}}" alt="Cover"
                  th:alt="#{bookList.cover}" class="book-cover mb-2">
             <div class="book-author" th:text="${item.author}">Author</div>
-            <div class="book-title" th:text="${item.name}">Book title</div>
+            <div class="book-title"><a class="book-title-link" th:href="@{/available_books/{id}/read(id=${item.book.id})}" th:text="${item.name}">Book title</a></div>
             <span class="rating-badge mb-1" th:if="${item.rating != null}">
                 <i class="fa-solid fa-star"></i>
                 <span th:text="${#numbers.formatDecimal(item.rating.average, 1, 1)}"></span>

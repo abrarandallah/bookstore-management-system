@@ -4,7 +4,7 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
-<main class="page-body">
+<main class="page-body" id="main-content">
 <div class="container my-5" style="max-width: 640px;">
     <div class="d-flex align-items-center gap-3 mb-4">
         <img th:if="${book.coverImageUrl}" th:src="@{${book.coverImageUrl}}" alt="Cover" th:alt="#{bookRead.cover}"

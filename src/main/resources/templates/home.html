@@ -4,7 +4,7 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
-<main class="page-body">
+<main class="page-body" id="main-content">
     <!-- Hero Section -->
     <div class="container hero-section">
         <div class="row align-items-center g-5">
@@ -61,17 +61,17 @@
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="hero-figure">
-                    <img src="/img/readers1.jpeg" alt="Reader in armchair" th:alt="#{home.reader.in.armchair}" class="book-cover"/>
+                    <img loading="lazy" decoding="async" src="/img/readers1.jpeg" alt="Reader in armchair" th:alt="#{home.reader.in.armchair}" class="book-cover"/>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="hero-figure">
-                    <img src="/img/readers2.jpeg" alt="Reader by window" th:alt="#{home.reader.by.window}" class="book-cover"/>
+                    <img loading="lazy" decoding="async" src="/img/readers2.jpeg" alt="Reader by window" th:alt="#{home.reader.by.window}" class="book-cover"/>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="hero-figure">
-                    <img src="/img/readers3.jpeg" alt="Children reading together" th:alt="#{home.children.reading.together}" class="book-cover"/>
+                    <img loading="lazy" decoding="async" src="/img/readers3.jpeg" alt="Children reading together" th:alt="#{home.children.reading.together}" class="book-cover"/>
                 </div>
             </div>
         </div>
@@ -82,7 +82,7 @@
         <span th:text="#{home.take.a.break}" class="eyebrow">Take a break</span>
         <h2 th:text="#{home.read.anywhere}" class="mb-4">Read anywhere</h2>
         <div class="hero-figure">
-            <img src="/img/nature.jpeg" alt="Reading outdoors under a tree" th:alt="#{home.reading.outdoors.under.a.tree}" class="book-cover"/>
+            <img loading="lazy" decoding="async" src="/img/nature.jpeg" alt="Reading outdoors under a tree" th:alt="#{home.reading.outdoors.under.a.tree}" class="book-cover"/>
         </div>
     </div>
 </main>

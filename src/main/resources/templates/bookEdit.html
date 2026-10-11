@@ -4,7 +4,7 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
-<main class="page-body">
+<main class="page-body" id="main-content">
 <div class="container my-5 p-5 form-panel" style="max-width: 640px;">
     <span th:text="#{bookEdit.editing}" class="eyebrow d-block text-center mb-2">Editing</span>
     <h4 th:text="#{bookEdit.edit.book}" class="text-center">Edit Book</h4>
@@ -24,7 +24,11 @@
         <div class="mb-4">
             <label th:text="#{bookEdit.cover.image}" for="cover" class="form-label">Cover image</label>
             <div th:if="${book.coverImageUrl}" class="mb-2">
-                <img th:src="@{${book.coverImageUrl}}" alt="Current cover" th:alt="#{bookEdit.current.cover}" style="height:90px;border-radius:4px;box-shadow:var(--shadow-card);">
+                <img th:src="@{${book.coverImageUrl}}" alt="Current cover" th:alt="#{bookEdit.current.cover}" class="cover-img" style="height:90px;border-radius:4px;box-shadow:var(--shadow-card);">
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="removeCover" name="removeCover" value="true">
+                    <label class="form-check-label" for="removeCover" th:text="#{bookEdit.remove.cover}">Remove the current cover</label>
+                </div>
             </div>
             <input type="file" id="cover" class="form-control" name="cover" accept="image/png,image/jpeg,image/webp,image/gif">
             <div th:text="#{bookEdit.leave.empty.to.keep.the}" class="form-text">Leave empty to keep the current cover.</div>

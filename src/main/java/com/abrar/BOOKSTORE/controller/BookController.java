@@ -157,6 +157,7 @@ public class BookController {
     @PreAuthorize("hasRole('LIBRARIAN')")
     public String addBook(@ModelAttribute Book b, @RequestParam(required = false) MultipartFile cover,
             @RequestParam(required = false) String existingCoverImageUrl,
+            @RequestParam(defaultValue = "false") boolean removeCover,
             @RequestParam(required = false) List<Integer> genreIds, Model model) {
         // Drop any takeaway rows the librarian left completely empty (extra
         // "add another" rows that never got filled in) before validating or
@@ -181,6 +182,9 @@ public class BookController {
             try {
                 if (cover != null && !cover.isEmpty()) {
                     b.setCoverImageUrl(fileStorageService.store(cover, "covers"));
+                } else if (removeCover) {
+                    // "Remove the current cover" ticked and no new file chosen.
+                    b.setCoverImageUrl(null);
                 } else {
                     b.setCoverImageUrl(existingCoverImageUrl);
                 }

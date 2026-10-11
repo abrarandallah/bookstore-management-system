@@ -4,7 +4,7 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
-<main class="page-body">
+<main class="page-body" id="main-content">
     <div class="container my-5">
         <div class="section-heading">
             <div>
@@ -26,7 +26,7 @@
         <div th:unless="${#lists.isEmpty(history)}">
             <div class="form-panel p-3 p-md-4 mb-3" th:each="rp : ${history}">
                 <div class="d-flex align-items-center gap-3">
-                    <img th:if="${rp.book.coverImageUrl}" th:src="@{${rp.book.coverImageUrl}}" alt="Cover" th:alt="#{readingHistory.cover}"
+                    <img th:if="${rp.book.coverImageUrl}" loading="lazy" decoding="async" th:src="@{${rp.book.coverImageUrl}}" alt="Cover" th:alt="#{readingHistory.cover}"
                          style="width:48px;height:auto;border-radius:4px;">
                     <div class="flex-grow-1">
                         <a th:href="@{/available_books/{id}/read(id=${rp.book.id})}" class="fw-semibold text-decoration-none"
