@@ -16,7 +16,7 @@
     }
 
     function isCover(el) {
-        return el && el.tagName === 'IMG' && el.matches('img.book-cover, img.cover-img');
+        return el && el.tagName === 'IMG' && el.matches('img.book-cover, img.cover-img, img.cover-sm, img.cover-lg, img.cover-xl');
     }
 
     // Images that fail after this script has loaded.
@@ -28,7 +28,7 @@
 
     // Images that already failed before this script ran.
     document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('img.book-cover, img.cover-img').forEach(function (img) {
+        document.querySelectorAll('img.book-cover, img.cover-img, img.cover-sm, img.cover-lg, img.cover-xl').forEach(function (img) {
             if (img.complete && img.naturalWidth === 0) {
                 replaceWithPlaceholder(img);
             }
