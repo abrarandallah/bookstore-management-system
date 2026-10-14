@@ -68,7 +68,7 @@
                 <div class="book-grid" th:unless="${#lists.isEmpty(book)}">
                     <div class="book-card" th:each="b : ${book}"
                          th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(b.name.hashCode()) % 360} + ', 42%, 34%)'">
-                        <img th:if="${b.coverImageUrl}" loading="lazy" decoding="async" th:src="@{${b.coverImageUrl}}" alt="Cover" th:alt="#{bookList.cover}" class="book-cover mb-2">
+                        <th:block th:replace="~{fragments/cover :: cover(${b.coverImageUrl}, 'book-cover mb-2', #{bookList.cover}, null)}"></th:block>
                         <div class="book-author" th:text="${localizedBooks.get(b.id).author}">Author</div>
                         <div class="book-title"><a class="book-title-link" th:href="@{/available_books/{id}/read(id=${b.id})}" th:text="${localizedBooks.get(b.id).name}">Book title</a></div>
                         <div class="d-flex align-items-center gap-1 flex-wrap mb-1" th:if="${!#sets.isEmpty(b.genres)}">
