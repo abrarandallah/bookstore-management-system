@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/* One book cover, used everywhere a cover is shown:
+       fragments/cover :: cover(url, cls, alt, imgStyle)
+       - url: the book's cover image URL (may be null or empty)
+       - cls: CSS classes, e.g. 'book-cover mb-2' (cards) or 'cover-sm' / 'cover-img' / 'cover-lg' / 'cover-xl' (fixed sizes)
+       - alt: accessible text
+       - imgStyle: optional inline style, applied to the real image only
+       With no cover image the same book-icon placeholder that cover-fallback.js
+       shows for a missing file is drawn right away, so a book never has an empty gap. */-->
+<th:block th:fragment="cover(url, cls, alt, imgStyle)">
+    <img th:if="${!#strings.isEmpty(url)}" loading="lazy" decoding="async" th:src="@{${url}}" th:alt="${alt}"
+         th:class="${cls}" th:style="${imgStyle}">
+    <div th:unless="${!#strings.isEmpty(url)}" th:class="'cover-placeholder ' + ${cls}" role="img"
+         th:attr="aria-label=${alt}"><i class="fa-solid fa-book-open" aria-hidden="true"></i></div>
+</th:block>
+</body>
+</html>
