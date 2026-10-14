@@ -1885,9 +1885,17 @@ h1, h2, h3, h4 { text-wrap: balance; }
   align-items: center;
   justify-content: center;
   background: rgba(156, 107, 36, 0.08);
+  background: color-mix(in srgb, var(--spine-color, #9c6b24) 12%, transparent);
   border: 1px dashed var(--line);
   color: var(--brass);
+  color: var(--spine-color, var(--brass));
   font-size: 1.8rem;
   min-height: 90px;
+  border-radius: 3px;
+  flex-shrink: 0;
 }
+.cover-placeholder.book-cover { height: 140px; }
+.cover-placeholder.cover-sm { width: 48px; height: 68px; min-height: 0; font-size: 1.2rem; }
 .cover-placeholder.cover-img { width: 64px; height: 90px; }
+.cover-placeholder.cover-lg { width: 96px; height: 136px; font-size: 2.2rem; }
+.cover-placeholder.cover-xl { width: 120px; height: 170px; font-size: 2.6rem; }
