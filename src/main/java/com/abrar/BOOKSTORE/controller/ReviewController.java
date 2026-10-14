@@ -43,6 +43,7 @@ public class ReviewController {
         User user = currentUser(principal);
         try {
             reviewService.submitReview(book, user, rating, comment);
+            redirectAttributes.addFlashAttribute("reviewSaved", true);
         } catch (IllegalArgumentException ex) {
             // Only reachable via a tampered request - the star widget on
             // the reader page only ever submits 1-5. Redirect back to the
