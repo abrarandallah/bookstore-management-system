@@ -304,9 +304,13 @@ public class BookController {
             // Resuming a finished book restarts the reader at page 1 rather than
             // dropping them back on the last page they already finished at.
             model.addAttribute("resumePage", progress.isFinished() ? 0 : progress.getCurrentPage());
+            // The review form is written on the "You finished" page; this flag lets the
+            // reader still offer it afterwards to someone who has already finished the book.
+            model.addAttribute("finished", progress.isFinished());
         } else {
             model.addAttribute("ownReview", null);
             model.addAttribute("resumePage", 0);
+            model.addAttribute("finished", false);
         }
         return "bookRead";
     }
@@ -329,6 +333,8 @@ public class BookController {
         boolean alreadyFinished = progress.isFinished();
         progress = readingProgressService.markFinished(user, b);
         model.addAttribute("book", b);
+        // The "You finished" page asks for a rating and review right at the end of the book.
+        model.addAttribute("ownReview", reviewService.findOwnReview(id, user).orElse(null));
         model.addAttribute("newAchievements",
                 alreadyFinished ? List.of() : achievementService.checkBookCompletionAchievements(user, progress));
         model.addAttribute("localizedBook", bookTranslationService.localizeBook(b,
