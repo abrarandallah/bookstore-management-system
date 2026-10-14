@@ -20,8 +20,9 @@
 <div class="container my-5" style="max-width: 560px;">
 
     <div class="text-center mb-4">
-        <img th:if="${book.coverImageUrl}" th:src="@{${book.coverImageUrl}}" alt="Cover" th:alt="#{bookShare.cover}"
-             style="width:120px;height:auto;border-radius:6px;box-shadow:var(--shadow-card);">
+        <div class="d-flex justify-content-center">
+            <th:block th:replace="~{fragments/cover :: cover(${book.coverImageUrl}, 'cover-xl', #{bookShare.cover}, 'width:120px;height:auto;border-radius:6px;box-shadow:var(--shadow-card);')}"></th:block>
+        </div>
         <span class="eyebrow d-block mt-3" th:text="${localizedBook.author}">Author</span>
         <h2 class="mb-2" th:text="${localizedBook.name}">Book title</h2>
 
