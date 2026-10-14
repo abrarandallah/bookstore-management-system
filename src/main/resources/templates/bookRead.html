@@ -7,8 +7,7 @@
 <main class="page-body" id="main-content">
 <div class="container my-5" style="max-width: 640px;">
     <div class="d-flex align-items-center gap-3 mb-4">
-        <img th:if="${book.coverImageUrl}" th:src="@{${book.coverImageUrl}}" alt="Cover" th:alt="#{bookRead.cover}"
-             style="width:64px;height:auto;border-radius:4px;box-shadow:var(--shadow-card);">
+        <th:block th:replace="~{fragments/cover :: cover(${book.coverImageUrl}, 'cover-img', #{bookRead.cover}, 'width:64px;height:auto;border-radius:4px;box-shadow:var(--shadow-card);')}"></th:block>
         <div>
             <span class="eyebrow d-block" th:text="${localizedBook.author}">Author</span>
             <h3 class="mb-0" th:text="${localizedBook.name}">Book title</h3>
@@ -63,40 +62,15 @@
         </p>
     </div>
 
-    <div class="form-panel p-4 mt-4" sec:authorize="isAuthenticated()">
+    <!--/* Reviews are written at the end of the book (see bookFinished.html). The form only shows here
+           for readers who have already finished it, or who already left a review and want to edit it. */-->
+    <div class="alert alert-success mt-4" th:if="${reviewSaved}" th:text="#{bookRead.review.saved}">Thanks! Your review has been saved.</div>
+    <div class="form-panel p-4 mt-4" sec:authorize="isAuthenticated()" th:if="${finished or ownReview != null}">
         <span class="eyebrow d-block mb-3" th:text="${ownReview != null} ? #{bookRead.edit.your.review} : #{bookRead.rate.this.book}">Rate this book</span>
-        <div class="alert alert-danger" th:if="${reviewError}" th:text="${#messages.msgOrNull(reviewError) ?: reviewError}"></div>
-        <form th:action="@{/available_books/{id}/review(id=${book.id})}" method="post">
-            <div class="star-rating mb-3">
-                <input type="radio" id="star5" name="rating" value="5" required
-                       th:checked="${ownReview != null and ownReview.rating == 5}">
-                <label for="star5" title="5 stars" th:title="#{bookRead.5.stars}"><i class="fa-solid fa-star"></i></label>
-                <input type="radio" id="star4" name="rating" value="4" required
-                       th:checked="${ownReview != null and ownReview.rating == 4}">
-                <label for="star4" title="4 stars" th:title="#{bookRead.4.stars}"><i class="fa-solid fa-star"></i></label>
-                <input type="radio" id="star3" name="rating" value="3" required
-                       th:checked="${ownReview != null and ownReview.rating == 3}">
-                <label for="star3" title="3 stars" th:title="#{bookRead.3.stars}"><i class="fa-solid fa-star"></i></label>
-                <input type="radio" id="star2" name="rating" value="2" required
-                       th:checked="${ownReview != null and ownReview.rating == 2}">
-                <label for="star2" title="2 stars" th:title="#{bookRead.2.stars}"><i class="fa-solid fa-star"></i></label>
-                <input type="radio" id="star1" name="rating" value="1" required
-                       th:checked="${ownReview != null and ownReview.rating == 1}">
-                <label for="star1" title="1 star" th:title="#{bookRead.1.star}"><i class="fa-solid fa-star"></i></label>
-            </div>
-            <textarea name="comment" class="form-control mb-3" rows="3" maxlength="2000"
-                      placeholder="What did you think? (optional)" th:placeholder="#{bookRead.what.did.you.think.optional}"
-                      th:text="${ownReview != null ? ownReview.comment : ''}"></textarea>
-            <button type="submit" class="btn btn-primary btn-sm"
-                    th:text="${ownReview != null} ? #{bookRead.update.review} : #{bookRead.submit.review}">Submit review</button>
-        </form>
-        <form th:if="${ownReview != null}"
-              th:action="@{/available_books/{bookId}/review/{reviewId}/delete(bookId=${book.id}, reviewId=${ownReview.id})}"
-              method="post" class="d-inline mt-2"
-              onsubmit="return appConfirm(event);" th:data-confirm="#{confirm.delete.review}">
-            <button th:text="#{bookRead.delete.my.review}" type="submit" class="btn btn-link btn-sm text-danger p-0">Delete my review</button>
-        </form>
+        <th:block th:replace="~{fragments/reviewForm :: reviewForm(${book}, ${ownReview})}"></th:block>
     </div>
+    <p class="text-center small text-muted mt-4" sec:authorize="isAuthenticated()" th:unless="${finished or ownReview != null}"
+       th:text="#{bookRead.finish.to.rate}">Finish the book to rate and review it.</p>
     <div class="form-panel p-4 mt-4 text-center" sec:authorize="isAnonymous()">
         <span th:text="#{bookRead.rate.this.book}" class="eyebrow d-block mb-2">Rate this book</span>
         <p th:text="#{bookRead.log.in.to.rate.and}" class="mb-3 text-muted">Log in to rate and review this book, and to pick up your reading progress next time.</p>
