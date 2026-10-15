@@ -60,12 +60,15 @@
                 addedToMyBooks: /*[[#{ui.added.to.my.books}]]*/ 'Added to My Books',
                 addFailed: /*[[#{ui.add.failed}]]*/ 'Could not add that book - try again',
                 confirmDelete: /*[[#{ui.delete}]]*/ 'Delete',
-                confirmCancel: /*[[#{ui.cancel}]]*/ 'Cancel'
+                confirmCancel: /*[[#{ui.cancel}]]*/ 'Cancel',
+                showPassword: /*[[#{ui.show.password}]]*/ 'Show password',
+                hidePassword: /*[[#{ui.hide.password}]]*/ 'Hide password'
             };
         </script>
         <script th:src="@{/js/toast.js}"></script>
         <script th:src="@{/js/confirm-modal.js}"></script>
         <script th:src="@{/js/cover-fallback.js}"></script>
+        <script th:src="@{/js/password-toggle.js}"></script>
         <script>
             function toggleTheme() {
                 const current = document.documentElement.getAttribute('data-theme');
