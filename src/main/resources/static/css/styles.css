@@ -1899,3 +1899,89 @@ h1, h2, h3, h4 { text-wrap: balance; }
 .cover-placeholder.cover-img { width: 64px; height: 90px; }
 .cover-placeholder.cover-lg { width: 96px; height: 136px; font-size: 2.2rem; }
 .cover-placeholder.cover-xl { width: 120px; height: 170px; font-size: 2.6rem; }
+
+/* ---- Home page layout fixes ------------------------------------------------ */
+
+/* Shelves scroll sideways instead of leaving one orphan card on a second row. */
+.book-grid.shelf-row {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding: 0.5rem 0.25rem 1rem;
+  scrollbar-width: thin;
+}
+.book-grid.shelf-row .book-card {
+  flex: 0 0 215px;
+  scroll-snap-align: start;
+}
+
+/* Main button row, then quiet text links underneath. */
+.hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.4rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+.hero-links a { color: var(--ink-soft); }
+.hero-links a:hover { color: var(--burgundy); }
+
+/* "About" teaser lines up with the other sections; only the text is narrow. */
+.home-about p { max-width: 60ch; }
+
+/* The three reader photos share one height so there are no empty gaps. */
+.photo-row .hero-figure { display: block; }
+.photo-row .hero-figure img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+/* ---- Show/hide password -------------------------------------------------------- */
+.password-field { position: relative; }
+.password-field .form-control { padding-inline-end: 2.75rem; }
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 0.35rem;
+  transform: translateY(-50%);
+  width: 2.25rem;
+  height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  opacity: 0.7;
+  cursor: pointer;
+}
+.password-toggle:hover { opacity: 1; color: var(--brass); }
+
+/* ---- Genre filter chips on the book list ---------------------------------------- */
+.genre-filter-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.1rem 0.9rem;
+  margin-bottom: 0.5rem;
+  scrollbar-width: thin;
+}
+.genre-filter {
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  white-space: nowrap;
+}
+.genre-filter:hover { border-color: var(--brass); color: var(--burgundy); }
+.genre-filter.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper-raised);
+}
