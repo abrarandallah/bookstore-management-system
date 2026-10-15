@@ -15,7 +15,7 @@
         <a th:if="${seeAllUrl != null}" th:href="@{${seeAllUrl}}" class="btn btn-outline-brass btn-sm"
            th:text="#{home.shelf.see.all}">See all books</a>
     </div>
-    <div class="book-grid">
+    <div class="book-grid shelf-row">
         <div class="book-card" th:each="item, iter : ${items}"
              th:style="'--card-index: ' + ${iter.index} + '; --spine-color: hsl(' + ${T(java.lang.Math).abs(item.book.name.hashCode()) % 360} + ', 42%, 34%)'">
             <th:block th:replace="~{fragments/cover :: cover(${item.book.coverImageUrl}, 'book-cover mb-2', #{bookList.cover}, null)}"></th:block>
