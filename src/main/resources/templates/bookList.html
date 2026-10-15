@@ -47,6 +47,17 @@
 
         <div id="book-results">
             <th:block th:fragment="resultsFragment">
+                <!--/* One-tap genre filter. Keeps the current search text and sort. */-->
+                <nav class="genre-filter-row" th:if="${!#lists.isEmpty(genres)}" aria-label="Genres" th:aria-label="#{genres.genres}">
+                    <a class="genre-filter" th:classappend="${selectedGenre == null} ? 'is-active'"
+                       th:attr="aria-current=${selectedGenre == null} ? 'true'"
+                       th:href="@{/available_books(q=${q}, sort=${sort})}" th:text="#{bookList.all.genres}">All genres</a>
+                    <a class="genre-filter" th:each="g : ${genres}"
+                       th:classappend="${selectedGenre != null and selectedGenre == g.id} ? 'is-active'"
+                       th:attr="aria-current=${selectedGenre != null and selectedGenre == g.id} ? 'true'"
+                       th:href="@{/available_books(q=${q}, sort=${sort}, genre=${g.id})}"
+                       th:text="${@genreLocalizer.localizeName(g.name, #locale.language)}">Genre</a>
+                </nav>
                 <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q)) and selectedGenre == null}" class="empty-state">
                     <span th:text="#{bookList.nothing.here.yet}" class="eyebrow">Nothing here yet</span>
                     <h3 th:text="#{bookList.the.shelf.is.empty}">The shelf is empty</h3>
