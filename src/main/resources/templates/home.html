@@ -40,57 +40,47 @@
         </div>
     </div>
 
+    <div class="container"><hr class="home-rule"></div>
+
     <!-- Shelves (see HomeShelvesService - an empty shelf is simply not shown) -->
-    <div sec:authorize="isAuthenticated()">
-        <th:block th:replace="~{fragments/shelves :: shelf(#{home.continue.eyebrow}, #{home.continue.title}, ${@homeShelves.continueReading(#authentication.name, #locale.language)}, null)}"></th:block>
-    </div>
-    <th:block th:replace="~{fragments/shelves :: shelf(#{home.newest.eyebrow}, #{home.newest.title}, ${@homeShelves.newest(#locale.language)}, '/available_books?sort=newest')}"></th:block>
-    <th:block th:replace="~{fragments/shelves :: shelf(#{home.top.eyebrow}, #{home.top.title}, ${@homeShelves.topRated(#locale.language)}, '/available_books')}"></th:block>
-    <th:block th:replace="~{fragments/shelves :: shelf(#{home.quick.eyebrow}, #{home.quick.title}, ${@homeShelves.quickReads(#locale.language)}, '/available_books?sort=read_time_asc')}"></th:block>
-
-    <!-- About teaser -->
-    <div class="container my-5 home-about" id="how-it-works">
-        <span th:text="#{home.how.it.works}" class="eyebrow">How it works</span>
-        <h2 th:text="#{home.about.bookstore}" class="mb-3">About BookStore</h2>
-        <p th:text="#{home.most.books.have.a.handful}">
-            Most books have a handful of ideas worth remembering, wrapped in pages of story and
-            repetition. BookStore distills each one into a few short takeaways you can read in
-            minutes, not hours.
-        </p>
-        <a th:text="#{home.learn.more}" href="/about" class="btn btn-outline-brass btn-sm">Learn more</a>
+    <div class="home-shelves">
+        <div sec:authorize="isAuthenticated()">
+            <th:block th:replace="~{fragments/shelves :: shelf(#{home.continue.eyebrow}, #{home.continue.title}, ${@homeShelves.continueReading(#authentication.name, #locale.language)}, null)}"></th:block>
+        </div>
+        <th:block th:replace="~{fragments/shelves :: shelf(#{home.newest.eyebrow}, #{home.newest.title}, ${@homeShelves.newest(#locale.language)}, '/available_books?sort=newest')}"></th:block>
+        <th:block th:replace="~{fragments/shelves :: shelf(#{home.top.eyebrow}, #{home.top.title}, ${@homeShelves.topRated(#locale.language)}, '/available_books')}"></th:block>
     </div>
 
-    <!-- Community Section -->
-    <div class="container my-5">
-        <span th:text="#{home.readers}" class="eyebrow">Readers</span>
-        <h2 th:text="#{home.made.for.readers}" class="mb-4">Made for readers</h2>
-        <div class="row g-4 photo-row">
-            <div class="col-md-4">
-                <div class="hero-figure">
-                    <img loading="lazy" decoding="async" src="/img/readers1.jpeg" alt="Reader in armchair" th:alt="#{home.reader.in.armchair}" class="book-cover"/>
+    <!--/* "How it works" lives at the bottom, just above the footer. The steps
+           are a real sequence, so they are numbered. */-->
+    <section class="home-how" id="how-it-works">
+        <div class="container">
+            <div class="row g-5 align-items-start">
+                <div class="col-lg-5">
+                    <h2 th:text="#{home.about.bookstore}" class="mb-3">About BookStore</h2>
+                    <p th:text="#{home.most.books.have.a.handful}">
+                        Most books have a handful of ideas worth remembering, wrapped in pages of story and
+                        repetition. BookStore distills each one into a few short takeaways you can read in
+                        minutes, not hours.
+                    </p>
+                    <a th:text="#{home.learn.more}" href="/about" class="btn btn-outline-brass btn-sm">Learn more</a>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="hero-figure">
-                    <img loading="lazy" decoding="async" src="/img/readers2.jpeg" alt="Reader by window" th:alt="#{home.reader.by.window}" class="book-cover"/>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="hero-figure">
-                    <img loading="lazy" decoding="async" src="/img/readers3.jpeg" alt="Children reading together" th:alt="#{home.children.reading.together}" class="book-cover"/>
+                <div class="col-lg-7">
+                    <ol class="steps">
+                        <li><span class="step-num" aria-hidden="true">1</span>
+                            <span><span class="step-title" th:text="#{home.step1.title}">Pick a book</span>
+                            <span class="step-text" th:text="#{home.step1.text}">Browse by genre, search by title, or let us surprise you.</span></span></li>
+                        <li><span class="step-num" aria-hidden="true">2</span>
+                            <span><span class="step-title" th:text="#{home.step2.title}">Read the takeaways</span>
+                            <span class="step-text" th:text="#{home.step2.text}">Each book is boiled down to 1-10 short pages you can finish in minutes.</span></span></li>
+                        <li><span class="step-num" aria-hidden="true">3</span>
+                            <span><span class="step-title" th:text="#{home.step3.title}">Keep what matters</span>
+                            <span class="step-text" th:text="#{home.step3.text}">Save books to My Books and pick up exactly where you left off.</span></span></li>
+                    </ol>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Closing Section -->
-    <div class="container my-5 text-center">
-        <span th:text="#{home.take.a.break}" class="eyebrow">Take a break</span>
-        <h2 th:text="#{home.read.anywhere}" class="mb-4">Read anywhere</h2>
-        <div class="hero-figure">
-            <img loading="lazy" decoding="async" src="/img/nature.jpeg" alt="Reading outdoors under a tree" th:alt="#{home.reading.outdoors.under.a.tree}" class="book-cover"/>
-        </div>
-    </div>
+    </section>
 </main>
 
 <div th:replace="~{fragments/layout :: footer}"></div>

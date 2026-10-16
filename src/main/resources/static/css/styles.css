@@ -356,18 +356,7 @@ a:hover {
   position: relative;
 }
 
-.hero-copy::before {
-  content: "\2766";
-  position: absolute;
-  top: -4.5rem;
-  left: -2rem;
-  font-size: 13rem;
-  line-height: 1;
-  color: var(--brass);
-  opacity: 0.1;
-  z-index: -1;
-  pointer-events: none;
-}
+/* (the faint ornament that used to sit behind the headline was removed: it read as a smudge) */
 
 .hero-copy .eyebrow {
   display: inline-block;
@@ -1985,3 +1974,49 @@ h1, h2, h3, h4 { text-wrap: balance; }
   border-color: var(--ink);
   color: var(--paper-raised);
 }
+
+/* ---- Home page: calmer structure ------------------------------------------------- */
+
+/* A ledger-style double rule between the hero and the shelves. */
+.home-rule {
+  border: 0;
+  border-top: 3px double var(--line);
+  opacity: 1;
+  margin: 0;
+}
+
+/* The heading already says what the shelf is; the small label above it repeated it. */
+.home-shelves .eyebrow { display: none; }
+
+/* "How it works": a slightly deeper paper band, last thing before the footer. */
+.home-how {
+  background: rgba(156, 107, 36, 0.08);
+  border-top: 1px solid var(--line);
+  padding: 3.5rem 0;
+  margin-top: 3rem;
+}
+.home-how h2 { font-size: 1.7rem; }
+.home-how p { max-width: 34rem; }
+.home-how .steps { list-style: none; margin: 0; padding: 0; }
+.home-how .steps li {
+  display: flex;
+  gap: 1.1rem;
+  padding: 1.05rem 0;
+  border-top: 1px solid var(--line);
+}
+.home-how .steps li:last-child { border-bottom: 1px solid var(--line); }
+.step-num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--brass);
+  min-width: 2rem;
+}
+.step-title {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+.step-text { display: block; font-size: 0.95rem; }
