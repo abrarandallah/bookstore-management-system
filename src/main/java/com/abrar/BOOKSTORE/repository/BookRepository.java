@@ -44,6 +44,11 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
         @Query("SELECT b FROM Book b WHERE SIZE(b.takeaways) BETWEEN 1 AND :maxTakeaways ORDER BY b.id DESC")
         List<Book> findQuickReads(@Param("maxTakeaways") int maxTakeaways, Pageable pageable);
 
+        // Ids of every readable book (at least one takeaway), oldest first - the
+        // pool the home page's "Takeaway of the day" picks from.
+        @Query("SELECT b.id FROM Book b WHERE SIZE(b.takeaways) > 0 ORDER BY b.id")
+        List<Integer> findReadableBookIds();
+
         // Every book currently tagged with a genre - used by GenreService#merge
         // to move each one onto the target genre before the source genre is
         // deleted.

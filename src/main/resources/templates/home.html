@@ -42,6 +42,29 @@
 
     <div class="container"><hr class="home-rule"></div>
 
+    <!--/* Takeaway of the day: one idea, the same for everyone today (see
+           HomeShelvesService#takeawayOfTheDay). Not shown if there are no books yet. */-->
+    <th:block th:with="daily=${@homeShelves.takeawayOfTheDay(#locale.language)}">
+    <section class="container home-daily" th:if="${daily != null}">
+        <article class="daily-card">
+            <span class="daily-ribbon" aria-hidden="true"></span>
+            <span class="eyebrow">
+                <span th:text="#{home.daily.eyebrow}">Takeaway of the day</span>
+                &middot; <span th:text="${#temporals.format(daily.date, 'd MMMM')}">17 October</span>
+            </span>
+            <h2 class="daily-heading" th:text="${daily.heading}">Heading</h2>
+            <p class="daily-text" th:text="${#strings.abbreviate(daily.content, 300)}">Content</p>
+            <p class="daily-source" th:text="#{home.daily.from(${daily.name}, ${daily.author})}">From a book</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <a class="btn btn-primary" th:href="@{/available_books/{id}/read(id=${daily.book.id})}"
+                   th:text="#{home.daily.read}">Read this book</a>
+                <a class="btn btn-outline-brass" th:href="@{/available_books/{id}/share(id=${daily.book.id})}"
+                   th:text="#{home.daily.share}">Share</a>
+            </div>
+        </article>
+    </section>
+    </th:block>
+
     <!-- Shelves (see HomeShelvesService - an empty shelf is simply not shown) -->
     <div class="home-shelves">
         <div sec:authorize="isAuthenticated()">
@@ -51,36 +74,6 @@
         <th:block th:replace="~{fragments/shelves :: shelf(#{home.top.eyebrow}, #{home.top.title}, ${@homeShelves.topRated(#locale.language)}, '/available_books')}"></th:block>
     </div>
 
-    <!--/* "How it works" lives at the bottom, just above the footer. The steps
-           are a real sequence, so they are numbered. */-->
-    <section class="home-how" id="how-it-works">
-        <div class="container">
-            <div class="row g-5 align-items-start">
-                <div class="col-lg-5">
-                    <h2 th:text="#{home.about.bookstore}" class="mb-3">About BookStore</h2>
-                    <p th:text="#{home.most.books.have.a.handful}">
-                        Most books have a handful of ideas worth remembering, wrapped in pages of story and
-                        repetition. BookStore distills each one into a few short takeaways you can read in
-                        minutes, not hours.
-                    </p>
-                    <a th:text="#{home.learn.more}" href="/about" class="btn btn-outline-brass btn-sm">Learn more</a>
-                </div>
-                <div class="col-lg-7">
-                    <ol class="steps">
-                        <li><span class="step-num" aria-hidden="true">1</span>
-                            <span><span class="step-title" th:text="#{home.step1.title}">Pick a book</span>
-                            <span class="step-text" th:text="#{home.step1.text}">Browse by genre, search by title, or let us surprise you.</span></span></li>
-                        <li><span class="step-num" aria-hidden="true">2</span>
-                            <span><span class="step-title" th:text="#{home.step2.title}">Read the takeaways</span>
-                            <span class="step-text" th:text="#{home.step2.text}">Each book is boiled down to 1-10 short pages you can finish in minutes.</span></span></li>
-                        <li><span class="step-num" aria-hidden="true">3</span>
-                            <span><span class="step-title" th:text="#{home.step3.title}">Keep what matters</span>
-                            <span class="step-text" th:text="#{home.step3.text}">Save books to My Books and pick up exactly where you left off.</span></span></li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </section>
 </main>
 
 <div th:replace="~{fragments/layout :: footer}"></div>

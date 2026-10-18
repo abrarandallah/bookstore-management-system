@@ -17,6 +17,7 @@ import com.abrar.BOOKSTORE.repository.ReadingProgressRepository;
 import com.abrar.BOOKSTORE.service.HomeShelvesService.ShelfItem;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -178,5 +179,35 @@ class HomeShelvesServiceTest {
         when(bookRepository.findById(1)).thenReturn(Optional.of(source));
 
         assertTrue(homeShelvesService.relatedBooks(1, "reader", "en").isEmpty());
+    }
+
+    /** Same day, same pick; the next day moves on to the next book. */
+    @Test
+    void testTakeawayOfTheDayIsStableForADayAndMovesOn() {
+        Book first = bookWithTakeaways(1, "First", 2);
+        Book second = bookWithTakeaways(2, "Second", 2);
+        first.getTakeaways().get(0).setHeading("Heading A");
+        second.getTakeaways().get(0).setHeading("Heading B");
+        when(bookRepository.findReadableBookIds()).thenReturn(List.of(1, 2));
+        when(bookRepository.findById(1)).thenReturn(Optional.of(first));
+        when(bookRepository.findById(2)).thenReturn(Optional.of(second));
+        when(bookTranslationService.localizeBook(Mockito.any(), Mockito.anyString())).thenReturn(null);
+        when(bookTranslationService.localizePages(Mockito.anyList(), Mockito.anyString())).thenReturn(null);
+
+        LocalDate day = LocalDate.of(2026, 10, 17);
+        HomeShelvesService.DailyPick today = homeShelvesService.takeawayOfTheDay("en", day);
+        HomeShelvesService.DailyPick todayAgain = homeShelvesService.takeawayOfTheDay("en", day);
+        HomeShelvesService.DailyPick tomorrow = homeShelvesService.takeawayOfTheDay("en", day.plusDays(1));
+
+        assertEquals(today.book().getId(), todayAgain.book().getId());
+        assertEquals(today.heading(), todayAgain.heading());
+        assertTrue(today.book().getId() != tomorrow.book().getId());
+    }
+
+    @Test
+    void testTakeawayOfTheDayIsNullWhenThereAreNoBooks() {
+        when(bookRepository.findReadableBookIds()).thenReturn(List.of());
+
+        assertEquals(null, homeShelvesService.takeawayOfTheDay("en", LocalDate.of(2026, 10, 17)));
     }
 }

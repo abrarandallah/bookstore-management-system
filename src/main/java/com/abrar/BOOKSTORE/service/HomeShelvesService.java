@@ -3,6 +3,7 @@ package com.abrar.BOOKSTORE.service;
 import com.abrar.BOOKSTORE.Login.user.User;
 import com.abrar.BOOKSTORE.Login.user.UserRepository;
 import com.abrar.BOOKSTORE.entity.Book;
+import com.abrar.BOOKSTORE.entity.BookPage;
 import com.abrar.BOOKSTORE.entity.Genre;
 import com.abrar.BOOKSTORE.entity.ReadingProgress;
 import com.abrar.BOOKSTORE.repository.BookRepository;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -65,6 +67,52 @@ public class HomeShelvesService {
      */
     public record ShelfItem(Book book, String name, String author, int takeawayCount, int minutes,
             RatingSummary rating, int step, int percent) {
+    }
+
+    /**
+     * The home page's "Takeaway of the day".
+     *
+     * @param date    the day this pick is for (changes every day)
+     * @param content the full text of the takeaway; the page shortens it
+     */
+    public record DailyPick(Book book, String name, String author, String heading, String content, LocalDate date) {
+    }
+
+    /**
+     * One takeaway, the same for everyone all day and different tomorrow, so
+     * the home page has a reason to visit again. Nothing is stored: the book
+     * and takeaway are worked out from the date, so the pick only changes when
+     * books are added or removed. Null when there is nothing to show.
+     */
+    public DailyPick takeawayOfTheDay(String language) {
+        return takeawayOfTheDay(language, LocalDate.now());
+    }
+
+    public DailyPick takeawayOfTheDay(String language, LocalDate date) {
+        List<Integer> ids = bookRepository.findReadableBookIds();
+        if (ids == null || ids.isEmpty()) {
+            return null;
+        }
+        long day = date.toEpochDay();
+        Optional<Book> found = bookRepository.findById(ids.get((int) Math.floorMod(day, (long) ids.size())));
+        if (found.isEmpty() || found.get().getTakeaways().isEmpty()) {
+            return null;
+        }
+        Book book = found.get();
+        List<BookPage> pages = book.getTakeaways();
+        // Different takeaway each time the same book comes round again.
+        BookPage page = pages.get((int) Math.floorMod(day / ids.size(), (long) pages.size()));
+
+        BookTranslationService.LocalizedBook lb = bookTranslationService.localizeBook(book, language);
+        Map<Long, BookTranslationService.LocalizedPage> localizedPages = bookTranslationService
+                .localizePages(List.of(page), language);
+        BookTranslationService.LocalizedPage lp = localizedPages == null ? null : localizedPages.get(page.getId());
+        return new DailyPick(book,
+                lb != null ? lb.name() : book.getName(),
+                lb != null ? lb.author() : book.getAuthor(),
+                lp != null ? lp.heading() : page.getHeading(),
+                lp != null ? lp.content() : page.getContent(),
+                date);
     }
 
     /** The reader's unfinished books, most recently read first. */
