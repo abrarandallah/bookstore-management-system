@@ -1916,17 +1916,6 @@ h1, h2, h3, h4 { text-wrap: balance; }
 .hero-links a { color: var(--ink-soft); }
 .hero-links a:hover { color: var(--burgundy); }
 
-/* "About" teaser lines up with the other sections; only the text is narrow. */
-.home-about p { max-width: 60ch; }
-
-/* The three reader photos share one height so there are no empty gaps. */
-.photo-row .hero-figure { display: block; }
-.photo-row .hero-figure img {
-  width: 100%;
-  height: 260px;
-  object-fit: cover;
-}
-
 /* ---- Show/hide password -------------------------------------------------------- */
 .password-field { position: relative; }
 .password-field .form-control { padding-inline-end: 2.75rem; }
