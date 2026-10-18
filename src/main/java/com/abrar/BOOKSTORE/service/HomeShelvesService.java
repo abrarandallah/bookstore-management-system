@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 /**
  * The little "shelves" shown on the home page: Continue reading, Newest,
- * Highest rated and Quick reads.
+ * and Highest rated.
  *
  * Registered under the bean name "homeShelves" so home.html can call it
  * directly (the same way templates already call @genreLocalizer) - that keeps
@@ -43,8 +43,6 @@ public class HomeShelvesService {
     public static final int SHELF_SIZE = 6;
     public static final int CONTINUE_LIMIT = 4;
     public static final int RELATED_LIMIT = 3;
-    // 4 takeaways is about 6 minutes (see Book#getEstimatedReadMinutes).
-    public static final int QUICK_READ_MAX_TAKEAWAYS = 4;
 
     @Autowired
     private BookRepository bookRepository;
@@ -175,13 +173,6 @@ public class HomeShelvesService {
                 .filter(b -> !b.getTakeaways().isEmpty())
                 .toList();
         return items(ordered, language);
-    }
-
-    /** Short books (a few takeaways), newest first. */
-    public List<ShelfItem> quickReads(String language) {
-        List<Book> books = bookRepository
-                .findQuickReads(QUICK_READ_MAX_TAKEAWAYS, PageRequest.of(0, SHELF_SIZE));
-        return items(books, language);
     }
 
     /**
