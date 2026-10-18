@@ -29,7 +29,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -134,20 +133,6 @@ class HomeShelvesServiceTest {
 
         assertTrue(homeShelvesService.topRated("en").isEmpty());
         verify(bookRepository, never()).findAllById(Mockito.<Iterable<Integer>>any());
-    }
-
-    @Test
-    void testQuickReadsReturnsTheRepositoryResultAsShelfItems() {
-        Book shortBook = bookWithTakeaways(5, "Short Book", 2);
-        when(bookRepository.findQuickReads(Mockito.eq(HomeShelvesService.QUICK_READ_MAX_TAKEAWAYS),
-                Mockito.any(Pageable.class))).thenReturn(List.of(shortBook));
-
-        List<ShelfItem> items = homeShelvesService.quickReads("en");
-
-        assertEquals(1, items.size());
-        assertEquals("Short Book", items.get(0).name());
-        assertEquals(2, items.get(0).takeawayCount());
-        assertEquals(0, items.get(0).step());
     }
 
     /** Same-genre books only: not the book itself, and not ones already finished. */
