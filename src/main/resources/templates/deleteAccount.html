@@ -21,7 +21,7 @@
                       onsubmit="return appConfirm(event);" th:data-confirm="#{confirm.delete.account}">
                     <div class="mb-3">
                         <label th:text="#{deleteAccount.confirm.your.password}" for="currentPassword" class="form-label">Confirm your password</label>
-                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" autocomplete="current-password" required>
                     </div>
                     <button type="submit" class="btn btn-danger w-100">
                         <i class="fa-solid fa-trash me-1"></i> <span th:text="#{deleteAccount.permanently.delete.my.account}">Permanently Delete My Account</span>
