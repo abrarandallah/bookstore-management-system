@@ -15,17 +15,18 @@
                 <form th:action="@{/register}" th:object="${signupRequest}" method="post">
                     <div class="mb-3">
                         <label th:text="#{register.username}" for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username"
+                        <input type="text" class="form-control" id="username" name="username" autocomplete="username" autocapitalize="off" spellcheck="false"
                                th:value="${signupRequest?.username}" placeholder="Enter your username" th:placeholder="#{register.enter.your.username}" required>
                     </div>
                     <div class="mb-3">
                         <label th:text="#{register.email}" for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email"
+                        <input type="email" class="form-control" id="email" name="email" autocomplete="email" autocapitalize="off" spellcheck="false"
                                th:value="${signupRequest?.email}" placeholder="Enter your email" th:placeholder="#{register.enter.your.email}" required>
                     </div>
                     <div class="mb-3">
                         <label th:text="#{register.password}" for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" minlength="8" placeholder="Enter your password" th:placeholder="#{register.enter.your.password}" required>
+                        <input type="password" class="form-control" id="password" name="password" minlength="8" autocomplete="new-password" aria-describedby="password-hint" placeholder="Enter your password" th:placeholder="#{register.enter.your.password}" required>
+                        <div id="password-hint" class="form-text" th:text="#{register.password.hint}">Use at least 8 characters.</div>
                     </div>
                     <button th:text="#{register.register}" type="submit" class="btn btn-primary w-100">Register</button>
                     <div class="text-center mt-3">
