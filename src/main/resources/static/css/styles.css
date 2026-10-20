@@ -2009,3 +2009,45 @@ h1, h2, h3, h4 { text-wrap: balance; }
 @media (max-width: 575.98px) {
   .daily-card { padding: 1.75rem 1.4rem 1.5rem; }
 }
+
+/* ---- Form feedback ----------------------------------------------------------
+   Show a field as invalid only once the person has interacted with it
+   (:user-invalid), so an empty form isn't covered in red on first load.
+   Unsupported browsers simply ignore these rules. */
+.form-control:user-invalid,
+.form-select:user-invalid {
+  border-color: var(--burgundy-bright);
+}
+.form-control:user-invalid:focus,
+.form-select:user-invalid:focus {
+  box-shadow: 0 0 0 0.2rem rgba(165, 67, 63, 0.25);
+}
+.form-text {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  margin-top: 0.35rem;
+}
+
+/* Submit button after the first click (see js/form-submit-guard.js). */
+.btn.is-submitting {
+  opacity: 0.75;
+  cursor: progress;
+  pointer-events: none;
+}
+.submit-guard-spinner {
+  margin-inline-start: 0.5rem;
+}
+
+/* In-page jumps glide, unless the person asked for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* Cairo sits taller and needs more air between lines than Inter/Fraunces. */
+html[lang="ar"] body { line-height: 1.85; }
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3,
+html[lang="ar"] h4,
+html[lang="ar"] h5,
+html[lang="ar"] h6 { line-height: 1.45; }
