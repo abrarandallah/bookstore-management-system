@@ -35,11 +35,11 @@
                 <form th:action="@{/login}" method="post">
                     <div class="mb-3">
                         <label th:text="#{login.username.or.email}" for="usernameOrEmail" class="form-label">Username or Email</label>
-                        <input type="text" class="form-control" id="usernameOrEmail" name="usernameOrEmail" placeholder="Enter your username or email" th:placeholder="#{login.enter.your.username.or.email}" required>
+                        <input type="text" class="form-control" id="usernameOrEmail" name="usernameOrEmail" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="Enter your username or email" th:placeholder="#{login.enter.your.username.or.email}" required>
                     </div>
                     <div class="mb-3">
                         <label th:text="#{login.password}" for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" th:placeholder="#{login.enter.your.password}" required>
+                        <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" th:placeholder="#{login.enter.your.password}" required>
                     </div>
                     <button th:text="#{login.login}" type="submit" class="btn btn-primary w-100">Login</button>
                     <div class="text-center mt-3">
