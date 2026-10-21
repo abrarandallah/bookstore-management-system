@@ -22,12 +22,7 @@
                 <input type="search" name="q" id="search-input" class="search-input"
                        placeholder="Search by title or author&hellip;" th:placeholder="#{bookList.search.by.title.or.author}" th:value="${q}" autocomplete="off">
             </div>
-            <div class="search-divider"></div>
-            <select name="genre" id="search-genre" class="search-sort" th:if="${!#lists.isEmpty(genres)}">
-                <option th:text="#{bookList.all.genres}" value="" th:selected="${selectedGenre == null}">All genres</option>
-                <option th:each="g : ${genres}" th:value="${g.id}" th:text="${@genreLocalizer.localizeName(g.name, #locale.language)}"
-                        th:selected="${selectedGenre != null and selectedGenre == g.id}"></option>
-            </select>
+            <input type="hidden" name="genre" id="search-genre" th:value="${selectedGenre}">
             <div class="search-divider"></div>
             <select name="sort" id="search-sort" class="search-sort">
                 <option th:text="#{bookList.title.a.ndash.z}" value="name_asc" th:selected="${sort == 'name_asc' or sort == null}">Title A&ndash;Z</option>
@@ -48,7 +43,8 @@
         <div id="book-results">
             <th:block th:fragment="resultsFragment">
                 <!--/* One-tap genre filter. Keeps the current search text and sort. */-->
-                <nav class="genre-filter-row" th:if="${!#lists.isEmpty(genres)}" aria-label="Genres" th:aria-label="#{genres.genres}">
+                <div class="genre-filter-wrap" th:if="${!#lists.isEmpty(genres)}" th:classappend="${selectedGenre != null} ? 'is-open'">
+                <nav class="genre-filter-row" aria-label="Genres" th:aria-label="#{genres.genres}">
                     <a class="genre-filter" th:classappend="${selectedGenre == null} ? 'is-active'"
                        th:attr="aria-current=${selectedGenre == null} ? 'true'"
                        th:href="@{/available_books(q=${q}, sort=${sort})}" th:text="#{bookList.all.genres}">All genres</a>
@@ -58,6 +54,10 @@
                        th:href="@{/available_books(q=${q}, sort=${sort}, genre=${g.id})}"
                        th:text="${@genreLocalizer.localizeName(g.name, #locale.language)}">Genre</a>
                 </nav>
+                <button type="button" class="genre-more" aria-expanded="false"
+                        th:data-more="#{bookList.genres.show.all}" th:data-less="#{bookList.genres.show.fewer}"
+                        th:text="${selectedGenre != null} ? #{bookList.genres.show.fewer} : #{bookList.genres.show.all}">Show all genres</button>
+                </div>
                 <div th:if="${#lists.isEmpty(book) and (q == null or #strings.isEmpty(q)) and selectedGenre == null}" class="empty-state">
                     <span th:text="#{bookList.nothing.here.yet}" class="eyebrow">Nothing here yet</span>
                     <h3 th:text="#{bookList.the.shelf.is.empty}">The shelf is empty</h3>
@@ -160,5 +160,6 @@
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 <script th:src="@{/js/live-search.js}"></script>
+<script th:src="@{/js/genre-chips.js}"></script>
 </body>
 </html>
