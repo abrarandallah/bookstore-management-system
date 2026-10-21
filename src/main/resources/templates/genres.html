@@ -14,7 +14,7 @@
 
     <th:block th:unless="${#maps.isEmpty(genreCounts)}">
     <div class="genre-toolbar" id="genre-toolbar">
-        <input type="search" id="genre-filter" class="form-control genre-filter"
+        <input type="search" id="genre-filter" class="form-control genre-search"
                th:placeholder="#{genres.filter.placeholder}" th:aria-label="#{genres.filter.placeholder}"
                autocomplete="off">
         <div class="genre-sort" role="group" th:aria-label="#{genres.sort.label}">
