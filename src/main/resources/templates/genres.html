@@ -12,17 +12,36 @@
 
     <div th:text="#{genres.no.genres.yet}" th:if="${#maps.isEmpty(genreCounts)}" class="text-muted">No genres yet.</div>
 
-    <div class="row g-3" th:unless="${#maps.isEmpty(genreCounts)}">
-        <div class="col-sm-6 col-md-4 col-lg-3" th:each="entry : ${genreCounts}">
-            <a class="card h-100 text-decoration-none text-reset"
+    <th:block th:unless="${#maps.isEmpty(genreCounts)}">
+    <div class="genre-toolbar" id="genre-toolbar">
+        <input type="search" id="genre-filter" class="form-control genre-filter"
+               th:placeholder="#{genres.filter.placeholder}" th:aria-label="#{genres.filter.placeholder}"
+               autocomplete="off">
+        <div class="genre-sort" role="group" th:aria-label="#{genres.sort.label}">
+            <button type="button" class="genre-sort-btn is-active" data-sort="az" aria-pressed="true" th:text="#{genres.sort.az}">A-Z</button>
+            <button type="button" class="genre-sort-btn" data-sort="most" aria-pressed="false" th:text="#{genres.sort.most}">Most books</button>
+        </div>
+        <span class="genre-total text-muted small" th:text="#{genres.total(${#maps.size(genreCounts)})}"></span>
+    </div>
+
+    <div class="row g-3" id="genre-grid">
+        <div class="col-sm-6 col-md-4 col-lg-3 genre-col" th:each="entry, stat : ${genreCounts}"
+             th:with="gname=${@genreLocalizer.localizeName(entry.key.name, #locale.language)}"
+             th:attr="data-name=${#strings.toLowerCase(gname + ' ' + entry.key.name)},data-label=${gname},data-count=${entry.value}">
+            <a class="genre-card text-decoration-none" th:classappend="'genre-tone-' + ${stat.index % 4}"
                th:href="@{/available_books(genre=${entry.key.id})}">
-                <div class="card-body">
-                    <div class="fw-semibold" th:text="${@genreLocalizer.localizeName(entry.key.name, #locale.language)}"></div>
-                    <div class="text-muted small" th:text="${entry.value == 1} ? #{genres.book.count.one(${entry.value})} : #{genres.book.count.other(${entry.value})}"></div>
-                </div>
+                <span class="genre-initial" aria-hidden="true" th:text="${#strings.toUpperCase(#strings.substring(gname, 0, 1))}">A</span>
+                <span class="genre-info">
+                    <span class="genre-name" th:text="${gname}"></span>
+                    <span class="genre-count" th:text="${entry.value == 1} ? #{genres.book.count.one(${entry.value})} : #{genres.book.count.other(${entry.value})}"></span>
+                    <span class="genre-bar" aria-hidden="true"><span class="genre-bar-fill"></span></span>
+                </span>
+                <span class="genre-arrow" aria-hidden="true">&rarr;</span>
             </a>
         </div>
     </div>
+    <p class="text-muted mt-4 d-none" id="genre-empty" th:text="#{genres.no.match}">No genre matches your search.</p>
+    </th:block>
 
     <div class="card mt-5" sec:authorize="hasRole('LIBRARIAN')" th:unless="${#maps.isEmpty(genreCounts)}">
         <div class="card-header">
@@ -76,5 +95,6 @@
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:src="@{/js/genres.js}"></script>
 </body>
 </html>
