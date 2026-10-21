@@ -89,9 +89,11 @@ CREATE TABLE book_genres (
 ) ENGINE = InnoDB;
 
 -- ---------------------------------------------------------------------
--- MyBooks (entity/MyBookList.java) - explicit @Table(name = "MyBooks")
+-- my_books (entity/MyBookList.java). The entity says @Table(name = "MyBooks"),
+-- but Spring Boot's naming strategy turns that into my_books, and MySQL on
+-- Linux is case-sensitive, so the table must be created in snake_case.
 -- ---------------------------------------------------------------------
-CREATE TABLE MyBooks (
+CREATE TABLE my_books (
     id      BIGINT       NOT NULL AUTO_INCREMENT,
     book_id INT          NOT NULL,
     name    VARCHAR(255) NULL,
