@@ -1938,14 +1938,16 @@ h1, h2, h3, h4 { text-wrap: balance; }
 .password-toggle:hover { opacity: 1; color: var(--brass); }
 
 /* ---- Genre filter chips on the book list ---------------------------------------- */
+.genre-filter-wrap { margin-bottom: 1.25rem; }
 .genre-filter-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
-  overflow-x: auto;
-  padding: 0.25rem 0.1rem 0.9rem;
-  margin-bottom: 0.5rem;
-  scrollbar-width: thin;
+  max-height: 4.9rem; /* two rows of chips; the rest opens with the toggle */
+  overflow: hidden;
+  padding: 0.15rem 0.1rem;
 }
+.genre-filter-wrap.is-open .genre-filter-row { max-height: none; }
 .genre-filter {
   flex: 0 0 auto;
   font-size: 0.85rem;
@@ -1956,6 +1958,7 @@ h1, h2, h3, h4 { text-wrap: balance; }
   border-radius: 999px;
   padding: 0.3rem 0.9rem;
   white-space: nowrap;
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 .genre-filter:hover { border-color: var(--brass); color: var(--burgundy); }
 .genre-filter.is-active {
@@ -1963,6 +1966,20 @@ h1, h2, h3, h4 { text-wrap: balance; }
   border-color: var(--ink);
   color: var(--paper-raised);
 }
+.genre-more {
+  display: none;
+  margin-top: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brass-deep);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+.genre-more:hover { color: var(--burgundy); text-decoration: underline; }
+.genre-filter-wrap.has-overflow .genre-more { display: inline-block; }
 
 /* ---- Home page: calmer structure ------------------------------------------------- */
 
@@ -2061,7 +2078,7 @@ html[lang="ar"] h6 { line-height: 1.45; }
   gap: 0.75rem 1rem;
   margin-bottom: 1.5rem;
 }
-.genre-filter { flex: 1 1 14rem; max-width: 22rem; }
+.genre-search { flex: 1 1 14rem; max-width: 22rem; }
 .genre-sort {
   display: inline-flex;
   border: 1px solid var(--line);
@@ -2153,4 +2170,26 @@ html[lang="ar"] h6 { line-height: 1.45; }
 @media (prefers-reduced-motion: reduce) {
   .genre-card, .genre-arrow { transition: none; }
   .genre-card:hover, .genre-card:focus-visible { transform: none; }
+}
+
+/* Book list search panel: one clean row, flat button that sits inside the panel. */
+.search-panel .search-submit {
+  box-shadow: none;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper-raised);
+  padding-inline: 1.4rem;
+  transform: none;
+}
+.search-panel .search-submit:hover {
+  background: var(--burgundy);
+  border-color: var(--burgundy);
+  color: var(--paper-raised);
+  box-shadow: none;
+}
+.search-panel .search-sort { min-width: 10.5rem; cursor: pointer; }
+.search-panel .search-field { min-width: 0; }
+.search-panel #search-clear { align-self: center; padding-inline: 0.5rem; }
+@media (max-width: 575.98px) {
+  .search-panel .search-submit { flex: 1 1 100%; }
 }
