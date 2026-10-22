@@ -5,12 +5,15 @@
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main class="page-body" id="main-content">
-<div class="container my-5" style="max-width: 640px;">
-    <div class="d-flex align-items-center gap-3 mb-4">
-        <th:block th:replace="~{fragments/cover :: cover(${book.coverImageUrl}, 'cover-img', #{bookRead.cover}, 'width:64px;height:auto;border-radius:4px;box-shadow:var(--shadow-card);')}"></th:block>
-        <div>
+<div class="container my-4 my-md-5 reader-shell">
+    <a th:href="@{/available_books}" class="reader-back text-decoration-none">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> <span th:text="#{bookList.available.books}">Available Books</span>
+    </a>
+    <div class="reader-head">
+        <th:block th:replace="~{fragments/cover :: cover(${book.coverImageUrl}, 'cover-img', #{bookRead.cover}, 'width:84px;height:auto;border-radius:4px;box-shadow:var(--shadow-card);')}"></th:block>
+        <div class="reader-head-text">
             <span class="eyebrow d-block" th:text="${localizedBook.author}">Author</span>
-            <h3 class="mb-0" th:text="${localizedBook.name}">Book title</h3>
+            <h1 class="reader-title" th:text="${localizedBook.name}">Book title</h1>
             <span class="rating-badge mt-1" th:if="${ratingSummary.count > 0}">
                 <i class="fa-solid fa-star"></i>
                 <span th:text="${#numbers.formatDecimal(ratingSummary.average, 1, 1)}">4.3</span>
@@ -37,27 +40,43 @@
             <input type="hidden" name="page" id="progress-page-input" value="0">
         </form>
         <div class="reader-progress mb-4">
-            <span class="eyebrow" id="reader-progress-label" th:text="#{bookRead.takeaway.progress(1, ${#lists.size(book.takeaways)})}">Takeaway 1 of 5</span>
+            <div class="reader-toolbar">
+                <span class="eyebrow" id="reader-progress-label" th:text="#{bookRead.takeaway.progress(1, ${#lists.size(book.takeaways)})}">Takeaway 1 of 5</span>
+                <div class="reader-textsize" role="group" th:aria-label="#{bookRead.text.size}">
+                    <button type="button" class="reader-textsize-btn" id="reader-smaller" th:title="#{bookRead.text.smaller}" th:aria-label="#{bookRead.text.smaller}">A&minus;</button>
+                    <button type="button" class="reader-textsize-btn reader-textsize-btn-lg" id="reader-larger" th:title="#{bookRead.text.larger}" th:aria-label="#{bookRead.text.larger}">A+</button>
+                </div>
+            </div>
             <div class="reader-progress-bar mt-2">
                 <div class="reader-progress-fill" id="reader-progress-fill"></div>
             </div>
+            <ol class="reader-steps" th:if="${#lists.size(book.takeaways) > 1}">
+                <li th:each="page, iter : ${book.takeaways}">
+                    <button type="button" class="reader-step" th:data-step="${iter.index}"
+                            th:title="${localizedPages.get(page.id).heading}"
+                            th:aria-label="#{bookRead.jump.to(${iter.count})}"
+                            th:text="${iter.count}">1</button>
+                </li>
+            </ol>
         </div>
 
         <div th:each="page, iter : ${book.takeaways}" class="reader-page" th:data-index="${iter.index}"
              th:style="${iter.index == resumePage} ? 'display:block' : ''">
-            <h4 th:text="${localizedPages.get(page.id).heading}">Heading</h4>
+            <span class="reader-numeral" aria-hidden="true" th:text="${iter.count < 10 ? '0' + iter.count : iter.count}">01</span>
+            <h2 class="reader-heading" th:text="${localizedPages.get(page.id).heading}">Heading</h2>
             <p th:text="${localizedPages.get(page.id).content}" style="white-space: pre-line;">Content</p>
         </div>
 
-        <div class="d-flex justify-content-between mt-4">
+        <div class="reader-nav">
             <button type="button" class="btn btn-secondary" id="reader-prev" onclick="readerGo(-1)">
                 <i class="fa-solid fa-arrow-left me-1"></i> <span th:text="#{bookRead.previous}">Previous</span>
             </button>
+            <span class="reader-counter" id="reader-counter" aria-hidden="true">1 / 1</span>
             <button type="button" class="btn btn-primary" id="reader-next" onclick="readerGo(1)">
                 <span th:text="#{bookRead.next}">Next</span> <i class="fa-solid fa-arrow-right ms-1"></i>
             </button>
         </div>
-        <p class="text-center mt-2 mb-0 small" style="color: var(--ink-soft); opacity: 0.7;">
+        <p class="text-center mt-3 mb-0 small reader-hint">
             <i class="fa-solid fa-keyboard me-1"></i> <span th:text="#{bookRead.keyboard.hint}">Use the &larr; and &rarr; arrow keys to navigate too</span>
         </p>
     </div>
@@ -143,6 +162,13 @@
         document.getElementById('reader-progress-label').textContent = readerI18n.takeawayProgress
             .replace('{0}', readerIndex + 1).replace('{1}', readerTotal);
         document.getElementById('reader-progress-fill').style.width = (((readerIndex + 1) / readerTotal) * 100) + '%';
+        document.getElementById('reader-counter').textContent = (readerIndex + 1) + ' / ' + readerTotal;
+        document.querySelectorAll('.reader-step').forEach((el) => {
+            const i = parseInt(el.getAttribute('data-step'), 10);
+            el.classList.toggle('is-current', i === readerIndex);
+            el.classList.toggle('is-done', i < readerIndex);
+            if (i === readerIndex) { el.setAttribute('aria-current', 'step'); } else { el.removeAttribute('aria-current'); }
+        });
         document.getElementById('reader-prev').disabled = readerIndex === 0;
         document.getElementById('reader-next').textContent = '';
         const nextBtn = document.getElementById('reader-next');
@@ -180,10 +206,52 @@
         readerIndex = Math.min(Math.max(readerIndex + delta, 0), readerTotal - 1);
         readerRender(delta);
         saveProgress();
+        readerKeepInView();
+    }
+
+    function readerJump(target) {
+        if (target === readerIndex || target < 0 || target >= readerTotal) {
+            return;
+        }
+        const direction = target > readerIndex ? 1 : -1;
+        readerIndex = target;
+        readerRender(direction);
+        saveProgress();
+        readerKeepInView();
+    }
+
+    // After a page turn, make sure the top of the reader is on screen (long
+    // takeaways on a phone leave you scrolled down at the Next button).
+    function readerKeepInView() {
+        const panel = document.querySelector('.reader-panel');
+        if (panel && panel.getBoundingClientRect().top < 0) {
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    // Text size: same storage key the Settings page uses, so the two stay in sync.
+    function readerSetTextSize(delta) {
+        const sizes = ['small', 'medium', 'large'];
+        const now = document.documentElement.getAttribute('data-reader-font-size') || 'medium';
+        const next = sizes[Math.min(Math.max(sizes.indexOf(now) + delta, 0), 2)];
+        document.documentElement.setAttribute('data-reader-font-size', next);
+        try { localStorage.setItem('bookstore-reader-font-size', next); } catch (e) { /* private mode */ }
+        readerSyncTextSizeButtons();
+    }
+    function readerSyncTextSizeButtons() {
+        const now = document.documentElement.getAttribute('data-reader-font-size') || 'medium';
+        document.getElementById('reader-smaller').disabled = now === 'small';
+        document.getElementById('reader-larger').disabled = now === 'large';
     }
 
     if (readerTotal > 0) {
         readerRender();
+        document.getElementById('reader-smaller').addEventListener('click', () => readerSetTextSize(-1));
+        document.getElementById('reader-larger').addEventListener('click', () => readerSetTextSize(1));
+        readerSyncTextSizeButtons();
+        document.querySelectorAll('.reader-step').forEach((el) => {
+            el.addEventListener('click', () => readerJump(parseInt(el.getAttribute('data-step'), 10)));
+        });
         // readerRender() above already set the fill's final width
         // synchronously, before the browser's had a chance to paint the 0%
         // state from the CSS, so nothing would visibly animate. Re-applying
