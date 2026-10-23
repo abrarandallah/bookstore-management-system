@@ -190,7 +190,7 @@ class BookControllerTest {
                                 .build()
                                 .perform(requestBuilder)
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.model().size(7))
+                                .andExpect(MockMvcResultMatchers.model().size(8))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("book"))
                                 .andExpect(MockMvcResultMatchers.model().attributeExists("pagination"))
                                 .andExpect(MockMvcResultMatchers.view().name("bookList :: resultsFragment"));
