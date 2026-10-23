@@ -6,15 +6,31 @@
 
 <main class="page-body" id="main-content">
     <div class="container my-5">
-        <div class="section-heading">
-            <div>
+        <section class="shelf-hero">
+            <div class="shelf-hero-copy">
                 <span th:text="#{bookList.the.shelf}" class="eyebrow">The shelf</span>
                 <h2 th:text="#{bookList.available.books}">Available Books</h2>
+                <p class="shelf-hero-tagline" th:text="#{bookList.hero.tagline}">Short, sharp takeaways from great books. Pick one and finish it in minutes.</p>
+                <div class="shelf-hero-actions">
+                    <a th:href="@{/random_book}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-shuffle me-1" aria-hidden="true"></i> <span th:text="#{home.surprise.me}">Surprise Me</span>
+                    </a>
+                    <a th:href="@{/genres}" class="btn btn-outline-brass btn-sm">
+                        <i class="fa-solid fa-layer-group me-1" aria-hidden="true"></i> <span th:text="#{genres.genres}">Genres</span>
+                    </a>
+                    <a th:href="@{/book_register}" class="btn btn-outline-brass btn-sm" sec:authorize="hasRole('LIBRARIAN')">
+                        <i class="fa-solid fa-plus me-1"></i> <span th:text="#{bookList.register.a.book}">Register a book</span>
+                    </a>
+                </div>
             </div>
-            <a th:href="@{/book_register}" class="btn btn-outline-brass" sec:authorize="hasRole('LIBRARIAN')">
-                <i class="fa-solid fa-plus me-1"></i> <span th:text="#{bookList.register.a.book}">Register a book</span>
-            </a>
-        </div>
+            <div class="shelf-hero-art" aria-hidden="true">
+                <i class="fa-solid fa-book-open art-main"></i>
+                <i class="fa-solid fa-feather-pointed art-a"></i>
+                <i class="fa-solid fa-bookmark art-b"></i>
+                <i class="fa-solid fa-glasses art-c"></i>
+                <i class="fa-solid fa-star art-d"></i>
+            </div>
+        </section>
 
         <form th:action="@{/available_books}" method="get" id="search-form" class="search-panel mb-4">
             <div class="search-field">
@@ -47,12 +63,12 @@
                 <nav class="genre-filter-row" aria-label="Genres" th:aria-label="#{genres.genres}">
                     <a class="genre-filter" th:classappend="${selectedGenre == null} ? 'is-active'"
                        th:attr="aria-current=${selectedGenre == null} ? 'true'"
-                       th:href="@{/available_books(q=${q}, sort=${sort})}" th:text="#{bookList.all.genres}">All genres</a>
+                       th:href="@{/available_books(q=${q}, sort=${sort})}"><i class="fa-solid fa-border-all" aria-hidden="true"></i> <span th:text="#{bookList.all.genres}">All genres</span></a>
                     <a class="genre-filter" th:each="g : ${genres}"
                        th:classappend="${selectedGenre != null and selectedGenre == g.id} ? 'is-active'"
                        th:attr="aria-current=${selectedGenre != null and selectedGenre == g.id} ? 'true'"
                        th:href="@{/available_books(q=${q}, sort=${sort}, genre=${g.id})}"
-                       th:text="${@genreLocalizer.localizeName(g.name, #locale.language)}">Genre</a>
+                       ><i class="fa-solid" th:classappend="${@genreIcons.iconFor(g.name)}" aria-hidden="true"></i> <span th:text="${@genreLocalizer.localizeName(g.name, #locale.language)}">Genre</span></a>
                 </nav>
                 <button type="button" class="genre-more" aria-expanded="false"
                         th:data-more="#{bookList.genres.show.all}" th:data-less="#{bookList.genres.show.fewer}"
@@ -76,27 +92,43 @@
                     <p th:text="#{bookList.try.a.different.title.or}">Try a different title or author.</p>
                 </div>
 
+                <p class="results-line" th:unless="${#lists.isEmpty(book)}" th:if="${pagination != null}">
+                    <i class="fa-solid fa-book" aria-hidden="true"></i>
+                    <span th:text="#{bookList.results.range(${(pagination.page - 1) * pagination.size + 1}, ${(pagination.page - 1) * pagination.size + #lists.size(book)}, ${pagination.totalItems})}">1-12 of 190 books</span>
+                </p>
                 <div class="book-grid" th:unless="${#lists.isEmpty(book)}">
                     <div class="book-card" th:each="b : ${book}"
                          th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(b.name.hashCode()) % 360} + ', 42%, 34%)'">
-                        <th:block th:replace="~{fragments/cover :: cover(${b.coverImageUrl}, 'book-cover mb-2', #{bookList.cover}, null)}"></th:block>
+                        <div class="book-art" th:with="firstGenre=${#sets.isEmpty(b.genres) ? null : b.genres.iterator().next()}">
+                            <th:block th:if="${!#strings.isEmpty(b.coverImageUrl)}">
+                                <th:block th:replace="~{fragments/cover :: cover(${b.coverImageUrl}, 'book-cover', #{bookList.cover}, null)}"></th:block>
+                            </th:block>
+                            <div class="gen-cover" th:if="${#strings.isEmpty(b.coverImageUrl)}" role="img" th:aria-label="#{bookList.cover}">
+                                <i class="fa-solid gen-cover-icon" th:classappend="${firstGenre != null} ? ${@genreIcons.iconFor(firstGenre.name)} : 'fa-book-open'" aria-hidden="true"></i>
+                                <span class="gen-cover-genre" th:if="${firstGenre != null}"
+                                      th:text="${@genreLocalizer.localizeName(firstGenre.name, #locale.language)}"></span>
+                            </div>
+                            <span class="book-art-badge" th:if="${firstGenre != null}" aria-hidden="true">
+                                <i class="fa-solid" th:classappend="${@genreIcons.iconFor(firstGenre.name)}"></i>
+                            </span>
+                        </div>
                         <div class="book-author" th:text="${localizedBooks.get(b.id).author}">Author</div>
                         <div class="book-title"><a class="book-title-link" th:href="@{/available_books/{id}/read(id=${b.id})}" th:text="${localizedBooks.get(b.id).name}">Book title</a></div>
-                        <div class="d-flex align-items-center gap-1 flex-wrap mb-1" th:if="${!#sets.isEmpty(b.genres)}">
-                            <span class="genre-badge" th:each="g : ${b.genres}" th:text="${@genreLocalizer.localizeName(g.name, #locale.language)}"></span>
-                        </div>
-                        <span class="rating-badge mb-1" th:if="${ratingSummaries.get(b.id) != null}">
-                            <i class="fa-solid fa-star"></i>
-                            <span th:text="${#numbers.formatDecimal(ratingSummaries.get(b.id).average, 1, 1)}"></span>
-                            <span class="text-muted">(<span th:text="${ratingSummaries.get(b.id).count}"></span>)</span>
-                        </span>
-                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <div class="book-meta">
+                            <span class="rating-badge" th:if="${ratingSummaries.get(b.id) != null}">
+                                <i class="fa-solid fa-star"></i>
+                                <span th:text="${#numbers.formatDecimal(ratingSummaries.get(b.id).average, 1, 1)}"></span>
+                                <span class="text-muted">(<span th:text="${ratingSummaries.get(b.id).count}"></span>)</span>
+                            </span>
                             <span class="takeaway-tag" th:if="${!#lists.isEmpty(b.takeaways)}">
-                                <i class="fa-solid fa-list-check"></i>
+                                <i class="fa-regular fa-clock"></i>
                                 <span th:text="${#lists.size(b.takeaways) == 1}
                                     ? #{bookList.takeaway.count.one(${#lists.size(b.takeaways)}, ${b.estimatedReadMinutes})}
                                     : #{bookList.takeaway.count.other(${#lists.size(b.takeaways)}, ${b.estimatedReadMinutes})}"></span>
                             </span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1 flex-wrap mb-1" th:if="${!#sets.isEmpty(b.genres)}">
+                            <span class="genre-badge" th:each="g : ${b.genres}" th:text="${@genreLocalizer.localizeName(g.name, #locale.language)}"></span>
                         </div>
                         <div class="book-actions">
                             <a th:text="#{bookList.read}" th:href="@{/available_books/{id}/read(id=${b.id})}" class="btn btn-secondary btn-sm">Read</a>
