@@ -138,6 +138,7 @@ public class BookController {
         model.addAttribute("pagination", result);
         model.addAttribute("q", q);
         model.addAttribute("sort", sort);
+        model.addAttribute("genres", genreService.findAll());
         model.addAttribute("selectedGenre", genre);
         model.addAttribute("ratingSummaries", reviewService.summariesForAllBooks());
         model.addAttribute("localizedBooks", bookTranslationService.localizeBooks(result.getContent(),
