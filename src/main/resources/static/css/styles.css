@@ -2317,43 +2317,7 @@ html[lang="ar"] h6 { line-height: 1.45; }
 }
 
 
-/* ---- Available Books: banner, designed covers, icons ---------------------- */
-.shelf-hero {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  margin-bottom: 1.75rem;
-  padding: 1.6rem 1.75rem;
-  background:
-    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--brass) 16%, transparent), transparent 60%),
-    var(--paper-raised);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-}
-.shelf-hero h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); margin: 0.2rem 0 0.4rem; }
-.shelf-hero-tagline { margin: 0 0 1rem; max-width: 34rem; color: var(--ink-soft); }
-.shelf-hero-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.shelf-hero-art {
-  position: relative;
-  flex: 0 0 9rem;
-  height: 7.5rem;
-  color: var(--brass);
-}
-.shelf-hero-art i { position: absolute; }
-.shelf-hero-art .art-main { font-size: 4.6rem; inset-inline-start: 1.6rem; top: 1.4rem; opacity: 0.9; }
-.shelf-hero-art .art-a { font-size: 1.7rem; inset-inline-end: 0.2rem; top: 0; transform: rotate(18deg); color: var(--burgundy); opacity: 0.85; }
-.shelf-hero-art .art-b { font-size: 1.5rem; inset-inline-start: 0.3rem; top: 0.1rem; color: var(--burgundy); opacity: 0.85; }
-.shelf-hero-art .art-c { font-size: 1.6rem; inset-inline-end: 0; bottom: 0.2rem; opacity: 0.6; }
-.shelf-hero-art .art-d { font-size: 0.9rem; inset-inline-start: 0.2rem; bottom: 0.8rem; opacity: 0.7; }
-@media (max-width: 575.98px) {
-  .shelf-hero { padding: 1.25rem; }
-  .shelf-hero-art { display: none; }
-}
-
+/* ---- Available Books: heading + spine shelf, compact clickable cards, quick actions ---- */
 .genre-filter i { margin-inline-end: 0.3rem; font-size: 0.8em; color: var(--brass); }
 .genre-filter.is-active i { color: var(--brass-bright); }
 
@@ -2427,4 +2391,139 @@ html[lang="ar"] h6 { line-height: 1.45; }
 .gen-cover-icon { transition: transform 0.25s ease; }
 @media (prefers-reduced-motion: reduce) {
   .book-card:hover .gen-cover-icon { transform: none; }
+}
+
+.shelf-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin-bottom: 1.1rem;
+}
+.shelf-head-copy { flex: 0 0 auto; }
+.shelf-head h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0.1rem 0 0; }
+
+/* A strip of book spines standing on a shelf: pure CSS, ~60px tall. */
+.spine-shelf {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 62px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  padding-inline: 0.5rem;
+  overflow: hidden;
+  border-bottom: 5px solid var(--brass-deep);
+  border-radius: 0 0 2px 2px;
+}
+.spine-shelf span {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 46px;
+  border-radius: 2px 2px 0 0;
+  background: var(--brass);
+  box-shadow: inset -2px 0 0 rgba(0, 0, 0, 0.18), inset 2px 0 0 rgba(255, 255, 255, 0.12);
+}
+.spine-shelf span:nth-child(4n+1) { background: var(--burgundy); }
+.spine-shelf span:nth-child(4n+2) { background: var(--brass); }
+.spine-shelf span:nth-child(4n+3) { background: var(--ink-soft); }
+.spine-shelf span:nth-child(4n)   { background: var(--brass-deep); }
+.spine-shelf span:nth-child(7n+1) { height: 56px; }
+.spine-shelf span:nth-child(7n+3) { height: 38px; }
+.spine-shelf span:nth-child(7n+5) { height: 52px; width: 18px; }
+.spine-shelf span:nth-child(5n+2) { width: 11px; }
+.spine-shelf span:nth-child(5n+4) { width: 17px; }
+.spine-shelf span:nth-child(13n+6) { transform: rotate(-9deg); transform-origin: bottom left; margin-inline-end: 8px; }
+@media (max-width: 575.98px) {
+  .shelf-head { flex-direction: column; align-items: stretch; gap: 0.6rem; }
+  .spine-shelf { height: 46px; }
+  .spine-shelf span { transform: none !important; }
+}
+
+/* Compact cards, clickable all over. */
+.book-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1rem; }
+.book-card { padding: 0.75rem 0.8rem 0.65rem 1.15rem; gap: 0.35rem; cursor: pointer; }
+.book-card::before { width: 6px; }
+.book-card:hover { transform: translateY(-4px) scale(1.01); }
+.book-card:nth-child(even):hover { transform: translateY(-4px) scale(1.01); }
+.book-art .book-cover,
+.book-art .cover-placeholder,
+.gen-cover { height: 118px; }
+.gen-cover { gap: 0.45rem; }
+.gen-cover-icon { font-size: 2.2rem; }
+.gen-cover::before { inset: 0.4rem; }
+.book-card .book-title { font-size: 1.02rem; line-height: 1.25; }
+.book-card .book-author { font-size: 0.68rem; }
+/* The title link stretches over the whole card; the small action icons sit above it. */
+.book-card .book-title-link::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.book-card .book-title-link:focus-visible { outline: none; text-decoration: underline; }
+.book-card .book-title-link:focus-visible::after { outline: 2px solid var(--brass); outline-offset: -2px; border-radius: var(--radius); }
+.book-card:hover .book-title-link { color: var(--burgundy); text-decoration: underline; text-underline-offset: 3px; }
+.book-card .book-actions {
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  padding-top: 0.25rem;
+  border-top: 0;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  cursor: default;
+}
+.book-card .book-actions .icon-link { padding: 0.2rem 0.35rem; }
+.book-art-badge { z-index: 0; }
+
+/* Floating quick-actions button (bottom corner) with a small menu. */
+.quick-fab {
+  position: fixed;
+  inset-block-end: 1.25rem;
+  inset-inline-end: 1.25rem;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+.quick-fab-btn {
+  width: 3.1rem;
+  height: 3.1rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--burgundy);
+  color: #fffcf5;
+  font-size: 1.15rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.quick-fab-btn:hover { background: var(--ink); transform: scale(1.06); }
+.quick-fab-btn[aria-expanded="true"] { background: var(--ink); transform: rotate(20deg); }
+.quick-fab-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+.quick-fab-menu[hidden] { display: none; }
+.quick-fab-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
+  font-size: 0.88rem;
+  text-decoration: none;
+  white-space: nowrap;
+  animation: fab-pop 0.18s ease backwards;
+}
+.quick-fab-item i { color: var(--brass); }
+.quick-fab-item:hover { border-color: var(--brass); color: var(--burgundy); }
+.quick-fab-item:nth-child(2) { animation-delay: 0.04s; }
+.quick-fab-item:nth-child(3) { animation-delay: 0.08s; }
+@keyframes fab-pop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+body.has-fab .toast-stack { bottom: 5.5rem; }
+@media (prefers-reduced-motion: reduce) {
+  .quick-fab-btn, .quick-fab-item { transition: none; animation: none; }
 }
