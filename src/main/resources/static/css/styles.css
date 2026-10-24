@@ -2527,3 +2527,12 @@ body.has-fab .toast-stack { bottom: 5.5rem; }
 @media (prefers-reduced-motion: reduce) {
   .quick-fab-btn, .quick-fab-item { transition: none; animation: none; }
 }
+
+/* Fixed column counts (1/2/3/4/6) that all divide the page size of 24, so a full
+   page never ends with a half-empty last row. */
+#book-results .book-grid { grid-template-columns: 1fr; }
+@media (min-width: 480px) { #book-results .book-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 768px) { #book-results .book-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 992px) { #book-results .book-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1400px) { #book-results .book-grid { grid-template-columns: repeat(6, 1fr); } }
+button.quick-fab-item { font-family: inherit; cursor: pointer; }
