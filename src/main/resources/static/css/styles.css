@@ -2536,3 +2536,11 @@ body.has-fab .toast-stack { bottom: 5.5rem; }
 @media (min-width: 992px) { #book-results .book-grid { grid-template-columns: repeat(4, 1fr); } }
 @media (min-width: 1400px) { #book-results .book-grid { grid-template-columns: repeat(6, 1fr); } }
 button.quick-fab-item { font-family: inherit; cursor: pointer; }
+
+/* Homepage is just the hero now: centre it in the space between navbar and footer. */
+.home-hero-only {
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - 12rem);
+}
+.home-hero-only .hero-section { width: 100%; padding-block: 2.5rem; }
