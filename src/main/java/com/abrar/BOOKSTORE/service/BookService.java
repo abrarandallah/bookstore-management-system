@@ -21,7 +21,9 @@ public class BookService {
     // How many books show per page on the shelf. Not currently exposed as
     // a user-choosable option - if that changes, this is the one place
     // to add a bound/validated size parameter.
-    public static final int DEFAULT_PAGE_SIZE = 12;
+    // 24 divides evenly by the 1/2/3/4/6 columns the book list grid uses (see
+    // styles.css), so every full page ends on a complete row - no gap of empty cells.
+    public static final int DEFAULT_PAGE_SIZE = 24;
 
     @Autowired
     private BookRepository bRepo;
