@@ -175,12 +175,18 @@
         <a th:href="@{/random_book}" class="quick-fab-item">
             <i class="fa-solid fa-shuffle" aria-hidden="true"></i> <span th:text="#{home.surprise.me}">Surprise Me</span>
         </a>
-        <a th:href="@{/genres}" class="quick-fab-item">
-            <i class="fa-solid fa-layer-group" aria-hidden="true"></i> <span th:text="#{genres.genres}">Genres</span>
+        <a th:href="@{/my_books}" class="quick-fab-item" sec:authorize="isAuthenticated()">
+            <i class="fa-solid fa-bookmark" aria-hidden="true"></i> <span th:text="#{myBooks.my.books}">My Books</span>
+        </a>
+        <a th:href="@{/reading-history}" class="quick-fab-item" sec:authorize="isAuthenticated()">
+            <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> <span th:text="#{readingHistory.reading.history}">Reading History</span>
         </a>
         <a th:href="@{/book_register}" class="quick-fab-item" sec:authorize="hasRole('LIBRARIAN')">
             <i class="fa-solid fa-plus" aria-hidden="true"></i> <span th:text="#{bookList.register.a.book}">Register a book</span>
         </a>
+        <button type="button" class="quick-fab-item" id="quick-fab-top">
+            <i class="fa-solid fa-arrow-up" aria-hidden="true"></i> <span th:text="#{bookList.back.to.top}">Back to top</span>
+        </button>
     </div>
     <button type="button" class="quick-fab-btn" id="quick-fab-btn" aria-expanded="false" aria-controls="quick-fab-menu"
             th:title="#{bookList.quick.actions}" th:aria-label="#{bookList.quick.actions}">
