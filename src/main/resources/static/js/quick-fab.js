@@ -12,6 +12,14 @@
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
   btn.addEventListener('click', function () { setOpen(menu.hidden); });
+  var top = document.getElementById('quick-fab-top');
+  if (top) {
+    top.addEventListener('click', function () {
+      var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: calm ? 'auto' : 'smooth' });
+      setOpen(false);
+    });
+  }
   document.addEventListener('click', function (e) {
     if (!fab.contains(e.target)) setOpen(false);
   });
