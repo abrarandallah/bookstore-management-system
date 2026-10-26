@@ -43,6 +43,10 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
         @Query("SELECT b.id FROM Book b WHERE SIZE(b.takeaways) > 0 ORDER BY b.id")
         List<Integer> findReadableBookIds();
 
+        // Total number of takeaways across all books (home page "numbers" strip).
+        @Query("SELECT COUNT(p) FROM BookPage p")
+        long countTakeaways();
+
         // Every book currently tagged with a genre - used by GenreService#merge
         // to move each one onto the target genre before the source genre is
         // deleted.
