@@ -5,14 +5,34 @@
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main class="page-body" id="main-content">
-<div class="container my-5">
-    <span th:text="#{genres.browse}" class="eyebrow d-block mb-2">Browse</span>
-    <h4 th:text="#{genres.genres}" class="mb-1">Genres</h4>
-    <p th:text="#{genres.pick.a.genre.to.see}" class="text-muted mb-4">Pick a genre to see the books shelved under it.</p>
+<div class="container my-4 my-md-5">
+    <section class="genres-hero">
+        <div class="genres-hero-copy">
+            <span th:text="#{genres.browse}" class="eyebrow d-block mb-2">Browse</span>
+            <h1 th:text="#{genres.genres}">Genres</h1>
+            <p th:text="#{genres.pick.a.genre.to.see}">Pick a genre to see the books shelved under it.</p>
+            <button type="button" class="btn btn-primary btn-sm" id="genre-lucky" th:if="${!#maps.isEmpty(genreCounts)}">
+                <i class="fa-solid fa-dice me-1" aria-hidden="true"></i> <span th:text="#{genres.lucky}">Pick one for me</span>
+            </button>
+        </div>
+        <div class="genres-hero-art" aria-hidden="true">
+            <i class="fa-solid fa-dragon"></i>
+            <i class="fa-solid fa-ghost"></i>
+            <i class="fa-solid fa-rocket"></i>
+            <i class="fa-solid fa-heart"></i>
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-solid fa-masks-theater"></i>
+        </div>
+    </section>
 
     <div th:text="#{genres.no.genres.yet}" th:if="${#maps.isEmpty(genreCounts)}" class="text-muted">No genres yet.</div>
 
     <th:block th:unless="${#maps.isEmpty(genreCounts)}">
+    <div class="genres-popular" id="genre-popular" hidden th:data-label="#{genres.popular}">
+        <span class="genres-popular-label"></span>
+        <span class="genres-popular-list"></span>
+    </div>
+
     <div class="genre-toolbar" id="genre-toolbar">
         <input type="search" id="genre-filter" class="form-control genre-search"
                th:placeholder="#{genres.filter.placeholder}" th:aria-label="#{genres.filter.placeholder}"
@@ -24,19 +44,18 @@
         <span class="genre-total text-muted small" th:text="#{genres.total(${#maps.size(genreCounts)})}"></span>
     </div>
 
-    <div class="row g-3" id="genre-grid">
-        <div class="col-sm-6 col-md-4 col-lg-3 genre-col" th:each="entry, stat : ${genreCounts}"
+    <div class="gcard-grid" id="genre-grid">
+        <div class="genre-col" th:each="entry, stat : ${genreCounts}"
              th:with="gname=${@genreLocalizer.localizeName(entry.key.name, #locale.language)}"
-             th:attr="data-name=${#strings.toLowerCase(gname + ' ' + entry.key.name)},data-label=${gname},data-count=${entry.value}">
-            <a class="genre-card text-decoration-none" th:classappend="'genre-tone-' + ${stat.index % 4}"
-               th:href="@{/available_books(genre=${entry.key.id})}">
-                <span class="genre-initial" aria-hidden="true" th:text="${#strings.toUpperCase(#strings.substring(gname, 0, 1))}">A</span>
-                <span class="genre-info">
-                    <span class="genre-name" th:text="${gname}"></span>
-                    <span class="genre-count" th:text="${entry.value == 1} ? #{genres.book.count.one(${entry.value})} : #{genres.book.count.other(${entry.value})}"></span>
-                    <span class="genre-bar" aria-hidden="true"><span class="genre-bar-fill"></span></span>
-                </span>
-                <span class="genre-arrow" aria-hidden="true">&rarr;</span>
+             th:attr="data-name=${#strings.toLowerCase(gname + ' ' + entry.key.name)},data-label=${gname},data-count=${entry.value}"
+             th:style="'--i:' + ${stat.index < 24 ? stat.index : 24} + '; --h:' + ${T(java.lang.Math).abs(entry.key.name.hashCode()) % 360}">
+            <a class="gcard" th:href="@{/available_books(genre=${entry.key.id})}">
+                <i class="fa-solid gcard-watermark" th:classappend="${@genreIcons.iconFor(entry.key.name)}" aria-hidden="true"></i>
+                <span class="gcard-icon" aria-hidden="true"><i class="fa-solid" th:classappend="${@genreIcons.iconFor(entry.key.name)}"></i></span>
+                <span class="gcard-name" th:text="${gname}"></span>
+                <span class="gcard-count" th:text="${entry.value == 1} ? #{genres.book.count.one(${entry.value})} : #{genres.book.count.other(${entry.value})}"></span>
+                <span class="genre-bar" aria-hidden="true"><span class="genre-bar-fill"></span></span>
+                <span class="gcard-go" aria-hidden="true">&rarr;</span>
             </a>
         </div>
     </div>
