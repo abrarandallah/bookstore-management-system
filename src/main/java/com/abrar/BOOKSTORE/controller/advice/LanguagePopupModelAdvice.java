@@ -20,6 +20,29 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @ControllerAdvice
 public class LanguagePopupModelAdvice {
 
+    // "currentPath" = where the visitor is right now, so the language links can
+    // send them back to the same page after switching. Templates can't read the
+    // request themselves (Thymeleaf 3.1 removed #httpServletRequest), and the site
+    // sends "Referrer-Policy: no-referrer", so the Referer header is not an option.
+    // The query string is kept only for the book list (its search/genre filters);
+    // everywhere else it is dropped, because it can hold one-time tokens
+    // (password reset, email verification) that must not be copied into another URL.
+    @ModelAttribute("currentPath")
+    public String currentPath(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String context = request.getContextPath();
+        if (context != null && !context.isEmpty() && path.startsWith(context)) {
+            path = path.substring(context.length());
+        }
+        if (path.isEmpty() || path.startsWith("/error")) {
+            return "/";
+        }
+        if ("/available_books".equals(path) && request.getQueryString() != null) {
+            return path + "?" + request.getQueryString();
+        }
+        return path;
+    }
+
     @ModelAttribute("showLanguagePopup")
     public boolean showLanguagePopup(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
