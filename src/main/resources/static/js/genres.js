@@ -6,12 +6,50 @@
   var empty = document.getElementById('genre-empty');
   var buttons = document.querySelectorAll('.genre-sort-btn');
   var lang = document.documentElement.lang || undefined;
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Size bars: start empty, then grow to their share of the biggest genre.
   var max = 1;
   cols.forEach(function (c) { max = Math.max(max, parseInt(c.dataset.count, 10) || 0); });
-  cols.forEach(function (c) {
-    var pct = Math.max(4, Math.round(((parseInt(c.dataset.count, 10) || 0) / max) * 100));
-    c.querySelector('.genre-bar-fill').style.width = pct + '%';
-  });
+  function widthFor(c) {
+    return Math.max(6, Math.round(((parseInt(c.dataset.count, 10) || 0) / max) * 100)) + '%';
+  }
+  cols.forEach(function (c) { c.querySelector('.genre-bar-fill').style.width = calm ? widthFor(c) : '0%'; });
+  if (!calm) {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        cols.forEach(function (c) { c.querySelector('.genre-bar-fill').style.width = widthFor(c); });
+      });
+    });
+  }
+
+  // "Popular right now": the five biggest genres as colourful chips.
+  var pop = document.getElementById('genre-popular');
+  if (pop) {
+    var top = cols.slice().sort(function (a, b) {
+      return (parseInt(b.dataset.count, 10) || 0) - (parseInt(a.dataset.count, 10) || 0);
+    }).slice(0, 5);
+    var list = pop.querySelector('.genres-popular-list');
+    top.forEach(function (c) {
+      var a = document.createElement('a');
+      a.className = 'genres-popular-chip';
+      a.style.setProperty('--h', c.style.getPropertyValue('--h'));
+      a.href = c.querySelector('a').getAttribute('href');
+      a.textContent = c.dataset.label;
+      list.appendChild(a);
+    });
+    pop.querySelector('.genres-popular-label').textContent = pop.dataset.label;
+    pop.hidden = top.length === 0;
+  }
+
+  // "Pick one for me": jump to a random genre.
+  var lucky = document.getElementById('genre-lucky');
+  if (lucky) {
+    lucky.addEventListener('click', function () {
+      var pick = cols[Math.floor(Math.random() * cols.length)];
+      window.location.href = pick.querySelector('a').getAttribute('href');
+    });
+  }
 
   var mode = 'az';
   function render() {
