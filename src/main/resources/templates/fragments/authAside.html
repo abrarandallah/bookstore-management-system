@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/* The lively left panel next to the login / register forms.
+       fragments/authAside :: aside(title, subtitle) */-->
+<aside th:fragment="aside(title, subtitle)" class="auth-aside">
+    <div class="auth-aside-art" aria-hidden="true">
+        <i class="fa-solid fa-book-open"></i>
+        <i class="fa-solid fa-feather-pointed"></i>
+        <i class="fa-solid fa-bookmark"></i>
+        <i class="fa-solid fa-glasses"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-moon"></i>
+    </div>
+    <div class="auth-aside-body">
+        <span class="auth-aside-brand"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i> BookStore</span>
+        <h2 class="auth-aside-title" th:text="${title}">Title</h2>
+        <p class="auth-aside-sub" th:text="${subtitle}">Subtitle</p>
+        <ul class="auth-benefits">
+            <li><span class="auth-benefit-icon"><i class="fa-solid fa-bookmark" aria-hidden="true"></i></span> <span th:text="#{auth.benefit.progress}">Pick up exactly where you left off</span></li>
+            <li><span class="auth-benefit-icon"><i class="fa-solid fa-heart" aria-hidden="true"></i></span> <span th:text="#{auth.benefit.bookmark}">Keep your favourites in your own list</span></li>
+            <li><span class="auth-benefit-icon"><i class="fa-solid fa-star" aria-hidden="true"></i></span> <span th:text="#{auth.benefit.review}">Rate and review what you read</span></li>
+            <li><span class="auth-benefit-icon"><i class="fa-solid fa-medal" aria-hidden="true"></i></span> <span th:text="#{auth.benefit.badges}">Earn badges as you finish books</span></li>
+        </ul>
+    </div>
+</aside>
+</body>
+</html>
