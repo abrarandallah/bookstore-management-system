@@ -13,6 +13,7 @@ import com.abrar.BOOKSTORE.entity.BookPage;
 import com.abrar.BOOKSTORE.entity.Genre;
 import com.abrar.BOOKSTORE.entity.ReadingProgress;
 import com.abrar.BOOKSTORE.repository.BookRepository;
+import com.abrar.BOOKSTORE.repository.GenreRepository;
 import com.abrar.BOOKSTORE.repository.ReadingProgressRepository;
 import com.abrar.BOOKSTORE.service.HomeShelvesService.ShelfItem;
 
@@ -41,6 +42,9 @@ class HomeShelvesServiceTest {
 
     @MockBean
     private BookRepository bookRepository;
+
+    @MockBean
+    private GenreRepository genreRepository;
 
     @MockBean
     private ReadingProgressRepository readingProgressRepository;
@@ -194,5 +198,25 @@ class HomeShelvesServiceTest {
         when(bookRepository.findReadableBookIds()).thenReturn(List.of());
 
         assertEquals(null, homeShelvesService.takeawayOfTheDay("en", LocalDate.of(2026, 10, 17)));
+    }
+
+    @Test
+    void siteStatsCountsReadableBooksGenresAndTakeaways() {
+        when(bookRepository.findReadableBookIds()).thenReturn(List.of(1, 2, 3));
+        when(genreRepository.count()).thenReturn(5L);
+        when(bookRepository.countTakeaways()).thenReturn(12L);
+
+        HomeShelvesService.SiteStats stats = homeShelvesService.siteStats();
+
+        assertEquals(3, stats.books());
+        assertEquals(5, stats.genres());
+        assertEquals(12, stats.takeaways());
+    }
+
+    @Test
+    void showcaseIsEmptyWhenNothingIsReadable() {
+        when(bookRepository.findReadableBookIds()).thenReturn(List.of());
+
+        assertTrue(homeShelvesService.showcase("en", LocalDate.of(2026, 10, 24)).isEmpty());
     }
 }
