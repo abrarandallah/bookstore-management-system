@@ -179,7 +179,21 @@
         }
     }
 
+    // Remember where this browser stopped, so the home page can offer
+    // "Continue reading" even to visitors without an account.
+    function rememberLastRead() {
+        try {
+            localStorage.setItem('bookstore-last-read', JSON.stringify({
+                id: /*[[${book.id}]]*/ 0,
+                name: /*[[${localizedBook.name}]]*/ '',
+                step: readerIndex + 1,
+                total: readerTotal
+            }));
+        } catch (e) { /* storage blocked */ }
+    }
+
     function saveProgress() {
+        rememberLastRead();
         if (!isLoggedIn) {
             return;
         }
@@ -196,6 +210,7 @@
 
     function readerGo(delta) {
         if (readerIndex === readerTotal - 1 && delta === 1) {
+            try { localStorage.removeItem('bookstore-last-read'); } catch (e) { /* storage blocked */ }
             if (isLoggedIn) {
                 document.getElementById('finish-form').submit();
             } else {
@@ -246,6 +261,7 @@
 
     if (readerTotal > 0) {
         readerRender();
+        rememberLastRead();
         document.getElementById('reader-smaller').addEventListener('click', () => readerSetTextSize(-1));
         document.getElementById('reader-larger').addEventListener('click', () => readerSetTextSize(1));
         readerSyncTextSizeButtons();
