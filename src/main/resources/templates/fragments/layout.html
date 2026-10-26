@@ -224,6 +224,35 @@
                             </span>
                         </button>
                     </li>
+                    <!--/* Language switcher: same /language endpoint the first-visit popup and Settings use. */-->
+                    <li class="nav-item dropdown" th:with="back=${#httpServletRequest != null ? #httpServletRequest.requestURI : '/'}">
+                        <button type="button" class="nav-link lang-toggle-btn" data-bs-toggle="dropdown" aria-expanded="false"
+                                title="Choose your language" th:title="#{fragments_layout.choose.your.language}"
+                                th:aria-label="#{fragments_layout.choose.your.language}">
+                            <i class="fa-solid fa-globe" aria-hidden="true"></i>
+                            <span class="lang-code" th:text="${#strings.toUpperCase(#locale.language)}">EN</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end lang-menu">
+                            <li>
+                                <a class="dropdown-item" lang="en" th:href="@{/language(lang='en',redirect=${back})}">
+                                    <span th:text="#{fragments_layout.english}">English</span>
+                                    <i class="fa-solid fa-check" th:if="${#locale.language == 'en'}" aria-hidden="true"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" lang="fr" th:href="@{/language(lang='fr',redirect=${back})}">
+                                    <span th:text="#{fragments_layout.fran.ais}">Français</span>
+                                    <i class="fa-solid fa-check" th:if="${#locale.language == 'fr'}" aria-hidden="true"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" lang="ar" dir="rtl" th:href="@{/language(lang='ar',redirect=${back})}">
+                                    <span>العربية</span>
+                                    <i class="fa-solid fa-check" th:if="${#locale.language == 'ar'}" aria-hidden="true"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="nav-item" sec:authorize="isAnonymous()">
                         <a th:text="#{fragments_layout.login}" class="nav-link" href="/login">Login</a>
                     </li>
