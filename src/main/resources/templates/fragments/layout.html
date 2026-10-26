@@ -100,9 +100,9 @@
                 <p th:text="#{fragments_layout.choose.your.language}" class="mb-1">Choose your language</p>
                 <p th:text="#{fragments_layout.middot.choisissez.votre.langue}" class="text-muted small mb-3" dir="rtl" lang="ar">اختر لغتك &middot; Choisissez votre langue</p>
                 <div class="language-popup-options">
-                    <a th:text="#{fragments_layout.english}" class="btn btn-secondary" lang="en" th:href="@{/language(lang='en',redirect=${#httpServletRequest != null ? #httpServletRequest.requestURI : '/'})}">English</a>
-                    <a th:text="#{fragments_layout.fran.ais}" class="btn btn-secondary" lang="fr" th:href="@{/language(lang='fr',redirect=${#httpServletRequest != null ? #httpServletRequest.requestURI : '/'})}">Français</a>
-                    <a class="btn btn-secondary" lang="ar" dir="rtl" th:href="@{/language(lang='ar',redirect=${#httpServletRequest != null ? #httpServletRequest.requestURI : '/'})}">العربية</a>
+                    <a th:text="#{fragments_layout.english}" class="btn btn-secondary" lang="en" th:href="@{/language(lang='en',redirect=${currentPath})}">English</a>
+                    <a th:text="#{fragments_layout.fran.ais}" class="btn btn-secondary" lang="fr" th:href="@{/language(lang='fr',redirect=${currentPath})}">Français</a>
+                    <a class="btn btn-secondary" lang="ar" dir="rtl" th:href="@{/language(lang='ar',redirect=${currentPath})}">العربية</a>
                 </div>
                 <p th:text="#{fragments_layout.you.can.always.change.this}" class="text-muted small mt-3 mb-0">You can always change this later in Settings.</p>
             </div>
@@ -225,7 +225,7 @@
                         </button>
                     </li>
                     <!--/* Language switcher: same /language endpoint the first-visit popup and Settings use. */-->
-                    <li class="nav-item dropdown" th:with="back=${#httpServletRequest != null ? #httpServletRequest.requestURI : '/'}">
+                    <li class="nav-item dropdown" th:with="back=${currentPath}">
                         <button type="button" class="nav-link lang-toggle-btn" data-bs-toggle="dropdown" aria-expanded="false"
                                 title="Choose your language" th:title="#{fragments_layout.choose.your.language}"
                                 th:aria-label="#{fragments_layout.choose.your.language}">
