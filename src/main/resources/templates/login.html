@@ -6,11 +6,18 @@
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main class="page-body" id="main-content">
-<div class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="auth-card p-4">
-                <h4 th:text="#{login.welcome.back}">Welcome back</h4>
+<div class="container my-4 my-md-5">
+    <div class="auth-split">
+        <div th:replace="~{fragments/authAside :: aside(#{auth.aside.login.title}, #{auth.aside.login.sub})}"></div>
+        <div class="auth-main">
+            <div class="auth-card p-4" data-auth="login">
+                <button type="button" class="auth-sfx-toggle" id="auth-sfx-toggle" aria-pressed="true"
+                        th:data-on="#{auth.sound.on}" th:data-off="#{auth.sound.off}"
+                        title="Sound effects" th:title="#{auth.sound.on}" th:aria-label="#{auth.sound.on}">
+                    <i class="fa-solid fa-volume-high" aria-hidden="true"></i>
+                </button>
+                <div class="auth-badge" aria-hidden="true"><i class="fa-solid fa-feather-pointed"></i></div>
+                <h1 class="auth-heading" th:text="#{login.welcome.back}">Welcome back</h1>
                 <div th:text="#{login.account.created.successfully.check.your}" class="alert alert-success" th:if="${param.registered != null}">
                     Account created successfully. Check your email for a verification link before logging in.
                 </div>
@@ -35,18 +42,31 @@
                 <form th:action="@{/login}" method="post">
                     <div class="mb-3">
                         <label th:text="#{login.username.or.email}" for="usernameOrEmail" class="form-label">Username or Email</label>
-                        <input type="text" class="form-control" id="usernameOrEmail" name="usernameOrEmail" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="Enter your username or email" th:placeholder="#{login.enter.your.username.or.email}" required>
+                        <div class="auth-field">
+                            <i class="fa-solid fa-user auth-field-icon" aria-hidden="true"></i>
+                            <input type="text" class="form-control" id="usernameOrEmail" name="usernameOrEmail" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="Enter your username or email" th:placeholder="#{login.enter.your.username.or.email}" required>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label th:text="#{login.password}" for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" th:placeholder="#{login.enter.your.password}" required>
+                        <div class="auth-field">
+                            <i class="fa-solid fa-lock auth-field-icon" aria-hidden="true"></i>
+                            <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" th:placeholder="#{login.enter.your.password}" required>
+                        </div>
+                        <div class="auth-caps" id="auth-caps" hidden>
+                            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span th:text="#{auth.caps.lock}">Caps Lock is on</span>
+                        </div>
                     </div>
-                    <button th:text="#{login.login}" type="submit" class="btn btn-primary w-100">Login</button>
+                    <button type="submit" class="btn btn-primary w-100 btn-auth">
+                        <span th:text="#{login.login}">Login</span> <i class="fa-solid fa-arrow-right ms-1" aria-hidden="true"></i>
+                    </button>
                     <div class="text-center mt-3">
                         <a th:text="#{login.forgot.password}" href="/forgot-password">Forgot password?</a>
                     </div>
-                    <div class="text-center mt-2">
-                        <a th:text="#{login.don.t.have.an.account}" href="/register">Don't have an account yet? Create one here</a>
+                    <div class="auth-divider"><span th:text="#{auth.or}">or</span></div>
+                    <div class="auth-alt">
+                        <a href="/register" class="btn btn-outline-brass w-100"><i class="fa-solid fa-user-plus me-1" aria-hidden="true"></i> <span th:text="#{login.don.t.have.an.account}">Don't have an account yet? Create one here</span></a>
+                        <a href="/available_books" class="auth-guest"><i class="fa-solid fa-book-open me-1" aria-hidden="true"></i> <span th:text="#{auth.continue.guest}">Just browsing? Continue as a guest</span></a>
                     </div>
                 </form>
             </div>
@@ -57,5 +77,6 @@
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:src="@{/js/auth-fx.js}"></script>
 </body>
 </html>
