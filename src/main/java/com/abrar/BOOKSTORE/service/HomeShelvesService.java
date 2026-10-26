@@ -7,6 +7,7 @@ import com.abrar.BOOKSTORE.entity.BookPage;
 import com.abrar.BOOKSTORE.entity.Genre;
 import com.abrar.BOOKSTORE.entity.ReadingProgress;
 import com.abrar.BOOKSTORE.repository.BookRepository;
+import com.abrar.BOOKSTORE.repository.GenreRepository;
 import com.abrar.BOOKSTORE.repository.ReadingProgressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -43,9 +46,12 @@ public class HomeShelvesService {
     public static final int SHELF_SIZE = 6;
     public static final int CONTINUE_LIMIT = 4;
     public static final int RELATED_LIMIT = 3;
+    public static final int SHOWCASE_SIZE = 14;
 
     @Autowired
     private BookRepository bookRepository;
+    @Autowired
+    private GenreRepository genreRepository;
     @Autowired
     private ReadingProgressRepository readingProgressRepository;
     @Autowired
@@ -138,6 +144,43 @@ public class HomeShelvesService {
             int step = Math.min(Math.max(p.getCurrentPage(), 0), total - 1) + 1;
             return item(p.getBook(), localized, ratings, step);
         }).toList();
+    }
+
+    /** The numbers shown on the home page: how much there is to read. */
+    public record SiteStats(long books, long genres, long takeaways) {
+    }
+
+    public SiteStats siteStats() {
+        List<Integer> ids = bookRepository.findReadableBookIds();
+        return new SiteStats(ids == null ? 0 : ids.size(), genreRepository.count(), bookRepository.countTakeaways());
+    }
+
+    /**
+     * The scrolling strip of covers on the home page: a handful of readable
+     * books, reshuffled once a day (same for everyone on a given day, so
+     * nothing is stored) so the strip shows different genres each visit
+     * instead of just the latest uploads.
+     */
+    public List<ShelfItem> showcase(String language) {
+        return showcase(language, LocalDate.now());
+    }
+
+    public List<ShelfItem> showcase(String language, LocalDate date) {
+        List<Integer> ids = bookRepository.findReadableBookIds();
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        List<Integer> shuffled = new ArrayList<>(ids);
+        Collections.shuffle(shuffled, new Random(date.toEpochDay()));
+        List<Integer> picked = shuffled.subList(0, Math.min(SHOWCASE_SIZE, shuffled.size()));
+        Map<Integer, Book> byId = bookRepository.findAllById(picked).stream()
+                .collect(Collectors.toMap(Book::getId, Function.identity()));
+        List<Book> ordered = picked.stream()
+                .map(byId::get)
+                .filter(Objects::nonNull)
+                .filter(b -> !b.getTakeaways().isEmpty())
+                .toList();
+        return items(ordered, language);
     }
 
     /** The most recently added books. */
