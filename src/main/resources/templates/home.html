@@ -4,7 +4,7 @@
 <body>
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
-<main class="page-body home-hero-only" id="main-content">
+<main class="page-body" id="main-content">
     <!-- Hero Section -->
     <div class="container hero-section">
         <div class="row align-items-center g-5">
@@ -31,6 +31,13 @@
                     </a>
                     <a th:text="#{home.how.it.works}" href="/about">How it works</a>
                 </div>
+                <!--/* Filled in by home.js from the last book this browser was reading (no account needed). */-->
+                <a id="home-continue" class="home-continue" href="#" hidden
+                   th:data-label="#{home.guest.continue}" th:data-progress="#{bookRead.takeaway.progress}"></a>
+                <ul class="hero-badges">
+                    <li><i class="fa-solid fa-lock-open" aria-hidden="true"></i> <span th:text="#{home.badge.noaccount}">No account needed to read</span></li>
+                    <li><i class="fa-solid fa-language" aria-hidden="true"></i> English &middot; Fran&ccedil;ais &middot; &#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577;</li>
+                </ul>
             </div>
             <div class="col-lg-6 text-center">
                 <div class="hero-figure">
@@ -40,9 +47,63 @@
         </div>
     </div>
 
+    <!--/* Numbers: how much there is to read. Counts up when scrolled into view (home.js). */-->
+    <th:block th:with="stats=${@homeShelves.siteStats()}">
+    <section class="container home-stats" th:if="${stats.books > 0}" aria-label="BookStore in numbers">
+        <div class="home-stat">
+            <strong class="home-stat-num" th:attr="data-count=${stats.books}" th:text="${stats.books}">190</strong>
+            <span th:text="#{home.stats.books}">books</span>
+        </div>
+        <div class="home-stat">
+            <strong class="home-stat-num" th:attr="data-count=${stats.takeaways}" th:text="${stats.takeaways}">760</strong>
+            <span th:text="#{home.stats.takeaways}">takeaways</span>
+        </div>
+        <div class="home-stat">
+            <strong class="home-stat-num" th:attr="data-count=${stats.genres}" th:text="${stats.genres}">56</strong>
+            <span th:text="#{home.stats.genres}">genres</span>
+        </div>
+        <div class="home-stat">
+            <strong class="home-stat-num" data-count="3">3</strong>
+            <span th:text="#{home.stats.languages}">languages</span>
+        </div>
+    </section>
+    </th:block>
+
+    <!--/* A slow scrolling strip of today's picks. Same list twice for a seamless loop; the second copy is hidden from screen readers. */-->
+    <th:block th:with="picks=${@homeShelves.showcase(#locale.language)}">
+    <section class="home-marquee-wrap" th:if="${!#lists.isEmpty(picks)}">
+        <div class="container">
+            <span class="eyebrow" th:text="#{home.showcase.eyebrow}">On the shelf today</span>
+            <h2 class="home-marquee-title" th:text="#{home.showcase.title}">Today's picks</h2>
+        </div>
+        <div class="cover-marquee">
+            <div class="cover-marquee-track">
+                <th:block th:each="copy : ${#numbers.sequence(1, 2)}">
+                    <a class="marquee-book" th:each="item : ${picks}"
+                       th:href="@{/available_books/{id}/read(id=${item.book.id})}"
+                       th:attr="tabindex=${copy == 2} ? '-1' : null, aria-hidden=${copy == 2} ? 'true' : null"
+                       th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(item.book.name.hashCode()) % 360} + ', 42%, 34%)'"
+                       th:with="firstGenre=${#sets.isEmpty(item.book.genres) ? null : item.book.genres.iterator().next()}">
+                        <img th:if="${!#strings.isEmpty(item.book.coverImageUrl)}" th:src="@{${item.book.coverImageUrl}}"
+                             th:alt="${item.name}" class="marquee-cover" loading="lazy">
+                        <span th:if="${#strings.isEmpty(item.book.coverImageUrl)}" class="gen-cover marquee-cover" aria-hidden="true">
+                            <i class="fa-solid gen-cover-icon" th:classappend="${firstGenre != null} ? ${@genreIcons.iconFor(firstGenre.name)} : 'fa-book-open'"></i>
+                            <span class="gen-cover-genre" th:if="${firstGenre != null}"
+                                  th:text="${@genreLocalizer.localizeName(firstGenre.name, #locale.language)}"></span>
+                        </span>
+                        <span class="marquee-title" th:text="${item.name}">Title</span>
+                        <span class="marquee-author" th:text="${item.author}">Author</span>
+                    </a>
+                </th:block>
+            </div>
+        </div>
+    </section>
+    </th:block>
+
 </main>
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:src="@{/js/home.js}"></script>
 </body>
 </html>
