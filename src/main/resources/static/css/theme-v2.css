@@ -15,6 +15,25 @@
   --shadow-card: var(--v2-shadow);
   --shadow-hard: 0 3px 8px rgba(42, 15, 18, 0.22);
 }
+/* Palette: blush-white paper that sits well with burgundy (the old yellow-beige
+   clashed with it). Brass stays as the small gold accent. Change these to re-tint
+   the whole site. */
+:root:not([data-theme="dark"]) {
+  --paper: #f6eeec;
+  --paper-raised: #fffafa;
+  --line: #e4d2cf;
+  --ink: #1f1315;
+  --ink-soft: #4d3b3e;
+  --burgundy: #6b1f2a;
+  --burgundy-bright: #a3394a;
+}
+[data-theme="dark"] {
+  --paper: #181012;
+  --paper-raised: #241719;
+  --line: #3e2b2e;
+  --ink: #f7eeee;
+  --ink-soft: #cfbcbe;
+}
 html { scrollbar-color: var(--brass) transparent; }
 ::selection { background: var(--v2-wine); color: var(--v2-cream); }
 
@@ -22,7 +41,7 @@ html { scrollbar-color: var(--brass) transparent; }
 .page-body {
   background:
     radial-gradient(60rem 28rem at 100% -5%, color-mix(in srgb, var(--burgundy) 9%, transparent), transparent 70%),
-    radial-gradient(50rem 26rem at -5% 105%, color-mix(in srgb, var(--brass) 12%, transparent), transparent 70%);
+    radial-gradient(50rem 26rem at -5% 105%, color-mix(in srgb, var(--brass) 7%, transparent), transparent 70%);
 }
 
 /* ---- navbar + footer: wine gradient ---------------------------------------- */
