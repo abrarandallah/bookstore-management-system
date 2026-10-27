@@ -1,0 +1,125 @@
+/* ==========================================================================
+   BookStore - theme v2 ("deep burgundy")
+   The look first used on the login/register pages, applied to every page.
+   Loaded AFTER styles.css, so it only overrides; nothing here is needed for the
+   app to work. To go back to the classic look, delete the one
+   <link ... theme-v2.css> line in templates/fragments/layout.html.
+   ========================================================================== */
+
+:root {
+  --radius: 10px;
+  --v2-wine: #5a1d22;
+  --v2-wine-deep: #2a0f12;
+  --v2-cream: #fffcf5;
+  --v2-shadow: 0 2px 6px rgba(42, 15, 18, 0.1), 0 14px 30px rgba(42, 15, 18, 0.14);
+  --shadow-card: var(--v2-shadow);
+  --shadow-hard: 0 3px 8px rgba(42, 15, 18, 0.22);
+}
+html { scrollbar-color: var(--brass) transparent; }
+::selection { background: var(--v2-wine); color: var(--v2-cream); }
+
+/* soft glow behind every page instead of flat paper */
+.page-body {
+  background:
+    radial-gradient(60rem 28rem at 100% -5%, color-mix(in srgb, var(--burgundy) 9%, transparent), transparent 70%),
+    radial-gradient(50rem 26rem at -5% 105%, color-mix(in srgb, var(--brass) 12%, transparent), transparent 70%);
+}
+
+/* ---- navbar + footer: wine gradient ---------------------------------------- */
+.site-header {
+  background: linear-gradient(120deg, var(--v2-wine), var(--v2-wine-deep));
+  border-bottom: 2px solid var(--brass);
+  box-shadow: 0 4px 18px rgba(42, 15, 18, 0.25);
+}
+.site-header .navbar-brand { color: var(--v2-cream) !important; }
+.site-header .navbar-brand .brand-mark { color: var(--brass-bright); }
+.site-header .nav-link { color: rgba(255, 252, 245, 0.86) !important; }
+.site-header .nav-link:hover { color: #fff !important; border-bottom-color: var(--brass-bright); }
+.site-header .navbar-toggler { border-color: rgba(255, 252, 245, 0.45); }
+.site-header .navbar-toggler-icon { filter: invert(1); }
+.site-header .logout-link { color: rgba(255, 252, 245, 0.86); }
+.site-header .user-menu-avatar-fallback { background: var(--brass); color: var(--v2-wine-deep); }
+.site-footer {
+  background: linear-gradient(120deg, var(--v2-wine-deep), var(--v2-wine));
+  border-top: 2px solid var(--brass);
+}
+
+/* ---- buttons: soft, rounded, lift on hover --------------------------------- */
+.btn {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(42, 15, 18, 0.15);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(42, 15, 18, 0.22); }
+.btn:active { transform: none; box-shadow: 0 1px 2px rgba(42, 15, 18, 0.2); }
+.btn-primary {
+  background: linear-gradient(135deg, #7a2a30, var(--v2-wine));
+  border-color: var(--v2-wine);
+  color: var(--v2-cream);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background: linear-gradient(135deg, #8c3239, #6b2429);
+  border-color: #6b2429;
+  color: var(--v2-cream);
+}
+.btn-outline-brass { background: transparent; border-color: var(--brass); color: var(--brass-deep); }
+.btn-outline-brass:hover { background: var(--brass); border-color: var(--brass); color: var(--v2-cream); }
+[data-theme="dark"] .btn-outline-brass { color: var(--brass-bright); }
+[data-theme="dark"] .btn-outline-brass:hover { color: var(--v2-wine-deep); background: var(--brass-bright); }
+.btn-secondary:hover { box-shadow: 0 8px 18px rgba(42, 15, 18, 0.18); }
+
+/* ---- cards and panels ------------------------------------------------------ */
+.card,
+.form-panel,
+.review-card,
+.empty-state,
+.daily-card,
+.book-card,
+.dropdown-menu { border-radius: var(--radius); }
+.card-header {
+  background: linear-gradient(120deg, var(--v2-wine), var(--v2-wine-deep));
+  border-radius: var(--radius) var(--radius) 0 0 !important;
+}
+.alert { border-radius: 8px; }
+.book-card::before { border-radius: var(--radius) 0 0 var(--radius); }
+
+/* ---- fields ---------------------------------------------------------------- */
+.form-control,
+.form-select { border-radius: 8px; }
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--burgundy-bright);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--burgundy-bright) 22%, transparent);
+}
+
+/* ---- active / selected states share the wine colour ------------------------ */
+.genre-filter,
+.genre-sort,
+.page-link { border-radius: 8px; }
+.genre-filter { border-radius: 999px; }
+.genre-filter.is-active,
+.genre-sort-btn.is-active,
+.reader-step.is-current,
+.search-panel .search-submit {
+  background: var(--v2-wine);
+  border-color: var(--v2-wine);
+  color: var(--v2-cream);
+}
+.search-panel .search-submit:hover { background: #7a2a30; border-color: #7a2a30; }
+.page-link.active { background: var(--v2-wine); border-color: var(--v2-wine); }
+.reader-progress-fill { background: linear-gradient(90deg, var(--burgundy-bright), var(--brass-bright)); }
+.eyebrow { color: var(--burgundy-bright); }
+.eyebrow::before { background: var(--burgundy-bright); }
+[data-theme="dark"] .eyebrow { color: var(--brass-bright); }
+[data-theme="dark"] .eyebrow::before { background: var(--brass-bright); }
+
+/* ---- a touch of life: pages rise in, cards react --------------------------- */
+.card:hover,
+.review-card:hover { box-shadow: 0 10px 26px rgba(42, 15, 18, 0.18); }
+.card,
+.review-card { transition: box-shadow 0.25s ease, transform 0.25s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover { transform: none; }
+  .card, .review-card { transition: none; }
+}
