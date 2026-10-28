@@ -1,114 +1,128 @@
-# Wazuh SIEM — Centralized Security Monitoring & Threat Detection
+# BookStore
 
-*Projet de Fin d'Études — Final-year cybersecurity project*
+A book insights/takeaways platform: each book has a cover and a set of 1–10 short
+takeaway pages instead of full text. Users browse and rate books, keep a personal
+"My Books" list, and share individual books via a public link. Built with Spring
+Boot 3.1.2, Java 17, Thymeleaf, MySQL, and Spring Security 6.
 
-A centralized Wazuh-based SIEM (Security Information and Event Management) deployment for real-time collection, detection, and investigation of Linux security events, with seven custom detection rules mapped to MITRE ATT&CK.
+## Features
 
-> **Note on this repository:** the live environment was decommissioned after the final presentation (it had grown to ~70GB of logs/indices on a personal machine and had no further need to stay running). This repository documents the working implementation through its technical architecture, verified rule output, and dashboard evidence captured while it was operational.
+- Browse/search books by genre, with pagination
+- Book detail page with cover, takeaway pages, genre, ratings and reviews
+- Public share page for a single book (`/available_books/{id}/share`) - viewable
+  without logging in
+- "My Books" personal list
+- Ratings and reviews on books
+- Account: signup with email verification, login, forgot/reset password,
+  in-app password change, self-service account deletion
+- Login is rate-limited per IP to slow down brute-force attempts
+- Librarian role: add/edit/delete books, manage genres, bulk import
+- Home page shelves (continue reading, newest, top rated, quick reads) and
+  "You might also like" suggestions after finishing a book
+- English, Arabic (right-to-left) and French interface
+- Librarians can remove any review (moderation)
+- Admin panel (`/admin/users`) to change user roles, reset a user's password,
+  or delete a user
 
----
+## Requirements
 
-## Architecture
+- Java 17
+- Maven
+- MySQL running locally (or update the datasource URL for a remote instance)
+
+## Running with Docker (recommended - no local MySQL or Maven needed)
+
+1. **Only if you don't already have a `.env` file** (copying over an existing
+   one erases your real values), copy `.env.example` to `.env` (`copy .env.example .env` in Windows Command
+   Prompt, or `cp .env.example .env` in PowerShell/macOS/Linux) and fill in real
+   values (at minimum, set `MAIL_USERNAME`/`MAIL_PASSWORD` if you want
+   verification/reset emails to actually be delivered - everything else has a
+   working default). Before putting the site online, also change `DB_PASSWORD`
+   and `LIBRARIAN_PASSWORD` - the defaults are only meant for your own computer.
+   Never put real passwords in `.env.example`: that file is committed to git.
+   With `MAIL_USERNAME` empty, no email is sent; the verification link is
+   printed in the app log instead (`docker compose logs app`).
+2. `docker compose up --build`
+3. Open `http://localhost:8081`.
+
+That's it - MySQL, the app, and uploaded files all persist in Docker
+volumes across restarts (`docker compose down` keeps them;
+`docker compose down -v` wipes everything for a clean slate).
+
+## Running locally without Docker
+
+1. Create a MySQL database named `book` (or set `DB_HOST`/`DB_PORT`/`DB_NAME`
+   to point elsewhere).
+2. Set the environment variables below. A `.env` file by itself does
+   **nothing** here - only docker-compose reads it automatically. For a
+   manual run you need these as real environment variables: either
+   `export` them in the same terminal you'll run the app from (add the
+   `export` lines to `~/.zshrc`/`~/.bashrc` so they survive new terminals),
+   or set them in your IDE's Run Configuration.
+3. `./mvnw spring-boot:run` (or `mvnw.cmd spring-boot:run` on Windows)
+4. The app starts on `http://localhost:8081` by default.
+
+On first run, a librarian account is created automatically using the
+`LIBRARIAN_*` variables below - there's no separate signup flow for the first
+librarian, since regular signup always creates a `ROLE_USER` account.
+
+## Configuration (environment variables)
+
+| Variable             | Default                             | Purpose                                                                              |
+| -------------------- | ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `DB_HOST`            | `localhost`                         | MySQL host (docker-compose sets this to `mysql` automatically)                       |
+| `DB_PORT`            | `3306`                              | MySQL port                                                                           |
+| `DB_NAME`            | `book`                              | MySQL database name                                                                  |
+| `DB_USERNAME`        | `abrar`                             | MySQL username                                                                       |
+| `DB_PASSWORD`        | `abrar`                             | MySQL password                                                                       |
+| `UPLOAD_DIR`         | `uploads` (relative to working dir) | Where uploaded book covers and avatars are stored                                    |
+| `LIBRARIAN_USERNAME` | `librarian`                         | Username for the auto-created librarian account                                      |
+| `LIBRARIAN_EMAIL`    | `librarian@bookstore.local`         | Email for the auto-created librarian account                                         |
+| `LIBRARIAN_PASSWORD` | `change-this-password`              | Password for the auto-created librarian account - change this in any real deployment |
+| `APP_BASE_URL`       | `http://localhost:8081`             | Used to build links in verification/password-reset emails                            |
+| `MAIL_HOST`          | `smtp.gmail.com`                    | SMTP host                                                                            |
+| `MAIL_PORT`          | `587`                               | SMTP port                                                                            |
+| `MAIL_USERNAME`      | _(empty)_                           | SMTP username                                                                        |
+| `MAIL_PASSWORD`      | _(empty)_                           | SMTP password                                                                        |
+| `MAIL_SSL_ENABLE`    | `false`                             | Set to `true` and `MAIL_PORT=465` if your network blocks STARTTLS on 587             |
+| `SHOW_SQL`           | `false`                             | Set to `true` to print every database query in the log while debugging               |
+
+Without real mail credentials, verification and password-reset emails won't
+actually be delivered, but the tokens are still created and logged - see
+`EmailService`. That also means newly registered accounts stay unverified and
+can't log in until mail is configured (or a librarian/admin promotes them
+manually).
+
+## Auth model
+
+- The website (`/`, `/login`, `/register`, book pages, etc.) uses standard
+  session/cookie login via Spring Security's form login. There's no separate
+  API - every page is server-rendered Thymeleaf.
+- New accounts must verify their email before they can log in at all. The
+  verification link is valid for 24 hours; a new one can be requested from
+  `/resend-verification`.
+
+## Deployment / HTTPS
+
+This app doesn't terminate TLS or force an HTTPS redirect itself - it
+expects a reverse proxy (nginx, Caddy, a cloud load balancer, etc.) in
+front of it handling both, and forwarding plain HTTP to `server.port`
+(8081) with `X-Forwarded-Proto`/`X-Forwarded-For` headers set correctly.
+`server.forward-headers-strategy=framework` (set in
+`application.properties`) tells Spring to trust and act on those headers -
+this is what makes the session cookie's `Secure` flag turn on correctly in
+production, and is only safe to rely on because the assumption is that
+nothing untrusted can reach the app directly and spoof them. If you deploy
+this without a proxy in front (e.g. exposing port 8081 straight to the
+internet), that assumption breaks and you'd need to reconsider this
+setting and add your own TLS termination.
+
+For local development (`docker compose up` or `./mvnw spring-boot:run`,
+both accessed directly over plain HTTP), none of this matters - there's no
+proxy in the loop and the app behaves the same either way.
+
+## Tests
 
 ```
-Linux Endpoint (Ubuntu 24.04 LTS, WSL2)
-  auth.log / syslog / journald
-            │
-            ▼
-     Wazuh Manager            → decode, analyze, correlate, apply rules
-            │
-            ▼
-  Wazuh Indexer (OpenSearch)   → port 9200, store & index events
-            │
-            ▼
-     Wazuh Dashboard           → port 5601, visualization & investigation
-            │
-     Wazuh API                → port 55000, programmatic access
+mvn test
 ```
-
-**Environment:** Wazuh 4.12.0, all-in-one deployment, Ubuntu 24.04 LTS on WSL2 (Windows host), bridge networking at `192.168.1.7`, 5.8GB RAM / 71GB storage / 4GB swap.
-
-**Deployment history:** the environment went through three iterations (VM1 → deleted, VM2 → failed, VM3 → the successful final deployment documented here) — largely due to WSL/systemd quirks and an initial SSL/TLS certificate mismatch between the dashboard and indexer, resolved by disabling TLS verification for the development environment (documented trade-off — not appropriate for production, acceptable for an academic single-user lab).
-
----
-
-## Custom Detection Rules
-
-All 7 rules were implemented, tested, and confirmed firing via live queries against the Wazuh Indexer (`rule.id:<id>` in Discover). Levels, descriptions and MITRE mappings come from the alerts shown in the screenshots; the `frequency`/`timeframe` values for rules 100004 and 100006 come from the `local_rules.xml` excerpt in the technical architecture report. The original rules file was lost when the environment was decommissioned.
-
-| Rule | Detects | Level | Threshold | MITRE ATT&CK | Verified |
-|------|---------|-------|-----------|---------------|----------|
-| 100001 | SSH brute force (multiple auth failures) | 10 | built on if_sid 5710, 5760 | T1110.001, T1021.004 | ✅ 3 hits, real failed-login events |
-| 100002 | Individual sudo / privileged command | 12 | single event | T1548.003 | ✅ 3 hits, sudo command capture |
-| 100003 | Root session opened | 10 | single event | T1548.003 | ✅ 25 hits over test period |
-| 100004 | Excessive sudo activity | 12 | 5 commands / 300s, same user | T1548.003 | ✅ confirmed firing on threshold |
-| 100005 | Multiple root sessions | 12 | 3 sessions / 180s | T1548.003 | ✅ 3 hits, "potential compromise" |
-| 100006 | Network scanning / reconnaissance | 12 | 10 events / 300s, same source IP | T1046, T1595 | ✅ 3 hits, correlated SSH failures |
-| 100007 | Potential data leakage / exfiltration | 12 | behavioral (privileged command volume) | T1041, T1560 | ✅ 2 hits, elevated command activity |
-
-Rules build on Wazuh's built-in decoders (sshd, sudo, PAM) rather than custom decoders — an initial custom decoder attempt was abandoned in favor of the built-in, proven decoders for reliability.
-
-**Correlation techniques used:** `same_source_ip` (IP-based correlation), `same_user` (user-based correlation), `if_matched_sid` (rule chaining/composite rules), `frequency` + `timeframe` (time-windowed behavioral thresholds).
-
----
-
-## Results
-
-- **738+ total alerts** generated during testing
-  - High severity (level 12+): 3
-  - Medium severity (level 8–11): 214
-  - Low severity (level 3–7): 521
-- MITRE ATT&CK dashboard (1-week view) shows real attack-technique distribution across the test period: Defense Evasion and Privilege Escalation as the dominant tactics, with Credential Access, Initial Access, Persistence, and Lateral Movement also represented — driven by the sudo/sudo-caching and SSH brute-force test activity.
-
----
-
-## Screenshots
-
-### MITRE ATT&CK dashboard (1-week view)
-![MITRE ATT&CK dashboard](screenshots/MITRE_ATT_CK_of_a_week.jpg)
-
-### Each custom rule firing (Discover, `rule.id:<id>`)
-| Rule | Evidence |
-|------|----------|
-| 100001 SSH brute force | ![100001](screenshots/rule_100001_working.jpg) |
-| 100002 Sudo / privilege escalation | ![100002](screenshots/rule_100002_working.jpg) |
-| 100003 Root session | ![100003](screenshots/rule_100003_working.jpg) |
-| 100004 Excessive sudo | ![100004](screenshots/rule_100004_working_.jpg) |
-| 100005 Multiple root sessions | ![100005](screenshots/rule_100005_working_.jpg) |
-| 100006 Network scanning | ![100006](screenshots/rule_100006_working.jpg) |
-| 100007 Data leakage | ![100007](screenshots/rule_100007_working.jpg) |
-
-### Service health
-- `screenshots/wazuh-manager_running.jpg`
-- `screenshots/wazuh-indexer_running.jpg`
-- `screenshots/wazuh-dashboard_runnning.jpg`
-- `screenshots/all_services_are_running.jpg`
-
-### Troubleshooting evidence
-- `screenshots/Dashboard_Installation_Failure.jpg`
-- `screenshots/Clean_Configuration_File__deleted_lines_caused_SSL_certificate_errors_.jpg`
-- `screenshots/network_troubleshooting_methodology.jpg`
-
----
-
-## Lessons Learned
-
-This project broke and required a full environment rebuild more than once during development — most notably days before the final presentation, which forced a decision to rely on pre-captured screenshots and documentation rather than a live demo. In hindsight, the key process gaps were:
-
-- **No configuration validation before restarts.** A single malformed rule in `local_rules.xml` could prevent the manager from starting, with no early warning.
-- **Verification wasn't always real verification.** Some later-stage testing relied on scripts that logged a fixed "success" message rather than actually confirming system state — a mistake that hid failures until they became visible the hard way.
-- **No version control on configuration changes**, so a bad edit meant re-deriving the working state from memory instead of rolling back one step.
-
-If rebuilding: validate config (`wazuh-control configcheck`) before every restart, verify every rule with `wazuh-logtest` against a real log line rather than trusting a script's own success message, and commit working configuration to git after every verified change.
-
----
-
-## Compliance Mapping (ISO 27001)
-
-| Control | Area | Implemented via |
-|---------|------|------------------|
-| A.12.6.1 | Technical vulnerabilities | Rules 100001, 100006 |
-| A.9.2.6 | Access rights management | Rules 100002–100005 |
-| A.12.4.1 | Event logging | Full log processing pipeline |
-| A.16.1.4 | Security event assessment | Rule correlation engine |
-| A.13.1.1 | Network controls | Rule 100006 |
