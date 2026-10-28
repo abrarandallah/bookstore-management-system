@@ -1,0 +1,20 @@
+# Fast-preview settings for working on the look of the site. NOT for a real/online server.
+#
+# Use it together with the normal file (dev.bat does this for you):
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+#
+# What it does: the app reads pages (templates), CSS, JavaScript and images straight from
+# your project folder instead of from the packaged copy. So after you change one of those
+# files you only refresh the browser (Ctrl+F5) - no rebuild, no waiting.
+#
+# Still needs a rebuild (run dev.bat again): Java code, the messages*.properties
+# translation files, pom.xml.
+services:
+  app:
+    environment:
+      SPRING_THYMELEAF_PREFIX: file:/app/res/templates/
+      SPRING_THYMELEAF_CACHE: "false"
+      SPRING_WEB_RESOURCES_STATIC_LOCATIONS: file:/app/res/static/
+      SPRING_WEB_RESOURCES_CACHE_PERIOD: "0"
+    volumes:
+      - ./src/main/resources:/app/res:ro
