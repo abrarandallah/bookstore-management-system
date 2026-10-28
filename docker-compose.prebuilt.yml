@@ -1,0 +1,10 @@
+# Start the app from the ready-made image (no compiling, no waiting for a build).
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prebuilt.yml up -d --no-build
+#
+# (quick.bat does exactly this on Windows.) The image is built by GitHub after every
+# push to main - see .github/workflows/docker-publish.yml.
+services:
+  app:
+    image: ghcr.io/abrarandallah/bookstore-management-system:latest
+    pull_policy: always
