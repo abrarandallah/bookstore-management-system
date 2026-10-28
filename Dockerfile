@@ -5,9 +5,12 @@ WORKDIR /build
 COPY pom.xml .
 # Downloads dependencies as their own layer, so a later `docker compose build`
 # only re-downloads them if pom.xml itself changed, not on every source edit.
-RUN mvn -q dependency:go-offline
+# The cache mount keeps Maven's download folder between builds on this machine,
+# so even when pom.xml changes nothing is downloaded twice.
+RUN --mount=type=cache,target=/root/.m2 mvn -q dependency:go-offline
 COPY src ./src
-RUN mvn -q package -DskipTests
+# maven.test.skip also skips compiling the tests, which is quicker than -DskipTests.
+RUN --mount=type=cache,target=/root/.m2 mvn -q package -Dmaven.test.skip=true
 
 # Runtime stage: just the JRE, curl (for docker-compose's app healthcheck
 # against /actuator/health - not present in the base image by default),
