@@ -62,6 +62,41 @@ public class AdminController {
 
     private static final java.util.Set<String> VALID_ROLES = java.util.Set.of("ROLE_USER", "ROLE_LIBRARIAN");
 
+    // Librarians can add accounts directly (staff, or readers who cannot self-register).
+    // The librarian vouches for the person, so the account is created already verified
+    // and no email is sent. Unlike public signup, showing "already taken" is fine here:
+    // only a logged-in librarian can reach this route.
+    @PostMapping("/users/create")
+    public String createUser(@RequestParam String username, @RequestParam String email,
+            @RequestParam String password, @RequestParam(defaultValue = "ROLE_USER") String role,
+            RedirectAttributes redirectAttributes) {
+        String name = username == null ? "" : username.trim();
+        String mail = email == null ? "" : email.trim();
+        String error = null;
+        if (name.length() < 3 || name.length() > 50) {
+            error = msg("admin.error.username.invalid");
+        } else if (!mail.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+            error = msg("admin.error.email.invalid");
+        } else if (password == null || password.length() < 8) {
+            error = msg("admin.error.password.short");
+        } else if (!VALID_ROLES.contains(role)) {
+            error = msg("admin.error.invalid.role");
+        } else if (userRepository.existsByUsername(name)) {
+            error = msg("admin.error.username.taken");
+        } else if (userRepository.findByEmail(mail).isPresent()) {
+            error = msg("admin.error.email.taken");
+        }
+        if (error != null) {
+            redirectAttributes.addFlashAttribute("error", error);
+            return "redirect:/admin/users";
+        }
+        User user = new User(name, mail, passwordEncoder.encode(password), role);
+        user.setVerified(true);
+        userRepository.save(user);
+        redirectAttributes.addFlashAttribute("message", msg("admin.message.user.created", name));
+        return "redirect:/admin/users";
+    }
+
     @PostMapping("/users/{id}/role")
     public String changeRole(@PathVariable long id, @RequestParam String role,
             Authentication authentication, RedirectAttributes redirectAttributes) {
