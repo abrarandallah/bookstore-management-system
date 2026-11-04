@@ -2,15 +2,17 @@
 # so the final image doesn't carry the JDK or the Maven cache around.
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /build
+# Maven Central sometimes answers 502; retry downloads instead of failing the build.
+ENV MVN_NET="-Dmaven.wagon.http.retryHandler.count=6 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
 COPY pom.xml .
 # Downloads dependencies as their own layer, so a later `docker compose build`
 # only re-downloads them if pom.xml itself changed, not on every source edit.
 # The cache mount keeps Maven's download folder between builds on this machine,
 # so even when pom.xml changes nothing is downloaded twice.
-RUN --mount=type=cache,target=/root/.m2 mvn -q dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 mvn -q $MVN_NET dependency:go-offline
 COPY src ./src
 # maven.test.skip also skips compiling the tests, which is quicker than -DskipTests.
-RUN --mount=type=cache,target=/root/.m2 mvn -q package -Dmaven.test.skip=true
+RUN --mount=type=cache,target=/root/.m2 mvn -q $MVN_NET package -Dmaven.test.skip=true
 
 # Runtime stage: just the JRE, curl (for docker-compose's app healthcheck
 # against /actuator/health - not present in the base image by default),
