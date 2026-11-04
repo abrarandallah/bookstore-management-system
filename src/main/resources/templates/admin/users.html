@@ -38,6 +38,45 @@
         </div>
     </div>
 
+
+    <div class="admin-toolbar">
+        <label class="admin-search">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input type="search" id="user-search" th:placeholder="#{admin_users.search.placeholder}" placeholder="Search users">
+        </label>
+        <button type="button" class="btn btn-primary" id="add-user-toggle" aria-expanded="false" aria-controls="add-user-panel">
+            <i class="fa-solid fa-user-plus" aria-hidden="true"></i> <span th:text="#{admin_users.add.toggle}">Add user</span>
+        </button>
+    </div>
+
+    <form id="add-user-panel" class="card admin-add-user" hidden
+          th:action="@{/admin/users/create}" method="post" autocomplete="off">
+        <h5 class="mb-3" th:text="#{admin_users.add.title}">Add a new user</h5>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label" for="nu-username" th:text="#{admin_users.user}">User</label>
+                <input class="form-control" id="nu-username" name="username" minlength="3" maxlength="50" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="nu-email" th:text="#{admin_users.email}">Email</label>
+                <input class="form-control" id="nu-email" name="email" type="email" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="nu-password" th:text="#{admin_users.new.password}">Password</label>
+                <input class="form-control" id="nu-password" name="password" type="password" minlength="8" required autocomplete="new-password">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="nu-role" th:text="#{admin_users.role}">Role</label>
+                <select class="form-select" id="nu-role" name="role">
+                    <option value="ROLE_USER" th:text="#{admin_users.reader}">Reader</option>
+                    <option value="ROLE_LIBRARIAN" th:text="#{admin_users.librarian}">Librarian</option>
+                </select>
+            </div>
+        </div>
+        <p class="text-muted small mt-3 mb-3" th:text="#{admin_users.add.hint}">The account is created already verified, no email is sent.</p>
+        <button type="submit" class="btn btn-primary" th:text="#{admin_users.add.submit}">Create user</button>
+    </form>
+
     <div class="card">
         <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
@@ -52,19 +91,20 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="u : ${users}">
+            <tr th:each="u : ${users}" class="user-row" th:attr="data-search=${#strings.toLowerCase(u.username + ' ' + u.email)}">
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center"
-                             style="width:32px;height:32px;font-size:0.85rem;flex-shrink:0;"
+                             th:style="'width:34px;height:34px;font-size:0.85rem;flex-shrink:0;background:hsl(' + ${T(java.lang.Math).abs(u.username.hashCode()) % 360} + ',45%,32%) !important'"
                              th:text="${#strings.toUpperCase(#strings.substring(u.username,0,1))}">U</div>
                         <span th:text="${u.username}"></span>
+                        <span class="badge bg-warning text-dark" th:unless="${u.verified}" th:text="#{admin_users.unverified}">Unverified</span>
                     </div>
                 </td>
                 <td th:text="${u.email}"></td>
                 <td>
                     <span class="badge" th:classappend="${u.role == 'ROLE_LIBRARIAN'} ? 'bg-dark' : 'bg-secondary'"
-                          th:text="${u.role == 'ROLE_LIBRARIAN'} ? 'Librarian' : 'Reader'"></span>
+                          th:text="${u.role == 'ROLE_LIBRARIAN'} ? #{admin_users.librarian} : #{admin_users.reader}"></span>
                 </td>
                 <td>
                     <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" class="d-flex gap-2">
@@ -128,5 +168,6 @@
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:src="@{/js/admin-users.js}"></script>
 </body>
 </html>
