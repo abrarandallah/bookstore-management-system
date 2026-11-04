@@ -122,8 +122,43 @@
 </div>
 </main>
 
+
+<!--/* Shown when a visitor WITHOUT an account reaches the end: a small celebration, a nudge to
+       register (their progress can only be saved with an account), and three similar books. */-->
+<div class="finish-overlay" id="guest-finish" hidden sec:authorize="isAnonymous()">
+    <div class="finish-card" role="dialog" aria-modal="true" aria-labelledby="guest-finish-title">
+        <button type="button" class="finish-close" id="guest-finish-close" th:aria-label="#{fragments_layout.close}">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+        <div class="finish-medal" aria-hidden="true"><i class="fa-solid fa-medal"></i></div>
+        <h2 id="guest-finish-title" th:text="#{bookRead.finish.title(${localizedBook.name})}">Nicely done!</h2>
+        <p class="finish-sub" th:text="#{bookRead.finish.sub}">Create a free account to save your progress, keep a reading history and earn badges.</p>
+        <div class="finish-actions">
+            <a th:href="@{/register}" class="btn btn-primary" id="guest-finish-primary" th:text="#{bookRead.create.an.account}">Create an account</a>
+            <a th:href="@{/login}" class="btn btn-outline-brass" th:text="#{bookRead.log.in}">Log in</a>
+        </div>
+        <th:block th:with="more=${@homeShelves.relatedBooks(book.id, null, #locale.language)}">
+        <div class="finish-more" th:if="${!#lists.isEmpty(more)}">
+            <span class="eyebrow d-block mb-2" th:text="#{bookRead.finish.more}">More like this</span>
+            <div class="finish-more-list">
+                <a class="finish-more-item" th:each="item : ${more}"
+                   th:href="@{/available_books/{id}/read(id=${item.book.id})}"
+                   th:style="'--spine-color: hsl(' + ${T(java.lang.Math).abs(item.book.name.hashCode()) % 360} + ', 42%, 34%)'">
+                    <span class="finish-more-cover">
+                        <img th:if="${!#strings.isEmpty(item.book.coverImageUrl)}" th:src="@{${item.book.coverImageUrl}}" th:alt="${item.name}" loading="lazy">
+                        <i th:if="${#strings.isEmpty(item.book.coverImageUrl)}" class="fa-solid fa-book-open" aria-hidden="true"></i>
+                    </span>
+                    <span class="finish-more-title" th:text="${item.name}">Title</span>
+                </a>
+            </div>
+        </div>
+        </th:block>
+        <button type="button" class="finish-keep" id="guest-finish-keep" th:text="#{bookRead.finish.close}">Keep browsing</button>
+    </div>
+</div>
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:src="@{/js/reader-finish.js}"></script>
 <script th:inline="javascript">
     let readerIndex = /*[[${resumePage}]]*/ 0;
     const readerTotal = /*[[${#lists.size(book.takeaways)}]]*/ 0;
@@ -214,7 +249,11 @@
             if (isLoggedIn) {
                 document.getElementById('finish-form').submit();
             } else {
-                window.showToast(readerI18n.loginToSave, { icon: 'circle-info' });
+                if (window.showGuestFinish) {
+                    window.showGuestFinish();
+                } else {
+                    window.showToast(readerI18n.loginToSave, { icon: 'circle-info' });
+                }
             }
             return;
         }
