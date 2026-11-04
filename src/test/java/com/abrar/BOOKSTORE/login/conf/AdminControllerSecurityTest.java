@@ -219,4 +219,30 @@ class AdminControllerSecurityTest {
 
                 org.mockito.Mockito.verify(genreService).rename(1, "Science Fiction");
         }
+
+        @Test
+        void testCreateUserRejectsARegularUser() throws Exception {
+                mockMvc.perform(post("/admin/users/create").with(asUser("reader", "ROLE_USER")).with(csrf())
+                                .param("username", "newbie").param("email", "n@example.com")
+                                .param("password", "longenough1"))
+                                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void testCreateUserSavesAVerifiedUserForALibrarian() throws Exception {
+                mockMvc.perform(post("/admin/users/create").with(asUser("librarian", "ROLE_LIBRARIAN")).with(csrf())
+                                .param("username", "newbie").param("email", "n@example.com")
+                                .param("password", "longenough1").param("role", "ROLE_USER"))
+                                .andExpect(status().is3xxRedirection());
+                org.mockito.Mockito.verify(userRepository).save(any(User.class));
+        }
+
+        @Test
+        void testCreateUserRejectsAShortPassword() throws Exception {
+                mockMvc.perform(post("/admin/users/create").with(asUser("librarian", "ROLE_LIBRARIAN")).with(csrf())
+                                .param("username", "newbie").param("email", "n@example.com")
+                                .param("password", "short"))
+                                .andExpect(status().is3xxRedirection());
+                org.mockito.Mockito.verify(userRepository, org.mockito.Mockito.never()).save(any(User.class));
+        }
 }
