@@ -3117,3 +3117,8 @@ body.finish-open { overflow: hidden; }
 html { scroll-behavior: smooth; }
 ::selection { background: rgba(163, 57, 74, 0.28); }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+
+/* Page-to-page fade: browsers that support it keep the old page on screen until the
+   next one is ready, so moving between pages feels instant instead of flashing white. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.18s; }
